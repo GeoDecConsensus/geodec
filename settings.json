@@ -1,0 +1,38 @@
+{
+    "testbed": "hotstuff",
+    "key": {
+        "name": "sm_matterlabs_dev",
+        "path": "/home/sm_matterlabs_dev/.ssh/google_compute_engine"
+    },
+    "ports": {
+        "consensus": 8000,
+        "mempool": 7000,
+        "front": 6000
+    },
+    "repo": {
+        "name": "geodec-hotstuff",
+        "url": "https://github.com/sm86/geodec-hotstuff.git",
+        "branch": "main"
+    },
+    "geodec": {
+        "interface": "ens3", 
+        "servers_file" : "/home/ubuntu/data/servers-2020-07-19.csv", 
+        "ip_file" : "/home/ubuntu/IP.txt", 
+        "pings_grouped_file" : "/home/ubuntu/data/pings-2020-07-19-2020-07-20-grouped.csv", 
+        "pings_file" : "/home/ubuntu/data/pings-2020-07-19-2020-07-20.csv"
+    },
+    "instances": {
+        "type": "m5d.8xlarge",
+        "regions": [
+            "us-east-1",
+            "eu-north-1",
+            "ap-southeast-2",
+            "us-west-1",
+            "ap-northeast-1"
+        ]
+    },
+    "configuration": {
+        "provider" : "google_compute_engine",
+        "ip_file" : "/home/sm_matterlabs_dev/gcp-scripts/instances_ip.csv"
+    }
+}
