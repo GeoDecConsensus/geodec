@@ -93,7 +93,7 @@ def install(ctx):
 
 
 @task
-def remote(ctx):
+def remote(ctx, consensus):
     ''' Run benchmarks on a cluster'''
     
     bench_params = {
@@ -120,7 +120,7 @@ def remote(ctx):
   
     
     try:
-        Bench(ctx).run(bench_params, node_params, None, debug=False)
+        Bench(ctx, consensus).run(bench_params, node_params, None, debug=False)
     except BenchError as e:
         Print.error(e)
 
