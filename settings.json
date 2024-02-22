@@ -41,7 +41,7 @@
         "cometbft": {
             "testbed": "cometbft",
             "key": {
-                "name": "naman-geodec.crash",
+                "name": "naman-geodec",
                 "path": "/home/ubuntu/naman-geodec.crash"
             },
             "ports": {
@@ -50,9 +50,9 @@
                 "front": 6000
             },
             "repo": {
-                "name": "geodec",
-                "url": "https://github.com/GeoDecConsensus/geodec.git",
-                "branch": "cometbft-develop"
+                "name": "cometbft",
+                "url": "https://github.com/cometbft/cometbft.git",
+                "branch": "v0.38.5"
             },
             "geodec": {
                 "interface": "ens3",

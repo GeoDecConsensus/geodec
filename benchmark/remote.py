@@ -19,6 +19,8 @@ from benchmark.instance import InstanceManager
 # from benchmark.geodec import GeoDec
 # from benchmark.geo_logs import GeoLogParser
 
+from benchmark.mechanisms.cometbft import CometBftMechanism
+from benchmark.mechanisms.hotstuff import HotStuffMechanism
 
 class FabricError(Exception):
     ''' Wrapper for Fabric exception with a meaningfull error message. '''
@@ -34,9 +36,20 @@ class ExecutionError(Exception):
 
 
 class Bench:
-    def __init__(self, ctx, consensus):
-        self.manager = InstanceManager.make(consensus)
+    def __init__(self, ctx, mechanism):
+        consensusMechanisms = ["cometbft", "hotstuff"]
+        if mechanism not in consensusMechanisms:
+            raise BenchError('Consensus mechanism support not available', e)
+
+        self.manager = InstanceManager.make(mechanism)
         self.settings = self.manager.settings
+
+        if mechanism == "cometbft":
+            self.mechanism = CometBftMechanism(self.settings)
+        # else if consensus == "hotsuff"
+        else: # considering default mechaism as hotstuff
+            self.mechanism = HotStuffMechanism()   
+ 
         try:
             ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(
                 self.manager.settings.key_path
@@ -55,35 +68,19 @@ class Bench:
                 raise ExecutionError(output.stderr)
 
     def install(self):
-        Print.info('Installing rust and cloning the repo...')
-        cmd = [
-            'sudo apt-get update',
-            'sudo apt-get -y upgrade',
-            'sudo apt-get -y autoremove',
+        Print.info(f'Installing {self.settings.testbed}')
+        cmd = self.mechanism.cmd
 
-            # The following dependencies prevent the error: [error: linker `cc` not found].
-            'sudo apt-get -y install build-essential',
-            'sudo apt-get -y install cmake',
-
-            # Install rust (non-interactive).
-            'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y',
-            'source $HOME/.cargo/env',
-            'rustup default stable',
-
-            # This is missing from the Rocksdb installer (needed for Rocksdb).
-            'sudo apt-get install -y clang',
-
-            # Clone the repo.
-            f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))'
-        ]
-        hosts = self.manager.hosts(flat=True)
-        try:
-            g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-            g.run(' && '.join(cmd), hide=True)
-            Print.heading(f'Initialized testbed of {len(hosts)} nodes')
-        except (GroupException, ExecutionError) as e:
-            e = FabricError(e) if isinstance(e, GroupException) else e
-            raise BenchError('Failed to install repo on testbed', e)
+        # hosts = self.manager.hosts(flat=True)
+        # print(hosts)
+        hosts = self.manager.print_info()
+        # try:
+        #     g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
+        #     g.run(' && '.join(cmd), hide=False)
+        #     Print.heading(f'Initialized testbed of {len(hosts)} nodes')
+        # except (GroupException, ExecutionError) as e:
+        #     e = FabricError(e) if isinstance(e, GroupException) else e
+        #     raise BenchError('Failed to install repo on testbed', e)
 
     def kill(self, hosts=[], delete_logs=False):
         assert isinstance(hosts, list)
@@ -137,7 +134,7 @@ class Bench:
             check_repo_cmd,
             f'(cd {self.settings.repo_name} && git fetch -f)',
             f'(cd {self.settings.repo_name} && git checkout -f {self.settings.branch})',
-            f'(cd {self.settings.repo_name} && git pull -f)',
+            f'(cd {self.settings.repo_name} && git pull origin -f)',
             'source $HOME/.cargo/env',
             f'(cd {self.settings.repo_name}/node && {CommandMaker.compile()})',
             CommandMaker.alias_binaries(
@@ -308,12 +305,12 @@ class Bench:
             return
 
 
-        # # Update nodes.
-        # try:
-        #     self._update(selected_hosts)
-        # except (GroupException, ExecutionError) as e:
-        #     e = FabricError(e) if isinstance(e, GroupException) else e
-        #     raise BenchError('Failed to update nodes', e)
+        # Update nodes.
+        try:
+            self._update(selected_hosts)
+        except (GroupException, ExecutionError) as e:
+            e = FabricError(e) if isinstance(e, GroupException) else e
+            raise BenchError('Failed to update nodes', e)
         
         # # # Set delay parameters.
         # try:

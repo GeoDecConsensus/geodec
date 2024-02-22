@@ -84,16 +84,16 @@ def info(ctx):
 
 
 @task
-def install(ctx):
+def install(ctx, mechanism):
     ''' Install the codebase on all machines '''
     try:
-        Bench(ctx).install()
+        Bench(ctx, mechanism).install()
     except BenchError as e:
         Print.error(e)
 
 
 @task
-def remote(ctx, consensus):
+def remote(ctx, mechanism):
     ''' Run benchmarks on a cluster'''
     
     bench_params = {
@@ -120,7 +120,7 @@ def remote(ctx, consensus):
   
     
     try:
-        Bench(ctx, consensus).run(bench_params, node_params, None, debug=False)
+        Bench(ctx, mechanism).run(bench_params, node_params, None, debug=False)
     except BenchError as e:
         Print.error(e)
 

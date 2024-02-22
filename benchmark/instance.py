@@ -35,6 +35,7 @@ class InstanceManager:
         # 'terminated', 'stopping', and 'stopped'.
         ids, ips = defaultdict(list), defaultdict(list)
         for region, client in self.clients.items():
+            # Code Breaking here!
             r = client.describe_instances(
                 Filters=[
                     {
@@ -48,6 +49,7 @@ class InstanceManager:
                 ]
             )
             instances = [y for x in r['Reservations'] for y in x['Instances']]
+            print(instances)
             for x in instances:
                 ids[region] += [x['InstanceId']]
                 if 'PublicIpAddress' in x:
