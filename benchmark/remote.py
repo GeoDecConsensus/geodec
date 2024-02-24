@@ -46,9 +46,8 @@ class Bench:
 
         if mechanism == "cometbft":
             self.mechanism = CometBftMechanism(self.settings)
-        # else if consensus == "hotsuff"
-        else: # considering default mechaism as hotstuff
-            self.mechanism = HotStuffMechanism()   
+        else if mechanism == "hotsuff"
+            self.mechanism = HotStuffMechanism(self.settings)   
  
         try:
             ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(
@@ -71,16 +70,17 @@ class Bench:
         Print.info(f'Installing {self.settings.testbed}')
         cmd = self.mechanism.cmd
 
+        hosts = self._select_hosts(4)
+
         # hosts = self.manager.hosts(flat=True)
-        # print(hosts)
-        hosts = self.manager.print_info()
-        # try:
-        #     g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-        #     g.run(' && '.join(cmd), hide=False)
-        #     Print.heading(f'Initialized testbed of {len(hosts)} nodes')
-        # except (GroupException, ExecutionError) as e:
-        #     e = FabricError(e) if isinstance(e, GroupException) else e
-        #     raise BenchError('Failed to install repo on testbed', e)
+
+        try:
+            g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
+            g.run(' && '.join(cmd), hide=True)
+            Print.heading(f'Initialized testbed of {len(hosts)} nodes')
+        except (GroupException, ExecutionError) as e:
+            e = FabricError(e) if isinstance(e, GroupException) else e
+            raise BenchError('Failed to install repo on testbed', e)
 
     def kill(self, hosts=[], delete_logs=False):
         assert isinstance(hosts, list)
@@ -321,48 +321,44 @@ class Bench:
         #     e = FabricError(e) if isinstance(e, GroupException) else e
         #     Print.error(BenchError('Failed to initalize delays', e))
          
-        print(bench_parameters.nodes)
-        print(bench_parameters.rate)
-        print(self.settings.testbed)
         # Run benchmarks.
         for n in bench_parameters.nodes:
             for r in bench_parameters.rate:
-                print(n, r)
                 Print.heading(f'\nRunning {n} nodes (input rate: {r:,} tx/s)')
                 hosts = selected_hosts[:n]
 
-                # # Upload all configuration files.
-                # try:
-                #     self._config(hosts, node_parameters)
-                # except (subprocess.SubprocessError, GroupException) as e:
-                #     e = FabricError(e) if isinstance(e, GroupException) else e
-                #     Print.error(BenchError('Failed to configure nodes', e))
-                #     continue
+                # Upload all configuration files.
+                try:
+                    self._config(hosts, node_parameters)
+                except (subprocess.SubprocessError, GroupException) as e:
+                    e = FabricError(e) if isinstance(e, GroupException) else e
+                    Print.error(BenchError('Failed to configure nodes', e))
+                    continue
 
-                # # Do not boot faulty nodes.
-                # faults = bench_parameters.faults
-                # hosts = hosts[:n-faults]
+                # Do not boot faulty nodes.
+                faults = bench_parameters.faults
+                hosts = hosts[:n-faults]
                 
-        #         run_id_array = []
+                # run_id_array = []
                 
-        #         # Run the benchmark.
-        #         for i in range(bench_parameters.runs):
-        # #             run_id = GeoLogParser.get_new_run_id()
-        # #             Print.heading(f'Run {i+1}/{bench_parameters.runs} with run_id {run_id}')
-        #             try:
-        #                 self._run_single(
-        #                     hosts, r, bench_parameters, node_parameters, debug
-        #                 )
-        #                 self._logs(hosts, faults).print(PathMaker.result_file(
-        #                     faults, n, r, bench_parameters.tx_size
-        #                 ))
-        # #                 run_id_array.append(run_id)
-        #             except (subprocess.SubprocessError, GroupException, ParseError) as e:
-        #                 self.kill(hosts=hosts)
-        #                 if isinstance(e, GroupException):
-        #                     e = FabricError(e)
-        #                 Print.error(BenchError('Benchmark failed', e))
-        #                 continue
+                # Run the benchmark.
+                for i in range(bench_parameters.runs):
+        #             run_id = GeoLogParser.get_new_run_id()
+        #             Print.heading(f'Run {i+1}/{bench_parameters.runs} with run_id {run_id}')
+                    try:
+                        self._run_single(
+                            hosts, r, bench_parameters, node_parameters, debug
+                        )
+                        self._logs(hosts, faults).print(PathMaker.result_file(
+                            faults, n, r, bench_parameters.tx_size
+                        ))
+        #                 run_id_array.append(run_id)
+                    except (subprocess.SubprocessError, GroupException, ParseError) as e:
+                        self.kill(hosts=hosts)
+                        if isinstance(e, GroupException):
+                            e = FabricError(e)
+                        Print.error(BenchError('Benchmark failed', e))
+                        continue
                 
         #         aggregated_results = GeoLogParser.aggregate_runs(run_id_array)
         #         print(aggregated_results)

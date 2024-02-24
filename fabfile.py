@@ -75,10 +75,10 @@ def stop(ctx):
 
 
 @task
-def info(ctx):
+def info(ctx, mechanism):
     ''' Display connect information about all the available machines '''
     try:
-        InstanceManager.make().print_info()
+        InstanceManager.make(mechanism).print_info()
     except BenchError as e:
         Print.error(e)
 
@@ -120,7 +120,7 @@ def remote(ctx, mechanism):
   
     
     try:
-        Bench(ctx, mechanism).run(bench_params, node_params, None, debug=False)
+        Bench(ctx, mechanism).run(bench_params, node_params, None, debug=True)
     except BenchError as e:
         Print.error(e)
 
@@ -154,7 +154,7 @@ def georemote(ctx):
   
     
     try:
-        Bench(ctx).run(bench_params, node_params, geoInput, debug=False)
+        Bench(ctx).run(bench_params, node_params, geoInput, debug=True)
     except BenchError as e:
         Print.error(e)
 

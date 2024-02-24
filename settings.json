@@ -3,8 +3,8 @@
         "hotstuff": {
             "testbed": "hotstuff",
             "key": {
-                "name": "naman-geodec.crash",
-                "path": "/home/ubuntu/naman-geodec.crash"
+                "name": "ubuntu",
+                "path": "/home/ubuntu/.ssh/geodec"
             },
             "ports": {
                 "consensus": 8000,
@@ -12,9 +12,9 @@
                 "front": 6000
             },
             "repo": {
-                "name": "geodec",
-                "url": "https://github.com/GeoDecConsensus/geodec.git",
-                "branch": "hotstuff-develop"
+                "name": "geodec-hotstuff",
+                "url": "https://github.com/sm86/geodec-hotstuff.git",
+                "branch": "main"
             },
             "geodec": {
                 "interface": "ens3",
@@ -41,8 +41,8 @@
         "cometbft": {
             "testbed": "cometbft",
             "key": {
-                "name": "naman-geodec",
-                "path": "/home/ubuntu/naman-geodec.crash"
+                "name": "ubuntu",
+                "path": "/home/ubuntu/.ssh/geodec"
             },
             "ports": {
                 "consensus": 8000,
