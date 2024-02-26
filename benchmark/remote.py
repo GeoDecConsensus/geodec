@@ -6,6 +6,7 @@ from os.path import basename, splitext
 from time import sleep
 from math import ceil
 from os.path import join
+from json import dump, load
 
 import csv
 import subprocess
@@ -48,7 +49,7 @@ class Bench:
             self.mechanism = CometBftMechanism(self.settings)
         elif mechanism == "hotsuff":
             self.mechanism = HotStuffMechanism(self.settings)   
- 
+
         try:
             ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(
                 self.manager.settings.key_path
@@ -69,7 +70,7 @@ class Bench:
 
     def install(self):
         Print.info(f'Installing {self.settings.testbed}')
-        cmd = self.mechanism.make_cmd
+        cmd = self.mechanism.cmd
 
         hosts = self._select_hosts(4)
 
@@ -106,6 +107,7 @@ class Bench:
                     addrs.append(row['Internal IP'])
             else:
                  addrs = [line.strip() for line in f.readlines()]
+        Print.info(f"Inside select_hosts={addrs}")
         return addrs[:num]
         # # Ensure there are enough hosts.
         # hosts = self.manager.hosts()
@@ -118,12 +120,20 @@ class Bench:
         # return ordered[:nodes]
 
     def _background_run(self, host, command, log_file):
-        name = splitext(basename(log_file))[0]
-        cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
-        # NOTE: Here the cmd is ran on a single instance
-        c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-        output = c.run(cmd, hide=True)
-        self._check_stderr(output)
+        if self.mechanism.name == 'hotstuff':
+            name = splitext(basename(log_file))[0]
+            cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
+            # NOTE: Here the cmd is ran on a single instance
+            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+            output = c.run(cmd, hide=True)
+            self._check_stderr(output)
+        
+        elif self.mechanism.name == 'cometbft':
+            cmd = f'tmux new -d -s "latest" "{command}"'
+            # NOTE: Here the cmd is ran on a single instance
+            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+            output = c.run(cmd, hide=True)
+            self._check_stderr(output)
 
     def _update(self, hosts):
         Print.info(
@@ -198,19 +208,37 @@ class Bench:
 
         elif self.mechanism.name == 'cometbft':
             
-            len_hosts = len(hosts)
+            # Create persistent peers
+            PathMaker.persistent_peers()
+
+            hosts_string = " ".join(hosts)
+            
+
+            # cmd = [f'~/cometbft show_node_id --home ./mytestnet/node{i}']
+            with open('persistent_peer.txt', 'w') as f:
+                f.write("")
+                f.close()
+
+            Print.info("Combined string=" + hosts_string)
+
+            # Run the bash file and store the ouput in this file
+            cmd = [
+                # 'chmod u+x ./persistent.sh',
+                f'./persistent.sh {hosts_string}'
+            ]
+            subprocess.run(cmd, shell=True)
+            
             # Create testnet config files
             cmd = [
-                f'./cometbft testnet --v {len(hosts)} --o ./cometbft-testnet' 
+                f'~/cometbft testnet --v {len(hosts)}' 
             ]
-            subprocess.run([cmd], shell=True)
+            subprocess.run(cmd, shell=True)
 
             progress = progress_bar(hosts, prefix='Uploading config files:')
-            for i, host in enumerate(progress):
-                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-                c.put(PathMaker.committee_file(), '.')
-                c.put(PathMaker.key_file(i), '.')
-                c.put(PathMaker.parameters_file(), '.')
+            for i, host in enumerate(hosts):
+                print(host)
+                cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./mytestnet/node{i} ubuntu@{host}:~/']
+                subprocess.run(cmd, shell=True)
 
     def _run_single(self, hosts, rate, bench_parameters, node_parameters, debug=False):
         Print.info('Booting testbed...')
@@ -218,47 +246,68 @@ class Bench:
         # Kill any potentially unfinished run and delete logs.
         self.kill(hosts=hosts, delete_logs=True)
 
-        # Run the clients (they will wait for the nodes to be ready).
-        # Filter all faulty nodes from the client addresses (or they will wait
-        # for the faulty nodes to be online).
-        committee = Committee.load(PathMaker.committee_file())
-        addresses = [f'{x}:{self.settings.front_port}' for x in hosts]
-        rate_share = ceil(rate / committee.size())  # Take faults into account.
-        timeout = node_parameters.timeout_delay
-        client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
-        for host, addr, log_file in zip(hosts, addresses, client_logs):
-            cmd = CommandMaker.run_client(
-                addr,
-                bench_parameters.tx_size,
-                rate_share,
-                timeout,
-                nodes=addresses
-            )
-            self._background_run(host, cmd, log_file)
+        if self.mechanism.name == 'hotstuff':
+            # Run the clients (they will wait for the nodes to be ready).
+            # Filter all faulty nodes from the client addresses (or they will wait
+            # for the faulty nodes to be online).
+            committee = Committee.load(PathMaker.committee_file())
+            addresses = [f'{x}:{self.settings.front_port}' for x in hosts]
+            rate_share = ceil(rate / committee.size())  # Take faults into account.
+            timeout = node_parameters.timeout_delay
+            client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
+            for host, addr, log_file in zip(hosts, addresses, client_logs):
+                cmd = CommandMaker.run_client(
+                    addr,
+                    bench_parameters.tx_size,
+                    rate_share,
+                    timeout,
+                    nodes=addresses
+                )
+                self._background_run(host, cmd, log_file)
 
-        # Run the nodes.
-        key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
-        dbs = [PathMaker.db_path(i) for i in range(len(hosts))]
-        node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
-        for host, key_file, db, log_file in zip(hosts, key_files, dbs, node_logs):
-            cmd = CommandMaker.run_node(
-                key_file,
-                PathMaker.committee_file(),
-                db,
-                PathMaker.parameters_file(),
-                debug=debug
-            )
-            self._background_run(host, cmd, log_file)
+            # Run the nodes.
+            key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
+            dbs = [PathMaker.db_path(i) for i in range(len(hosts))]
+            node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
+            for host, key_file, db, log_file in zip(hosts, key_files, dbs, node_logs):
+                cmd = CommandMaker.run_node(
+                    key_file,
+                    PathMaker.committee_file(),
+                    db,
+                    PathMaker.parameters_file(),
+                    debug=debug
+                )
+                self._background_run(host, cmd, log_file)
 
-        # Wait for the nodes to synchronize
-        Print.info('Waiting for the nodes to synchronize...')
-        sleep(2 * node_parameters.timeout_delay / 1000)
+            # Wait for the nodes to synchronize
+            Print.info('Waiting for the nodes to synchronize...')
+            sleep(2 * node_parameters.timeout_delay / 1000)
 
-        # Wait for all transactions to be processed.
-        duration = bench_parameters.duration
-        for _ in progress_bar(range(20), prefix=f'Running benchmark ({duration} sec):'):
-            sleep(ceil(duration / 20))
-        self.kill(hosts=hosts, delete_logs=False)
+            # Wait for all transactions to be processed.
+            duration = bench_parameters.duration
+            for _ in progress_bar(range(20), prefix=f'Running benchmark ({duration} sec):'):
+                sleep(ceil(duration / 20))
+            self.kill(hosts=hosts, delete_logs=False)
+
+        elif self.mechanism.name == 'cometbft':
+            persistent_peers = []
+            
+            with open('persistent_peer.txt', 'r') as f:
+                # dump('content', f, indent=4, sort_keys=True)
+                persistent_peers = f.read()
+                persistent_peers = persistent_peers[:-2]
+                # persistent_peers = persistent_peers_content.split(",")
+
+            print(persistent_peers)
+
+            for i, host in enumerate(hosts):
+                
+                cmd = [
+                    f'~/cometbft node --home ./mytestnet/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}"'
+                ]
+                self._background_run(host, cmd, "")
+            # self.kill(hosts=hosts, delete_logs=False)
+
 
     def _logs(self, hosts, faults): #, servers, run_id):
        # Delete local logs (if any).
@@ -371,9 +420,9 @@ class Bench:
                         self._run_single(
                             hosts, r, bench_parameters, node_parameters, debug
                         )
-                        self._logs(hosts, faults).print(PathMaker.result_file(
-                            faults, n, r, bench_parameters.tx_size
-                        ))
+                        # self._logs(hosts, faults).print(PathMaker.result_file(
+                        #     faults, n, r, bench_parameters.tx_size
+                        # ))
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)

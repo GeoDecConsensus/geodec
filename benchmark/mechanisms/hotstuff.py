@@ -1,6 +1,7 @@
 class HotStuffMechanism:
     def __init__(self, settings):
         self.settings = settings
+        self.name = 'hotstuff'
         print("Inside hotstuff")
 
         self.cmd = [
