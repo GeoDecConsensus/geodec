@@ -47,6 +47,7 @@ class Bench:
         if mechanism == "cometbft":
             self.mechanism = CometBftMechanism(self.settings)
         elif mechanism == "hotsuff":
+        elif mechanism == "hotsuff":
             self.mechanism = HotStuffMechanism(self.settings)   
  
         try:
@@ -69,7 +70,7 @@ class Bench:
 
     def install(self):
         Print.info(f'Installing {self.settings.testbed}')
-        cmd = self.mechanism.cmd
+        cmd = self.mechanism.make_cmd
 
         hosts = self._select_hosts(4)
 
@@ -77,7 +78,7 @@ class Bench:
 
         try:
             g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-            g.run(' && '.join(cmd), hide=True)
+            g.run(' && '.join(cmd), hide=False)
             Print.heading(f'Initialized testbed of {len(hosts)} nodes')
         except (GroupException, ExecutionError) as e:
             e = FabricError(e) if isinstance(e, GroupException) else e
@@ -149,50 +150,68 @@ class Bench:
     def _config(self, hosts, node_parameters):
         Print.info('Generating configuration files...')
 
-        # Cleanup all local configuration files.
-        cmd = CommandMaker.cleanup()
-        subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
+        if self.mechanism.name == 'hotstuff':
 
-        # Recompile the latest code.
-        cmd = CommandMaker.compile().split()
-        # FIXME: breaking here when standalone benchmark folder
-        subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path())
+            # Cleanup all local configuration files.
+            cmd = CommandMaker.cleanup()
+            subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
 
-        # Create alias for the client and nodes binary.
-        cmd = CommandMaker.alias_binaries(PathMaker.binary_path())
-        subprocess.run([cmd], shell=True)
+            # Recompile the latest code.
+            cmd = CommandMaker.compile().split()
+            # FIXME: breaking here when standalone benchmark folder
+            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path())
 
-        # Generate configuration files.
-        keys = []
-        key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
-        for filename in key_files:
-            cmd = CommandMaker.generate_key(filename).split()
-            subprocess.run(cmd, check=True)
-            keys += [Key.from_file(filename)]
+            # Create alias for the client and nodes binary.
+            cmd = CommandMaker.alias_binaries(PathMaker.binary_path())
+            subprocess.run([cmd], shell=True)
 
-        names = [x.name for x in keys]
-        consensus_addr = [f'{x}:{self.settings.consensus_port}' for x in hosts]
-        front_addr = [f'{x}:{self.settings.front_port}' for x in hosts]
-        mempool_addr = [f'{x}:{self.settings.mempool_port}' for x in hosts]
-        committee = Committee(names, consensus_addr, front_addr, mempool_addr)
-        committee.print(PathMaker.committee_file())
+            # Generate configuration files.
+            keys = []
+            key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
+            for filename in key_files:
+                cmd = CommandMaker.generate_key(filename).split()
+                subprocess.run(cmd, check=True)
+                keys += [Key.from_file(filename)]
 
-        node_parameters.print(PathMaker.parameters_file())
+            names = [x.name for x in keys]
+            consensus_addr = [f'{x}:{self.settings.consensus_port}' for x in hosts]
+            front_addr = [f'{x}:{self.settings.front_port}' for x in hosts]
+            mempool_addr = [f'{x}:{self.settings.mempool_port}' for x in hosts]
+            committee = Committee(names, consensus_addr, front_addr, mempool_addr)
+            committee.print(PathMaker.committee_file())
 
-        # NOTE Cleanup all nodes.
-        cmd = f'{CommandMaker.cleanup()} || true'
-        g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-        g.run(cmd, hide=True)
+            node_parameters.print(PathMaker.parameters_file())
 
-        # NOTE Upload configuration files.
-        progress = progress_bar(hosts, prefix='Uploading config files:')
-        for i, host in enumerate(progress):
-            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            c.put(PathMaker.committee_file(), '.')
-            c.put(PathMaker.key_file(i), '.')
-            c.put(PathMaker.parameters_file(), '.')
+            # NOTE Cleanup all nodes.
+            cmd = f'{CommandMaker.cleanup()} || true'
+            g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
+            g.run(cmd, hide=True)
 
-        return committee
+            # NOTE Upload configuration files.
+            progress = progress_bar(hosts, prefix='Uploading config files:')
+            for i, host in enumerate(progress):
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+                c.put(PathMaker.committee_file(), '.')
+                c.put(PathMaker.key_file(i), '.')
+                c.put(PathMaker.parameters_file(), '.')
+
+                return committee
+
+        elif self.mechanism.name == 'cometbft':
+            
+            len_hosts = len(hosts)
+            # Create testnet config files
+            cmd = [
+                f'./cometbft testnet --v {len(hosts)} --o ./cometbft-testnet' 
+            ]
+            subprocess.run([cmd], shell=True)
+
+            progress = progress_bar(hosts, prefix='Uploading config files:')
+            for i, host in enumerate(progress):
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+                c.put(PathMaker.committee_file(), '.')
+                c.put(PathMaker.key_file(i), '.')
+                c.put(PathMaker.parameters_file(), '.')
 
     def _run_single(self, hosts, rate, bench_parameters, node_parameters, debug=False):
         Print.info('Booting testbed...')
@@ -309,11 +328,12 @@ class Bench:
 
 
         # Update nodes.
-        try:
-            self._update(selected_hosts)
-        except (GroupException, ExecutionError) as e:
-            e = FabricError(e) if isinstance(e, GroupException) else e
-            raise BenchError('Failed to update nodes', e)
+        # NOTE: Leaving this out because cometbft doest need a repo
+        # try:
+        #     self._update(selected_hosts)
+        # except (GroupException, ExecutionError) as e:
+        #     e = FabricError(e) if isinstance(e, GroupException) else e
+        #     raise BenchError('Failed to update nodes', e)
         
         # # # Set delay parameters.
         # try:
