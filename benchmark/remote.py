@@ -46,7 +46,7 @@ class Bench:
 
         if mechanism == "cometbft":
             self.mechanism = CometBftMechanism(self.settings)
-        else if mechanism == "hotsuff"
+        elif mechanism == "hotsuff":
             self.mechanism = HotStuffMechanism(self.settings)   
  
         try:
@@ -61,6 +61,7 @@ class Bench:
         if isinstance(output, dict):
             for x in output.values():
                 if x.stderr:
+                    Print("ERROR in an instance")
                     raise ExecutionError(x.stderr)
         else:
             if output.stderr:
@@ -119,6 +120,7 @@ class Bench:
     def _background_run(self, host, command, log_file):
         name = splitext(basename(log_file))[0]
         cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
+        # NOTE: Here the cmd is ran on a single instance
         c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
         output = c.run(cmd, hide=True)
         self._check_stderr(output)
@@ -153,6 +155,7 @@ class Bench:
 
         # Recompile the latest code.
         cmd = CommandMaker.compile().split()
+        # FIXME: breaking here when standalone benchmark folder
         subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path())
 
         # Create alias for the client and nodes binary.
@@ -176,12 +179,12 @@ class Bench:
 
         node_parameters.print(PathMaker.parameters_file())
 
-        # Cleanup all nodes.
+        # NOTE Cleanup all nodes.
         cmd = f'{CommandMaker.cleanup()} || true'
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(cmd, hide=True)
 
-        # Upload configuration files.
+        # NOTE Upload configuration files.
         progress = progress_bar(hosts, prefix='Uploading config files:')
         for i, host in enumerate(progress):
             c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
