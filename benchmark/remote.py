@@ -107,7 +107,6 @@ class Bench:
                     addrs.append(row['Internal IP'])
             else:
                  addrs = [line.strip() for line in f.readlines()]
-        Print.info(f"Inside select_hosts={addrs}")
         return addrs[:num]
         # # Ensure there are enough hosts.
         # hosts = self.manager.hosts()
@@ -204,7 +203,7 @@ class Bench:
                 c.put(PathMaker.key_file(i), '.')
                 c.put(PathMaker.parameters_file(), '.')
 
-                return committee
+            return committee
 
         elif self.mechanism.name == 'cometbft':
             
@@ -369,7 +368,7 @@ class Bench:
 
         # Select which hosts to use.
         selected_hosts = self._select_hosts(bench_parameters.nodes[0])
-        print(selected_hosts)
+
         if len(selected_hosts) < bench_parameters.nodes[0]:
             Print.warn('There are not enough instances available')
             return
@@ -420,9 +419,9 @@ class Bench:
                         self._run_single(
                             hosts, r, bench_parameters, node_parameters, debug
                         )
-                        # self._logs(hosts, faults).print(PathMaker.result_file(
-                        #     faults, n, r, bench_parameters.tx_size
-                        # ))
+                        self._logs(hosts, faults).print(PathMaker.result_file(
+                            faults, n, r, bench_parameters.tx_size
+                        ))
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)
