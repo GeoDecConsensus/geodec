@@ -47,7 +47,7 @@ class Bench:
 
         if mechanism == "cometbft":
             self.mechanism = CometBftMechanism(self.settings)
-        elif mechanism == "hotsuff":
+        elif mechanism == "hotstuff":
             self.mechanism = HotStuffMechanism(self.settings)   
 
         try:
