@@ -24,9 +24,9 @@ class InstanceManager:
             self.clients[region] = boto3.client('ec2', region_name=region)
 
     @classmethod
-    def make(cls, settings_file='settings.json'):
+    def make(cls, consensus, settings_file='settings.json'):
         try:
-            return cls(Settings.load(settings_file))
+            return cls(Settings.load(settings_file, consensus))
         except SettingsError as e:
             raise BenchError('Failed to load settings', e)
 
@@ -35,6 +35,7 @@ class InstanceManager:
         # 'terminated', 'stopping', and 'stopped'.
         ids, ips = defaultdict(list), defaultdict(list)
         for region, client in self.clients.items():
+            # Code Breaking here!
             r = client.describe_instances(
                 Filters=[
                     {
@@ -48,6 +49,7 @@ class InstanceManager:
                 ]
             )
             instances = [y for x in r['Reservations'] for y in x['Instances']]
+            print(instances)
             for x in instances:
                 ids[region] += [x['InstanceId']]
                 if 'PublicIpAddress' in x:

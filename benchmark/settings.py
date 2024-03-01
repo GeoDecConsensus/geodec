@@ -53,10 +53,12 @@ class Settings:
 
         
     @classmethod
-    def load(cls, filename):
+    def load(cls, filename, consensus):
         try:
             with open(filename, 'r') as f:
                 data = load(f)
+
+            data = data["consensusMechanisms"][consensus]
 
             return cls(
                 data['testbed'],

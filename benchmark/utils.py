@@ -11,6 +11,10 @@ class BenchError(Exception):
 
 class PathMaker:
     @staticmethod
+    def persistent_peers():
+        return 'persistent_peers.json'
+        
+    @staticmethod
     def binary_path():
         return join('..', 'target', 'release')
 
