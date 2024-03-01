@@ -119,8 +119,8 @@ class Bench:
         # return ordered[:nodes]
 
     def _background_run(self, host, command, log_file):
+        name = splitext(basename(log_file))[0]
         if self.mechanism.name == 'hotstuff':
-            name = splitext(basename(log_file))[0]
             cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
             # NOTE: Here the cmd is ran on a single instance
             c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
@@ -128,8 +128,7 @@ class Bench:
             self._check_stderr(output)
         
         elif self.mechanism.name == 'cometbft':
-            cmd = f'tmux new -d -s "latest" "{command}"'
-            # NOTE: Here the cmd is ran on a single instance
+            cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
             c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
             output = c.run(cmd, hide=True)
             self._check_stderr(output)
@@ -211,14 +210,12 @@ class Bench:
             PathMaker.persistent_peers()
 
             hosts_string = " ".join(hosts)
-            
+            Print.info("Combined string=" + hosts_string)
 
             # cmd = [f'~/cometbft show_node_id --home ./mytestnet/node{i}']
             with open('persistent_peer.txt', 'w') as f:
                 f.write("")
                 f.close()
-
-            Print.info("Combined string=" + hosts_string)
 
             # Run the bash file and store the ouput in this file
             cmd = [
@@ -236,7 +233,8 @@ class Bench:
             progress = progress_bar(hosts, prefix='Uploading config files:')
             for i, host in enumerate(hosts):
                 print(host)
-                cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./mytestnet/node{i} ubuntu@{host}:~/']
+                # NOTE: Path of the node config files
+                cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec-hotstuff/benchmark/mytestnet/node{i} ubuntu@{host}:~/']
                 subprocess.run(cmd, shell=True)
 
     def _run_single(self, hosts, rate, bench_parameters, node_parameters, debug=False):
@@ -292,39 +290,43 @@ class Bench:
             persistent_peers = []
             
             with open('persistent_peer.txt', 'r') as f:
-                # dump('content', f, indent=4, sort_keys=True)
                 persistent_peers = f.read()
                 persistent_peers = persistent_peers[:-2]
-                # persistent_peers = persistent_peers_content.split(",")
-
             print(persistent_peers)
 
-            for i, host in enumerate(hosts):
-                
+            node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
+            for i, host, log_file in zip(len(hosts), hosts, node_logs):
                 cmd = [
-                    f'~/cometbft node --home ./mytestnet/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}"'
+                    f'~/cometbft node --home ./node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}"'
                 ]
-                self._background_run(host, cmd, "")
-            # self.kill(hosts=hosts, delete_logs=False)
+                print(cmd[0])
+                self._background_run(host, cmd, log_file)
+            
+            # Wait for the nodes to synchronize
+            Print.info('Waiting for the nodes to synchronize...')
+            sleep(2 * node_parameters.timeout_delay / 1000)
+
+            self.kill(hosts=hosts, delete_logs=False)
 
 
     def _logs(self, hosts, faults): #, servers, run_id):
-       # Delete local logs (if any).
-        cmd = CommandMaker.clean_logs()
-        subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
+        if self.mechanism.name == "hotstuff":
+            # Delete local logs (if any).
+            cmd = CommandMaker.clean_logs()
+            subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
 
-        # Download log files.
-        progress = progress_bar(hosts, prefix='Downloading logs:')
-        for i, host in enumerate(progress):
-            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-            c.get(
-                PathMaker.client_log_file(i), local=PathMaker.client_log_file(i)
-            )
+            # Download log files.
+            progress = progress_bar(hosts, prefix='Downloading logs:')
+            for i, host in enumerate(progress):
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+                c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
+                c.get(
+                    PathMaker.client_log_file(i), local=PathMaker.client_log_file(i)
+                )
 
-        # Parse logs and return the parser.
-        Print.info('Parsing logs and computing performance...')
-        return LogParser.process(PathMaker.logs_path(), faults=faults)
+            # Parse logs and return the parser.
+            Print.info('Parsing logs and computing performance...')
+            return LogParser.process(PathMaker.logs_path(), faults=faults)
         # # Delete local logs (if any).
         # cmd = CommandMaker.clean_logs()
         # subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
@@ -419,9 +421,10 @@ class Bench:
                         self._run_single(
                             hosts, r, bench_parameters, node_parameters, debug
                         )
-                        self._logs(hosts, faults).print(PathMaker.result_file(
-                            faults, n, r, bench_parameters.tx_size
-                        ))
+                        if self.mechanism.name == "hotstuff":
+                            self._logs(hosts, faults).print(PathMaker.result_file(
+                                faults, n, r, bench_parameters.tx_size
+                            ))
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)
