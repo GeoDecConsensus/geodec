@@ -4,15 +4,15 @@ GeoDec aims to address the geographic concentration of validator nodes in existi
 
 ### Progress
 
-1. **Emulator Development**
-   - [x] Develop HotStuff emulator
-   - [-] Extend emulator for Tendermint consensus mechanisms (like CometBFT)
-   - [ ] Extend emulator for BullShark consensus mechanism
-   - [ ] Implement and improvise a modular and extensible code structure
-   - [ ] Get feedback from the community on emulator
-   - [ ] Improve emulator based on feedback
+**Emulator Development**
+- [x] Develop HotStuff emulator
+- [-] Extend emulator for Tendermint consensus mechanisms (like CometBFT)
+- [ ] Extend emulator for BullShark consensus mechanism
+- [ ] Implement and improvise a modular and extensible code structure
+- [ ] Get feedback from the community on emulator
+- [ ] Improve emulator based on feedback
 
-2. **Research and Design**
+<!-- 2. **Research and Design**
    - [ ] Conduct in-depth research on existing proposer selection methods (if any)
    - [ ] Investigate geospatial factors impacting consensus mechanisms
    - [ ] Design a geospatial-aware proposer selection mechanism
@@ -28,7 +28,7 @@ GeoDec aims to address the geographic concentration of validator nodes in existi
   - [ ] Deploy the protocol with the revised proposer selection mechanism
   - [ ] Develop a user-friendly dashboard for visualizing geospatial data
   - [ ] Collect and analyze key metrics
-  - [ ] Evaluate the impact on decentralization
+  - [ ] Evaluate the impact on decentralization -->
 
 ### Vision
 Success for GeoDec entails advancing geospatial decentralization in blockchain validator networks. The desired impact includes the development of a widely-used open-source emulator, an effective mechanism for geographically decentralized block proposers, and influential academic research. The goal is to set new standards for blockchain networks globally.
@@ -39,4 +39,4 @@ Success for GeoDec entails advancing geospatial decentralization in blockchain v
 - Censorship pics, https://censorship.pics/, accessed 25th January 2024.
 
 ### Credits
-Huge thanks to [Alberto Sonnino](https://github.com/asonnino) for the initial hotstuff benchmark.
+Thanks to [Alberto Sonnino](https://github.com/asonnino) for the initial hotstuff benchmark.
