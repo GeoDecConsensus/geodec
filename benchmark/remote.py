@@ -205,34 +205,38 @@ class Bench:
             return committee
 
         elif self.mechanism.name == 'cometbft':
-            
+
+            # NOTE: Need to test # Cleanup node configuration files on hosts
+            # for i, host in enumerate(hosts):
+            #     cmd = CommandMaker.clean_node_config(i)
+            #     c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+            #     c.run([cmd], shell=True, stderr=subprocess.DEVNULL)
+
             # Create persistent peers
             PathMaker.persistent_peers()
 
             hosts_string = " ".join(hosts)
-            Print.info("Combined string=" + hosts_string)
+            Print.info("Combined hosts: " + hosts_string)
 
             # cmd = [f'~/cometbft show_node_id --home ./mytestnet/node{i}']
             with open('persistent_peer.txt', 'w') as f:
                 f.write("")
                 f.close()
 
+            # Create testnet config files
+            cmd = [f'~/cometbft testnet --v {len(hosts)}']
+            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            
             # Run the bash file and store the ouput in this file
             cmd = [
                 # 'chmod u+x ./persistent.sh',
                 f'./persistent.sh {hosts_string}'
             ]
             subprocess.run(cmd, shell=True)
-            
-            # Create testnet config files
-            cmd = [
-                f'~/cometbft testnet --v {len(hosts)}' 
-            ]
-            subprocess.run(cmd, shell=True)
 
             progress = progress_bar(hosts, prefix='Uploading config files:')
             for i, host in enumerate(hosts):
-                print(host)
+                Print.info("Sent node config file to " + host)
                 # NOTE: Path of the node config files
                 cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec-hotstuff/benchmark/mytestnet/node{i} ubuntu@{host}:~/']
                 subprocess.run(cmd, shell=True)
@@ -291,15 +295,12 @@ class Bench:
             
             with open('persistent_peer.txt', 'r') as f:
                 persistent_peers = f.read()
-                persistent_peers = persistent_peers[:-2]
+                persistent_peers = persistent_peers[:-1]
             print(persistent_peers)
 
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
-            for i, host, log_file in zip(len(hosts), hosts, node_logs):
-                cmd = [
-                    f'~/cometbft node --home ./node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}"'
-                ]
-                print(cmd[0])
+            for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
+                cmd = f'~/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}"'
                 self._background_run(host, cmd, log_file)
             
             # Wait for the nodes to synchronize

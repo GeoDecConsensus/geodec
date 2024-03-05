@@ -6,6 +6,10 @@ from benchmark.utils import PathMaker
 class CommandMaker:
 
     @staticmethod
+    def clean_node_config(i):
+        return (f'rm -rf ./node{i}')
+
+    @staticmethod
     def cleanup():
         return (
             f'rm -r .db-* ; rm .*.json ; mkdir -p {PathMaker.results_path()}'
