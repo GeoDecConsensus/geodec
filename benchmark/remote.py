@@ -206,11 +206,11 @@ class Bench:
 
         elif self.mechanism.name == 'cometbft':
 
-            # NOTE: Need to test # Cleanup node configuration files on hosts
-            # for i, host in enumerate(hosts):
-            #     cmd = CommandMaker.clean_node_config(i)
-            #     c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            #     c.run([cmd], shell=True, stderr=subprocess.DEVNULL)
+            # Cleanup node configuration files on hosts
+            for i, host in enumerate(hosts):
+                cmd = CommandMaker.clean_node_config(i)
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+                c.run(cmd, shell=True)
 
             # Create persistent peers
             PathMaker.persistent_peers()
@@ -296,7 +296,7 @@ class Bench:
             with open('persistent_peer.txt', 'r') as f:
                 persistent_peers = f.read()
                 persistent_peers = persistent_peers[:-1]
-            print(persistent_peers)
+            Print.info("Persistent Peers: " + persistent_peers)
 
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
