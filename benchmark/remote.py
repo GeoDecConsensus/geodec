@@ -310,11 +310,11 @@ class Bench:
 
 
     def _logs(self, hosts, faults): #, servers, run_id):
-        if self.mechanism.name == "hotstuff":
-            # Delete local logs (if any).
-            cmd = CommandMaker.clean_logs()
-            subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
+        # Delete local logs (if any).
+        cmd = CommandMaker.clean_logs()
+        subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
 
+        if self.mechanism.name == "hotstuff":
             # Download log files.
             progress = progress_bar(hosts, prefix='Downloading logs:')
             for i, host in enumerate(progress):
@@ -327,6 +327,18 @@ class Bench:
             # Parse logs and return the parser.
             Print.info('Parsing logs and computing performance...')
             return LogParser.process(PathMaker.logs_path(), faults=faults)
+        
+        elif self.mechanism.name == "cometbft":
+            # Download log files.
+            progress = progress_bar(hosts, prefix='Downloading logs:')
+            for i, host in enumerate(progress):
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+                c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
+
+            # Parse logs and return the parser.
+            Print.info('Parsing logs and computing performance...')
+            # return LogParser.process(PathMaker.logs_path(), faults=faults)
+
         # # Delete local logs (if any).
         # cmd = CommandMaker.clean_logs()
         # subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
@@ -425,6 +437,8 @@ class Bench:
                             self._logs(hosts, faults).print(PathMaker.result_file(
                                 faults, n, r, bench_parameters.tx_size
                             ))
+                        elif self.mechanism.name == "cometbft":
+                            self._logs(hosts, faults)
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)
