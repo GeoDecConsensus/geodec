@@ -16,7 +16,7 @@ class CometBftMechanism:
         self.name = 'cometbft'
         print("Inside CometBft")
 
-        self.cmd = [
+        self.old_cmd = [
             'sudo apt-get update',
             'sudo apt-get -y upgrade',
             'sudo apt-get -y autoremove',
@@ -28,35 +28,40 @@ class CometBftMechanism:
             'rm -rf cometbft-repo'
         ]
 
-        self.old_cmd = [
-            'sudo apt-get update',
-            'sudo apt-get -y upgrade',
-            'sudo apt-get -y autoremove',
-            
-            # Install required packages
-            'sudo apt-get install -y wget tar git make',
+        self.cmd = [
+            [
+                'sudo apt-get update',
+                'sudo apt-get -y upgrade',
+                'sudo apt-get -y autoremove',
+                
+                # Install required packages
+                'sudo apt-get install -y wget tar git make',
 
-            # Download and install Golang
-            'wget -c https://golang.org/dl/go1.21.6.linux-amd64.tar.gz',
-            'tar -xzf go1.21.6.linux-amd64.tar.gz',
-            #'sudo mv go /usr/local',
+                # Download Golang
+                'wget -c https://go.dev/dl/go1.21.8.linux-amd64.tar.gz',
+                
+                #Delete prev version and extract
+                # 'sudo rm -rf /usr/local/go && tar -xzf go1.21.8.linux-amd64.tar.gz',
+                'sudo rm -rf ~/go/ && tar -xzf go1.21.8.linux-amd64.tar.gz',
 
-            # Remove the tar.gz file
-            'rm go1.21.6.linux-amd64.tar.gz',
+                # Remove the tar.gz file
+                'rm go1.21.8.linux-amd64.tar.gz',
 
-            # 'echo export GOPATH=\"\$HOME/go\" >> ~/.profile',
-            # 'echo export PATH=\"\$PATH:\$GOPATH/bin\" >> ~/.profile',
-            # 'source ~/.profile',
+                # If you do bash_profile then the color in terminal will go as on load that config will be used
+                'echo export GOPATH=\"\$HOME/go\" >> ~/.profile',
+                'echo export PATH=\"\$PATH:\$GOPATH/bin\" >> ~/.profile',
+                # 'export PATH=$PATH:/usr/local/go/bin'
+                'source ~/.profile',
 
-            'echo \'export PATH=\$PATH:/usr/local/go/bin\' >> ~/.bashrc',
-            'source ~/.bashrc',
-
-            f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))',
-
-            # 'make install',
-            # 'make build',
-
-            # 'source ~/.profile'
+                 f'(git clone -b {self.settings.branch} {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))',
+            ],
+            [
+                'source ~/.profile',
+                f'cd {self.settings.repo_name}',
+                # f'git fetch -f && git checkout -f {self.settings.branch}',
+                'make install',
+                'make build',
+            ]
         ]
 
         self.rev_cmd = [

@@ -175,10 +175,10 @@ def plot(ctx):
 
 
 @task
-def kill(ctx):
+def kill(ctx, mechanism):
     ''' Stop any HotStuff execution on all machines '''
     try:
-        Bench(ctx).kill()
+        Bench(ctx, mechanism).kill()
     except BenchError as e:
         Print.error(e)
 

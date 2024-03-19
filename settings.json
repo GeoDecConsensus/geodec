@@ -52,7 +52,7 @@
             "repo": {
                 "name": "cometbft",
                 "url": "https://github.com/cometbft/cometbft.git",
-                "branch": "v0.38.5"
+                "branch": "v0.38.6"
             },
             "geodec": {
                 "interface": "ens3",

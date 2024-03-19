@@ -70,24 +70,26 @@ class Bench:
 
     def install(self):
         Print.info(f'Installing {self.settings.testbed}')
-        cmd = self.mechanism.cmd
+        cmds = self.mechanism.cmd
 
-        hosts = self._select_hosts(4)
+        hosts = self._select_hosts()
 
         # hosts = self.manager.hosts(flat=True)
-
-        try:
-            g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-            g.run(' && '.join(cmd), hide=False)
-            Print.heading(f'Initialized testbed of {len(hosts)} nodes')
-        except (GroupException, ExecutionError) as e:
-            e = FabricError(e) if isinstance(e, GroupException) else e
-            raise BenchError('Failed to install repo on testbed', e)
+        
+        for cmd in cmds:
+            try:
+                g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
+                g.run(' && '.join(cmd), hide=False)
+                Print.heading(f'Initialized testbed of {len(hosts)} nodes')
+            except (GroupException, ExecutionError) as e:
+                e = FabricError(e) if isinstance(e, GroupException) else e
+                raise BenchError('Failed to install repo on testbed', e)
 
     def kill(self, hosts=[], delete_logs=False):
         assert isinstance(hosts, list)
         assert isinstance(delete_logs, bool)
-        hosts = hosts if hosts else self.manager.hosts(flat=True)
+        # hosts = hosts if hosts else self.manager.hosts(flat=True)
+        hosts = self._select_hosts()
         delete_logs = CommandMaker.clean_logs() if delete_logs else 'true'
         cmd = [delete_logs, f'({CommandMaker.kill()} || true)']
         try:
@@ -96,7 +98,7 @@ class Bench:
         except GroupException as e:
             raise BenchError('Failed to kill nodes', FabricError(e))
 
-    def _select_hosts(self, num):
+    def _select_hosts(self):
         addrs = [] 
         # Retrieve values based on your scripts, note we use Internal IP addresses
         with open(self.settings.ip_file, 'r') as f:
@@ -107,7 +109,7 @@ class Bench:
                     addrs.append(row['Internal IP'])
             else:
                  addrs = [line.strip() for line in f.readlines()]
-        return addrs[:num]
+        return addrs
         # # Ensure there are enough hosts.
         # hosts = self.manager.hosts()
         # if sum(len(x) for x in hosts.values()) < nodes:
@@ -300,7 +302,7 @@ class Bench:
 
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
-                cmd = f'~/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}"'
+                cmd = f'cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=false'
                 self._background_run(host, cmd, log_file)
             
             # Wait for the nodes to synchronize
@@ -382,7 +384,8 @@ class Bench:
         # pingDelays = geodec.getPingDelay(geoInput, "/home/ubuntu/data/pings-2020-07-19-2020-07-20-grouped.csv", "/home/ubuntu/data/pings-2020-07-19-2020-07-20.csv")
 
         # Select which hosts to use.
-        selected_hosts = self._select_hosts(bench_parameters.nodes[0])
+        # selected_hosts = self._select_hosts(bench_parameters.nodes[0])
+        selected_hosts = self._select_hosts()
 
         if len(selected_hosts) < bench_parameters.nodes[0]:
             Print.warn('There are not enough instances available')
