@@ -37,26 +37,35 @@ class CommandMaker:
         return (f'sudo tc qdisc del dev {interface} parent root')
 
     @staticmethod
-    def run_node(keys, committee, store, parameters, debug=False):
+    def run_node(keys, committee, store, parameters, debug=False, mechanism='hotstuff'):
         assert isinstance(keys, str)
         assert isinstance(committee, str)
         assert isinstance(parameters, str)
         assert isinstance(debug, bool)
         v = '-vvv' if debug else '-vv'
-        return (f'./node {v} run --keys {keys} --committee {committee} '
-                f'--store {store} --parameters {parameters}')
-
+        if mechanism == 'hotstuff':
+            return (f'./node {v} run --keys {keys} --committee {committee} '
+                    f'--store {store} --parameters {parameters}')
+        elif mechanism == 'cometbft':
+            # incomplete
+            return (f'~/cometbft/build/cometbft node --home ~/node i --p2p.persistent_peers="{persistent_peers}" '
+                    f'--proxy_app=kvstore --consensus.create_empty_blocks=true')
+    
     @staticmethod
-    def run_client(address, size, rate, timeout, nodes=[]):
+    def run_client(address, size, rate, timeout, nodes=[], mechanism='hotstuff'):
         assert isinstance(address, str)
         assert isinstance(size, int) and size > 0
         assert isinstance(rate, int) and rate >= 0
         assert isinstance(nodes, list)
         assert all(isinstance(x, str) for x in nodes)
-        nodes = f'--nodes {" ".join(nodes)}' if nodes else ''
-        return (f'./client {address} --size {size} '
-                f'--rate {rate} --timeout {timeout} {nodes}')
-
+        if mechanism == 'hotstuff':
+            nodes = f'--nodes {" ".join(nodes)}' if nodes else ''
+            return (f'./client {address} --size {size} '
+                    f'--rate {rate} --timeout {timeout} {nodes}')
+        elif mechanism == 'cometbft':
+            return (f'~/cometbft/test/loadtime/build/load -c 1 --size {size} --rate {rate} --time {timeout}' 
+                    # f'--broadcast-tx-method async --endpoints ws://localhost:26657/websocket')
+                    f' --endpoints ws://localhost:26657/websocket -v --stats-output ~/cometbft/test/loadtime/out1.csv')
     @staticmethod
     def kill():
         return 'tmux kill-server'

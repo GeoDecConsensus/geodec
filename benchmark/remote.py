@@ -79,7 +79,7 @@ class Bench:
         for cmd in cmds:
             try:
                 g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-                g.run(' && '.join(cmd), hide=False)
+                g.run(' && '.join(cmd), hide=True)
                 Print.heading(f'Initialized testbed of {len(hosts)} nodes')
             except (GroupException, ExecutionError) as e:
                 e = FabricError(e) if isinstance(e, GroupException) else e
@@ -236,6 +236,18 @@ class Bench:
             ]
             subprocess.run(cmd, shell=True)
 
+            # # NOTE Build loadtest - Part of cometbft install
+            # Print.info('Building loadtest')
+            # cmd = [
+            #     'source ~/.profile',
+            #     'cd ~/cometbft/test/loadtime',
+            #     'make build',
+            #     '~/cometbft/test/loadtime/build/load version'
+            # ]
+            # g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
+            # g.run(' && '.join(cmd), hide=False)
+            
+            # NOTE Upload configuration files.
             progress = progress_bar(hosts, prefix='Uploading config files:')
             for i, host in enumerate(hosts):
                 Print.info("Sent node config file to " + host)
@@ -264,7 +276,8 @@ class Bench:
                     bench_parameters.tx_size,
                     rate_share,
                     timeout,
-                    nodes=addresses
+                    nodes=addresses,
+                    mechanism=self.mechanism.name
                 )
                 self._background_run(host, cmd, log_file)
 
@@ -278,7 +291,8 @@ class Bench:
                     PathMaker.committee_file(),
                     db,
                     PathMaker.parameters_file(),
-                    debug=debug
+                    debug=debug,
+                    mechanism=self.mechanism.name
                 )
                 self._background_run(host, cmd, log_file)
 
@@ -300,9 +314,29 @@ class Bench:
                 persistent_peers = persistent_peers[:-1]
             Print.info("Persistent Peers: " + persistent_peers)
 
+            # Run the nodes.
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
-                cmd = f'cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=false'
+                # cmd = f'source ~/.profile && cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=true'
+                cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,*:error" --consensus.create_empty_blocks=true'
+                self._background_run(host, cmd, log_file)
+            
+            # Run the clients
+            # committee = Committee.load(PathMaker.committee_file())
+            addresses = [f'{x}:{self.settings.front_port}' for x in hosts]
+            # rate_share = ceil(rate / committee.size())  # Take faults into account.
+            rate_share = ceil(rate / len(hosts))
+            timeout = node_parameters.timeout_delay
+            client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
+            for host, addr, log_file in zip(hosts, addresses, client_logs):
+                cmd = CommandMaker.run_client(
+                    addr,
+                    bench_parameters.tx_size,
+                    rate_share,
+                    timeout,
+                    nodes=addresses,
+                    mechanism=self.mechanism.name
+                )
                 self._background_run(host, cmd, log_file)
             
             # Wait for the nodes to synchronize
@@ -323,9 +357,7 @@ class Bench:
             for i, host in enumerate(progress):
                 c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-                c.get(
-                    PathMaker.client_log_file(i), local=PathMaker.client_log_file(i)
-                )
+                c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
 
             # Parse logs and return the parser.
             Print.info('Parsing logs and computing performance...')
@@ -337,6 +369,7 @@ class Bench:
             for i, host in enumerate(progress):
                 c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
+                c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
 
             # Parse logs and return the parser.
             Print.info('Parsing logs and computing performance...')

@@ -61,6 +61,8 @@ class CometBftMechanism:
                 # f'git fetch -f && git checkout -f {self.settings.branch}',
                 'make install',
                 'make build',
+                'cd ./test/loadtime',
+                'make build'
             ]
         ]
 
