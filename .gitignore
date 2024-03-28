@@ -140,3 +140,5 @@ cython_debug/
 mytestnet/
 
 *.json
+
+persistent_peer.txt
