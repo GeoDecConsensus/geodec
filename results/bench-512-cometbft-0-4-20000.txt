@@ -1,0 +1,63 @@
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,631 tx/s
+ Consensus BPS: 835,110 B/s
+ Consensus latency: 2,130 ms
+
+ End-to-end TPS: 1,619 tx/s
+ End-to-end BPS: 828,722 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY: Async client
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,036 tx/s
+ Consensus BPS: 530,519 B/s
+ Consensus latency: 638 ms
+
+ End-to-end TPS: 1,036 tx/s
+ End-to-end BPS: 530,421 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY: Sync client
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,049 tx/s
+ Consensus BPS: 537,065 B/s
+ Consensus latency: 718 ms
+
+ End-to-end TPS: 1,041 tx/s
+ End-to-end BPS: 532,754 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------

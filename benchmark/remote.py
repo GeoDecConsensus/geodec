@@ -22,6 +22,7 @@ from benchmark.instance import InstanceManager
 
 from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
+from benchmark.mechanisms.bullshark import BullSharkMechanism
 
 class FabricError(Exception):
     ''' Wrapper for Fabric exception with a meaningfull error message. '''
@@ -48,7 +49,9 @@ class Bench:
         if mechanism == "cometbft":
             self.mechanism = CometBftMechanism(self.settings)
         elif mechanism == "hotstuff":
-            self.mechanism = HotStuffMechanism(self.settings)   
+            self.mechanism = HotStuffMechanism(self.settings)
+        elif mechanism == "bullshark":
+            self.mechanism = BullSharkMechanism(self.settings)
 
         try:
             ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(
@@ -71,9 +74,7 @@ class Bench:
     def install(self):
         Print.info(f'Installing {self.settings.testbed}')
         cmds = self.mechanism.install_cmd
-
         hosts = self._select_hosts()
-
         # hosts = self.manager.hosts(flat=True)
         
         for cmd in cmds:
@@ -122,18 +123,10 @@ class Bench:
 
     def _background_run(self, host, command, log_file):
         name = splitext(basename(log_file))[0]
-        if self.mechanism.name == 'hotstuff':
-            cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
-            # NOTE: Here the cmd is ran on a single instance
-            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            output = c.run(cmd, hide=True)
-            self._check_stderr(output)
-        
-        elif self.mechanism.name == 'cometbft':
-            cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
-            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            output = c.run(cmd, hide=True)
-            self._check_stderr(output)
+        cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
+        c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+        output = c.run(cmd, hide=True)
+        self._check_stderr(output)
 
     def _update(self, hosts):
         Print.info(
@@ -274,16 +267,6 @@ class Bench:
                 )
                 self._background_run(host, cmd, log_file)
 
-            # Wait for the nodes to synchronize
-            Print.info('Waiting for the nodes to synchronize...')
-            sleep(2 * node_parameters.timeout_delay / 1000)
-
-            # Wait for all transactions to be processed.
-            duration = bench_parameters.duration
-            for _ in progress_bar(range(20), prefix=f'Running benchmark ({duration} sec):'):
-                sleep(ceil(duration / 20))
-            self.kill(hosts=hosts, delete_logs=False)
-
         elif self.mechanism.name == 'cometbft':
             persistent_peers = []
             
@@ -297,7 +280,7 @@ class Bench:
             addresses = [f'{x}:{self.settings.front_port}' for x in hosts]
             # rate_share = ceil(rate / committee.size())  # Take faults into account.
             rate_share = ceil(rate / len(hosts))
-            timeout = node_parameters.timeout_delay
+            timeout = int(node_parameters.timeout_delay / 1000) # In seconds
             client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
             for host, addr, log_file in zip(hosts, addresses, client_logs):
                 cmd = CommandMaker.run_client(
@@ -317,12 +300,16 @@ class Bench:
                 cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error" --consensus.create_empty_blocks=true'
                 # cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="*:debug,rpc-server:none" --consensus.create_empty_blocks=true'
                 self._background_run(host, cmd, log_file)
-            
-            # Wait for the nodes to synchronize
-            Print.info('Waiting for the nodes to synchronize...')
-            sleep(2 * node_parameters.timeout_delay / 1000)
 
-            self.kill(hosts=hosts, delete_logs=False)
+        # Wait for the nodes to synchronize
+        Print.info('Waiting for the nodes to synchronize...')
+        sleep(2 * node_parameters.timeout_delay / 1000)
+
+        # Wait for all transactions to be processed.
+        duration = bench_parameters.duration
+        for _ in progress_bar(range(20), prefix=f'Running benchmark ({duration} sec):'):
+            sleep(ceil(duration / 20))
+        self.kill(hosts=hosts, delete_logs=False)
 
 
     def _logs(self, hosts, faults): #, servers, run_id):
@@ -330,27 +317,19 @@ class Bench:
         cmd = CommandMaker.clean_logs()
         subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
 
+        # Download log files.
+        progress = progress_bar(hosts, prefix='Downloading logs:')
+        for i, host in enumerate(progress):
+            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+            c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
+            c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
+            
+        # Parse logs and return the parser.
         if self.mechanism.name == "hotstuff":
-            # Download log files.
-            progress = progress_bar(hosts, prefix='Downloading logs:')
-            for i, host in enumerate(progress):
-                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-                c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-                c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
-
-            # Parse logs and return the parser.
             Print.info('Parsing logs and computing performance...')
             return LogParser.process(PathMaker.logs_path(), faults=faults)
         
         elif self.mechanism.name == "cometbft":
-            # Download log files.
-            progress = progress_bar(hosts, prefix='Downloading logs:')
-            for i, host in enumerate(progress):
-                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-                c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-                c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
-
-            # Parse logs and return the parser.
             Print.info('Parsing logs and computing performance...')
             return CometBftLogParser.process(PathMaker.logs_path(), faults=faults)
 
@@ -450,10 +429,12 @@ class Bench:
                         )
                         if self.mechanism.name == "hotstuff":
                             self._logs(hosts, faults).print(PathMaker.result_file(
-                                faults, n, r, bench_parameters.tx_size
+                                self.mechanism.name, faults, n, r, bench_parameters.tx_size
                             ))
                         elif self.mechanism.name == "cometbft":
-                            self._logs(hosts, faults)
+                            self._logs(hosts, faults).print(PathMaker.result_file(
+                                self.mechanism.name, faults, n, r, bench_parameters.tx_size
+                            ))
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)
