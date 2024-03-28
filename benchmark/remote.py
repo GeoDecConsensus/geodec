@@ -20,7 +20,7 @@ from benchmark.instance import InstanceManager
 # from benchmark.geodec import GeoDec
 # from benchmark.geo_logs import GeoLogParser
 
-from benchmark.mechanisms.cometbft import CometBftMechanism
+from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
 
 class FabricError(Exception):
@@ -352,7 +352,7 @@ class Bench:
 
             # Parse logs and return the parser.
             Print.info('Parsing logs and computing performance...')
-            # return LogParser.process(PathMaker.logs_path(), faults=faults)
+            return CometBftLogParser.process(PathMaker.logs_path(), faults=faults)
 
         # # Delete local logs (if any).
         # cmd = CommandMaker.clean_logs()

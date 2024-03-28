@@ -6,7 +6,7 @@ from benchmark.utils import Print
 from benchmark.plot import Ploter, PlotError
 from benchmark.instance import InstanceManager
 from benchmark.remote import Bench, BenchError
-from benchmark.mechanisms.cometbft import CometBftMechanism, CometbftLogParser
+from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
 
 
 @task
@@ -189,8 +189,8 @@ def logs(ctx, mechanism):
     ''' Print a summary of the logs '''
     try:
         if mechanism == 'hotstuff':
-            print(LogParser.process('./logs', faults='?').result())
+            LogParser.process('./logs-hotstuff', faults='?').result()
         elif mechanism == 'cometbft':
-            print(CometbftLogParser.process('./logs', faults='?').result())
+            CometbftLogParser.process('./logs-cometbft', faults='0').result()
     except ParseError as e:
         Print.error(BenchError('Failed to parse logs', e))
