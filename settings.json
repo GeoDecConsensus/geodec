@@ -51,8 +51,8 @@
             },
             "repo": {
                 "name": "cometbft",
-                "url": "https://github.com/cometbft/cometbft.git",
-                "branch": "v0.38.6"
+                "url": "https://github.com/GeoDecConsensus/cometbft",
+                "branch": "v0.38.6-geodec"
             },
             "geodec": {
                 "interface": "ens3",

@@ -70,7 +70,7 @@ class Bench:
 
     def install(self):
         Print.info(f'Installing {self.settings.testbed}')
-        cmds = self.mechanism.cmd
+        cmds = self.mechanism.install_cmd
 
         hosts = self._select_hosts()
 
@@ -139,20 +139,9 @@ class Bench:
         Print.info(
             f'Updating {len(hosts)} nodes (branch "{self.settings.branch}")...'
         )
-        # Check if the repo directory exists
-        check_repo_cmd = f'[ -d {self.settings.repo_name} ] || git clone {self.settings.repo_url}'
-
-        cmd = [
-            check_repo_cmd,
-            f'(cd {self.settings.repo_name} && git fetch -f)',
-            f'(cd {self.settings.repo_name} && git checkout -f {self.settings.branch})',
-            f'(cd {self.settings.repo_name} && git pull origin -f)',
-            'source $HOME/.cargo/env',
-            f'(cd {self.settings.repo_name}/node && {CommandMaker.compile()})',
-            CommandMaker.alias_binaries(
-                f'./{self.settings.repo_name}/target/release/'
-            )
-        ]
+        
+        cmd = self.mechanism.update_cmd
+        
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(' && '.join(cmd), hide=True)
 
@@ -218,7 +207,7 @@ class Bench:
             PathMaker.persistent_peers()
 
             hosts_string = " ".join(hosts)
-            Print.info("Combined hosts: " + hosts_string)
+            # Print.info("Combined hosts: " + hosts_string)
 
             # cmd = [f'~/cometbft show_node_id --home ./mytestnet/node{i}']
             with open('persistent_peer.txt', 'w') as f:
@@ -226,7 +215,7 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            cmd = [f'~/cometbft testnet --v {len(hosts)}']
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec-hotstuff/benchmark/config.toml']
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             
             # Run the bash file and store the ouput in this file
@@ -235,22 +224,11 @@ class Bench:
                 f'./persistent.sh {hosts_string}'
             ]
             subprocess.run(cmd, shell=True)
-
-            # # NOTE Build loadtest - Part of cometbft install
-            # Print.info('Building loadtest')
-            # cmd = [
-            #     'source ~/.profile',
-            #     'cd ~/cometbft/test/loadtime',
-            #     'make build',
-            #     '~/cometbft/test/loadtime/build/load version'
-            # ]
-            # g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-            # g.run(' && '.join(cmd), hide=False)
             
             # NOTE Upload configuration files.
             progress = progress_bar(hosts, prefix='Uploading config files:')
             for i, host in enumerate(hosts):
-                Print.info("Sent node config file to " + host)
+                # Print.info("Sent node config file to " + host)
                 # NOTE: Path of the node config files
                 cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec-hotstuff/benchmark/mytestnet/node{i} ubuntu@{host}:~/']
                 subprocess.run(cmd, shell=True)
@@ -312,14 +290,7 @@ class Bench:
             with open('persistent_peer.txt', 'r') as f:
                 persistent_peers = f.read()
                 persistent_peers = persistent_peers[:-1]
-            Print.info("Persistent Peers: " + persistent_peers)
-
-            # Run the nodes.
-            node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
-            for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
-                # cmd = f'source ~/.profile && cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=true'
-                cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,*:error" --consensus.create_empty_blocks=true'
-                self._background_run(host, cmd, log_file)
+            # Print.info("Persistent Peers: " + persistent_peers)
             
             # Run the clients
             # committee = Committee.load(PathMaker.committee_file())
@@ -337,6 +308,14 @@ class Bench:
                     nodes=addresses,
                     mechanism=self.mechanism.name
                 )
+                self._background_run(host, cmd, log_file)
+
+            # Run the nodes.
+            node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
+            for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
+                # cmd = f'source ~/.profile && cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=true'
+                cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error" --consensus.create_empty_blocks=true'
+                # cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="*:debug,rpc-server:none" --consensus.create_empty_blocks=true'
                 self._background_run(host, cmd, log_file)
             
             # Wait for the nodes to synchronize
@@ -426,12 +405,11 @@ class Bench:
 
 
         # Update nodes.
-        # NOTE: Leaving this out because cometbft doest need a repo
-        # try:
-        #     self._update(selected_hosts)
-        # except (GroupException, ExecutionError) as e:
-        #     e = FabricError(e) if isinstance(e, GroupException) else e
-        #     raise BenchError('Failed to update nodes', e)
+        try:
+            self._update(selected_hosts)
+        except (GroupException, ExecutionError) as e:
+            e = FabricError(e) if isinstance(e, GroupException) else e
+            raise BenchError('Failed to update nodes', e)
         
         # # # Set delay parameters.
         # try:

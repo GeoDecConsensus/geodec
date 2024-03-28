@@ -63,9 +63,8 @@ class CommandMaker:
             return (f'./client {address} --size {size} '
                     f'--rate {rate} --timeout {timeout} {nodes}')
         elif mechanism == 'cometbft':
-            return (f'~/cometbft/test/loadtime/build/load -c 1 --size {size} --rate {rate} --time {timeout}' 
-                    # f'--broadcast-tx-method async --endpoints ws://localhost:26657/websocket')
-                    f' --endpoints ws://localhost:26657/websocket -v --stats-output ~/cometbft/test/loadtime/out1.csv')
+            return (f'~/cometbft/test/loadtime/build/load -c 1 --size {size} --rate {rate} --time {timeout}'
+                    f' --endpoints ws://localhost:26657/websocket -v --broadcast-tx-method sync --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
     @staticmethod
     def kill():
         return 'tmux kill-server'
