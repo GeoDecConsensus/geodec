@@ -19,10 +19,9 @@ class Settings:
             testbed, key_name, key_path, repo_name, repo_url, branch, instance_type
         ]
         inputs_str += regions
-        # inputs_int = [consensus_port, mempool_port, front_port]
         inputs_int = ports
         ok = all(isinstance(x, str) for x in inputs_str)
-        ok &= all(isinstance(x, int) for x in inputs_int)
+        # ok &= all(isinstance(x, int) for x in inputs_int)
         ok &= len(regions) > 0
         if not ok:
             raise SettingsError('Invalid settings types')
@@ -32,9 +31,6 @@ class Settings:
         self.key_name = key_name
         self.key_path = key_path
 
-        # self.consensus_port = consensus_port
-        # self.mempool_port = mempool_port
-        # self.front_port = front_port
         self.ports = ports
 
         self.repo_name = repo_name
@@ -65,9 +61,6 @@ class Settings:
                 data['testbed'],
                 data['key']['name'],
                 data['key']['path'],
-                # data['ports']['consensus'],
-                # data['ports']['mempool'],
-                # data['ports']['front'],
                 data['ports'],
                 data['repo']['name'],
                 data['repo']['url'],

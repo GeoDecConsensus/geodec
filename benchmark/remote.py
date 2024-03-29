@@ -253,9 +253,9 @@ class Bench:
                     addr,
                     bench_parameters.tx_size,
                     rate_share,
+                    self.mechanism.name,
                     timeout,
-                    nodes=addresses,
-                    mechanism=self.mechanism.name
+                    nodes=addresses
                 )
                 self._background_run(host, cmd, log_file)
 
@@ -294,9 +294,9 @@ class Bench:
                     addr,
                     bench_parameters.tx_size,
                     rate_share,
+                    self.mechanism.name,
                     timeout,
-                    nodes=addresses,
-                    mechanism=self.mechanism.name
+                    nodes=addresses
                 )
                 self._background_run(host, cmd, log_file)
 

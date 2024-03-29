@@ -175,6 +175,6 @@ def logs(ctx, mechanism):
         if mechanism == 'hotstuff':
             LogParser.process('./logs-hotstuff', faults='?').result()
         elif mechanism == 'cometbft':
-            CometBftLogParser.process('./logs-cometbft', faults='0').result()
+            CometBftLogParser.process('./logs', faults='0').result()
     except ParseError as e:
         Print.error(BenchError('Failed to parse logs', e))

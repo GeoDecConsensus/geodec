@@ -101,7 +101,7 @@ class CometBftLogParser:
         proposals = self._merge_results([tmp])
 
         # tmp = findall(r'\[(.*Z) .* Committed B\d+ -> ([^ ]+=)', log)
-        tmp = findall(r'D\[(.*?)\].*committed block.*(.{64})"', log)
+        tmp = findall(r'D\[(.*?)\].*committed block.*block=([A-Fa-f0-9]+).*', log)
         tmp = [(d, self._to_posix(t)) for t, d in tmp]
         commits = self._merge_results([tmp])
 
