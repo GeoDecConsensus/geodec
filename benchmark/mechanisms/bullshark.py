@@ -337,6 +337,8 @@ class BullsharkLogParser:
                 f'Clients missed their target rate {self.misses:,} time(s)'
             )
 
+        print(self.result())
+
     def _merge_results(self, input):
         # Keep the earliest timestamp.
         merged = {}
@@ -563,7 +565,4 @@ class BullsharkMechanism:
             CommandMaker.alias_binaries_bullshark(
                 f'./{self.settings.repo_name}/target/release/'
             )
-        ]
-        
-        
-        
+        ]     

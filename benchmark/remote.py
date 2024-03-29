@@ -325,6 +325,7 @@ class Bench:
                         bench_parameters.tx_size,
                         rate_share,
                         self.mechanism.name,
+                        0,
                         [x for y in workers_addresses for _, x in y],
                     )
                     log_file = PathMaker.client_log_file_bull(i, id)
