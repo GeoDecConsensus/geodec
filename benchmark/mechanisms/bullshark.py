@@ -13,7 +13,7 @@ class ParseError(Exception):
     pass
 
 
-class LogParser:
+class BullsharkLogParser:
     def __init__(self, clients, primaries, workers, faults=0):
         inputs = [clients, primaries, workers]
         assert all(isinstance(x, list) for x in inputs)
@@ -258,7 +258,7 @@ class LogParser:
 
         return cls(clients, primaries, workers, faults=faults)
 
-class BullSharkMechanism:
+class BullsharkMechanism:
     def __init__(self, settings):
         self.settings = settings
         self.name = 'bullshark'

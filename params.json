@@ -1,0 +1,71 @@
+{
+    "remote": {
+        "hotstuff": {
+            "bench_params": {
+                "faults": 0,
+                "nodes": [4],
+                "rate": [20000],
+                "tx_size": 512,
+                "duration": 20,
+                "runs": 1
+            },
+            "node_params": {
+                "consensus": {
+                    "timeout_delay": 50000,
+                    "sync_retry_delay": 50000
+                },
+                "mempool": {
+                    "gc_depth": 50,
+                    "sync_retry_delay": 5000,
+                    "sync_retry_nodes": 3,
+                    "batch_size": 204800,
+                    "max_batch_delay": 100
+                }
+            }
+        },
+        "cometbft": {
+            "bench_params": {
+                "faults": 0,
+                "nodes": [4],
+                "rate": [20000],
+                "tx_size": 512,
+                "duration": 20,
+                "runs": 1
+            },
+            "node_params": {
+                "consensus": {
+                    "timeout_delay": 50000,
+                    "sync_retry_delay": 50000
+                },
+                "mempool": {
+                    "gc_depth": 50,
+                    "sync_retry_delay": 5000,
+                    "sync_retry_nodes": 3,
+                    "batch_size": 204800,
+                    "max_batch_delay": 100
+                }
+            }
+        },
+        "bullshark": {
+            "bench_params": {
+                "faults": 0,
+                "nodes": [10, 20],
+                "workers": 1,
+                "collocate": true,
+                "rate": [10000, 50000],
+                "tx_size": 512,
+                "duration": 300,
+                "runs": 2
+            },
+            "node_params": {
+                "header_size": 50,
+                "max_header_delay": 5000,
+                "gc_depth": 50,
+                "sync_retry_delay": 10000,
+                "sync_retry_nodes": 3,
+                "batch_size": 500000,
+                "max_batch_delay": 200
+            }
+        }
+    }
+}

@@ -22,7 +22,7 @@ from benchmark.instance import InstanceManager
 
 from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
-from benchmark.mechanisms.bullshark import BullSharkMechanism
+from benchmark.mechanisms.bullshark import BullsharkMechanism, BullsharkLogParser
 
 class FabricError(Exception):
     ''' Wrapper for Fabric exception with a meaningfull error message. '''
@@ -51,7 +51,7 @@ class Bench:
         elif mechanism == "hotstuff":
             self.mechanism = HotStuffMechanism(self.settings)
         elif mechanism == "bullshark":
-            self.mechanism = BullSharkMechanism(self.settings)
+            self.mechanism = BullsharkMechanism(self.settings)
 
         try:
             ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(
@@ -208,7 +208,7 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec-hotstuff/benchmark/config.toml']
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec-hotstuff/benchmark/cometbft-config.toml']
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             
             # Run the bash file and store the ouput in this file
