@@ -20,8 +20,9 @@ from benchmark.instance import InstanceManager
 # from benchmark.geodec import GeoDec
 # from benchmark.geo_logs import GeoLogParser
 
-from benchmark.mechanisms.cometbft import CometBftMechanism
+from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
+from benchmark.mechanisms.bullshark import BullSharkMechanism
 
 class FabricError(Exception):
     ''' Wrapper for Fabric exception with a meaningfull error message. '''
@@ -48,7 +49,9 @@ class Bench:
         if mechanism == "cometbft":
             self.mechanism = CometBftMechanism(self.settings)
         elif mechanism == "hotstuff":
-            self.mechanism = HotStuffMechanism(self.settings)   
+            self.mechanism = HotStuffMechanism(self.settings)
+        elif mechanism == "bullshark":
+            self.mechanism = BullSharkMechanism(self.settings)
 
         try:
             ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(
@@ -70,24 +73,24 @@ class Bench:
 
     def install(self):
         Print.info(f'Installing {self.settings.testbed}')
-        cmd = self.mechanism.cmd
-
-        hosts = self._select_hosts(4)
-
+        cmds = self.mechanism.install_cmd
+        hosts = self._select_hosts()
         # hosts = self.manager.hosts(flat=True)
-
-        try:
-            g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-            g.run(' && '.join(cmd), hide=False)
-            Print.heading(f'Initialized testbed of {len(hosts)} nodes')
-        except (GroupException, ExecutionError) as e:
-            e = FabricError(e) if isinstance(e, GroupException) else e
-            raise BenchError('Failed to install repo on testbed', e)
+        
+        for cmd in cmds:
+            try:
+                g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
+                g.run(' && '.join(cmd), hide=True)
+                Print.heading(f'Initialized testbed of {len(hosts)} nodes')
+            except (GroupException, ExecutionError) as e:
+                e = FabricError(e) if isinstance(e, GroupException) else e
+                raise BenchError('Failed to install repo on testbed', e)
 
     def kill(self, hosts=[], delete_logs=False):
         assert isinstance(hosts, list)
         assert isinstance(delete_logs, bool)
-        hosts = hosts if hosts else self.manager.hosts(flat=True)
+        # hosts = hosts if hosts else self.manager.hosts(flat=True)
+        hosts = self._select_hosts()
         delete_logs = CommandMaker.clean_logs() if delete_logs else 'true'
         cmd = [delete_logs, f'({CommandMaker.kill()} || true)']
         try:
@@ -96,7 +99,7 @@ class Bench:
         except GroupException as e:
             raise BenchError('Failed to kill nodes', FabricError(e))
 
-    def _select_hosts(self, num):
+    def _select_hosts(self):
         addrs = [] 
         # Retrieve values based on your scripts, note we use Internal IP addresses
         with open(self.settings.ip_file, 'r') as f:
@@ -107,7 +110,7 @@ class Bench:
                     addrs.append(row['Internal IP'])
             else:
                  addrs = [line.strip() for line in f.readlines()]
-        return addrs[:num]
+        return addrs
         # # Ensure there are enough hosts.
         # hosts = self.manager.hosts()
         # if sum(len(x) for x in hosts.values()) < nodes:
@@ -120,37 +123,18 @@ class Bench:
 
     def _background_run(self, host, command, log_file):
         name = splitext(basename(log_file))[0]
-        if self.mechanism.name == 'hotstuff':
-            cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
-            # NOTE: Here the cmd is ran on a single instance
-            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            output = c.run(cmd, hide=True)
-            self._check_stderr(output)
-        
-        elif self.mechanism.name == 'cometbft':
-            cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
-            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            output = c.run(cmd, hide=True)
-            self._check_stderr(output)
+        cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
+        c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+        output = c.run(cmd, hide=True)
+        self._check_stderr(output)
 
     def _update(self, hosts):
         Print.info(
             f'Updating {len(hosts)} nodes (branch "{self.settings.branch}")...'
         )
-        # Check if the repo directory exists
-        check_repo_cmd = f'[ -d {self.settings.repo_name} ] || git clone {self.settings.repo_url}'
-
-        cmd = [
-            check_repo_cmd,
-            f'(cd {self.settings.repo_name} && git fetch -f)',
-            f'(cd {self.settings.repo_name} && git checkout -f {self.settings.branch})',
-            f'(cd {self.settings.repo_name} && git pull origin -f)',
-            'source $HOME/.cargo/env',
-            f'(cd {self.settings.repo_name}/node && {CommandMaker.compile()})',
-            CommandMaker.alias_binaries(
-                f'./{self.settings.repo_name}/target/release/'
-            )
-        ]
+        
+        cmd = self.mechanism.update_cmd
+        
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(' && '.join(cmd), hide=True)
 
@@ -205,18 +189,28 @@ class Bench:
             return committee
 
         elif self.mechanism.name == 'cometbft':
-            
+
+            # Cleanup node configuration files on hosts
+            for i, host in enumerate(hosts):
+                cmd = CommandMaker.clean_node_config(i)
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+                c.run(cmd, shell=True)
+
             # Create persistent peers
             PathMaker.persistent_peers()
 
             hosts_string = " ".join(hosts)
-            Print.info("Combined string=" + hosts_string)
+            # Print.info("Combined hosts: " + hosts_string)
 
             # cmd = [f'~/cometbft show_node_id --home ./mytestnet/node{i}']
             with open('persistent_peer.txt', 'w') as f:
                 f.write("")
                 f.close()
 
+            # Create testnet config files
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec-hotstuff/benchmark/config.toml']
+            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            
             # Run the bash file and store the ouput in this file
             cmd = [
                 # 'chmod u+x ./persistent.sh',
@@ -224,15 +218,10 @@ class Bench:
             ]
             subprocess.run(cmd, shell=True)
             
-            # Create testnet config files
-            cmd = [
-                f'~/cometbft testnet --v {len(hosts)}' 
-            ]
-            subprocess.run(cmd, shell=True)
-
+            # NOTE Upload configuration files.
             progress = progress_bar(hosts, prefix='Uploading config files:')
             for i, host in enumerate(hosts):
-                print(host)
+                # Print.info("Sent node config file to " + host)
                 # NOTE: Path of the node config files
                 cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec-hotstuff/benchmark/mytestnet/node{i} ubuntu@{host}:~/']
                 subprocess.run(cmd, shell=True)
@@ -258,7 +247,8 @@ class Bench:
                     bench_parameters.tx_size,
                     rate_share,
                     timeout,
-                    nodes=addresses
+                    nodes=addresses,
+                    mechanism=self.mechanism.name
                 )
                 self._background_run(host, cmd, log_file)
 
@@ -272,61 +262,77 @@ class Bench:
                     PathMaker.committee_file(),
                     db,
                     PathMaker.parameters_file(),
-                    debug=debug
+                    debug=debug,
+                    mechanism=self.mechanism.name
                 )
                 self._background_run(host, cmd, log_file)
-
-            # Wait for the nodes to synchronize
-            Print.info('Waiting for the nodes to synchronize...')
-            sleep(2 * node_parameters.timeout_delay / 1000)
-
-            # Wait for all transactions to be processed.
-            duration = bench_parameters.duration
-            for _ in progress_bar(range(20), prefix=f'Running benchmark ({duration} sec):'):
-                sleep(ceil(duration / 20))
-            self.kill(hosts=hosts, delete_logs=False)
 
         elif self.mechanism.name == 'cometbft':
             persistent_peers = []
             
             with open('persistent_peer.txt', 'r') as f:
                 persistent_peers = f.read()
-                persistent_peers = persistent_peers[:-2]
-            print(persistent_peers)
-
-            node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
-            for i, host, log_file in zip(len(hosts), hosts, node_logs):
-                cmd = [
-                    f'~/cometbft node --home ./node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}"'
-                ]
-                print(cmd[0])
-                self._background_run(host, cmd, log_file)
+                persistent_peers = persistent_peers[:-1]
+            # Print.info("Persistent Peers: " + persistent_peers)
             
-            # Wait for the nodes to synchronize
-            Print.info('Waiting for the nodes to synchronize...')
-            sleep(2 * node_parameters.timeout_delay / 1000)
+            # Run the clients
+            # committee = Committee.load(PathMaker.committee_file())
+            addresses = [f'{x}:{self.settings.front_port}' for x in hosts]
+            # rate_share = ceil(rate / committee.size())  # Take faults into account.
+            rate_share = ceil(rate / len(hosts))
+            timeout = int(node_parameters.timeout_delay / 1000) # In seconds
+            client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
+            for host, addr, log_file in zip(hosts, addresses, client_logs):
+                cmd = CommandMaker.run_client(
+                    addr,
+                    bench_parameters.tx_size,
+                    rate_share,
+                    timeout,
+                    nodes=addresses,
+                    mechanism=self.mechanism.name
+                )
+                self._background_run(host, cmd, log_file)
 
-            self.kill(hosts=hosts, delete_logs=False)
+            # Run the nodes.
+            node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
+            for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
+                # cmd = f'source ~/.profile && cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=true'
+                cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error" --consensus.create_empty_blocks=true'
+                # cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="*:debug,rpc-server:none" --consensus.create_empty_blocks=true'
+                self._background_run(host, cmd, log_file)
+
+        # Wait for the nodes to synchronize
+        Print.info('Waiting for the nodes to synchronize...')
+        sleep(2 * node_parameters.timeout_delay / 1000)
+
+        # Wait for all transactions to be processed.
+        duration = bench_parameters.duration
+        for _ in progress_bar(range(20), prefix=f'Running benchmark ({duration} sec):'):
+            sleep(ceil(duration / 20))
+        self.kill(hosts=hosts, delete_logs=False)
 
 
     def _logs(self, hosts, faults): #, servers, run_id):
+        # Delete local logs (if any).
+        cmd = CommandMaker.clean_logs()
+        subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
+
+        # Download log files.
+        progress = progress_bar(hosts, prefix='Downloading logs:')
+        for i, host in enumerate(progress):
+            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+            c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
+            c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
+            
+        # Parse logs and return the parser.
         if self.mechanism.name == "hotstuff":
-            # Delete local logs (if any).
-            cmd = CommandMaker.clean_logs()
-            subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
-
-            # Download log files.
-            progress = progress_bar(hosts, prefix='Downloading logs:')
-            for i, host in enumerate(progress):
-                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-                c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-                c.get(
-                    PathMaker.client_log_file(i), local=PathMaker.client_log_file(i)
-                )
-
-            # Parse logs and return the parser.
             Print.info('Parsing logs and computing performance...')
             return LogParser.process(PathMaker.logs_path(), faults=faults)
+        
+        elif self.mechanism.name == "cometbft":
+            Print.info('Parsing logs and computing performance...')
+            return CometBftLogParser.process(PathMaker.logs_path(), faults=faults)
+
         # # Delete local logs (if any).
         # cmd = CommandMaker.clean_logs()
         # subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
@@ -369,7 +375,8 @@ class Bench:
         # pingDelays = geodec.getPingDelay(geoInput, "/home/ubuntu/data/pings-2020-07-19-2020-07-20-grouped.csv", "/home/ubuntu/data/pings-2020-07-19-2020-07-20.csv")
 
         # Select which hosts to use.
-        selected_hosts = self._select_hosts(bench_parameters.nodes[0])
+        # selected_hosts = self._select_hosts(bench_parameters.nodes[0])
+        selected_hosts = self._select_hosts()
 
         if len(selected_hosts) < bench_parameters.nodes[0]:
             Print.warn('There are not enough instances available')
@@ -377,12 +384,11 @@ class Bench:
 
 
         # Update nodes.
-        # NOTE: Leaving this out because cometbft doest need a repo
-        # try:
-        #     self._update(selected_hosts)
-        # except (GroupException, ExecutionError) as e:
-        #     e = FabricError(e) if isinstance(e, GroupException) else e
-        #     raise BenchError('Failed to update nodes', e)
+        try:
+            self._update(selected_hosts)
+        except (GroupException, ExecutionError) as e:
+            e = FabricError(e) if isinstance(e, GroupException) else e
+            raise BenchError('Failed to update nodes', e)
         
         # # # Set delay parameters.
         # try:
@@ -423,7 +429,11 @@ class Bench:
                         )
                         if self.mechanism.name == "hotstuff":
                             self._logs(hosts, faults).print(PathMaker.result_file(
-                                faults, n, r, bench_parameters.tx_size
+                                self.mechanism.name, faults, n, r, bench_parameters.tx_size
+                            ))
+                        elif self.mechanism.name == "cometbft":
+                            self._logs(hosts, faults).print(PathMaker.result_file(
+                                self.mechanism.name, faults, n, r, bench_parameters.tx_size
                             ))
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:

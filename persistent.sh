@@ -31,7 +31,7 @@ done
 # Remove the leading comma
 final_result="${final_result:1}"
 
-# Print the final result
-echo "Final Result: $final_result"
+# # Print the final result
+# echo "Final Result: $final_result"
 
 echo "$final_result" > persistent_peer.txt

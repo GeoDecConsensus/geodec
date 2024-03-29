@@ -1,10 +1,12 @@
+from benchmark.commands import CommandMaker
+
 class HotStuffMechanism:
     def __init__(self, settings):
         self.settings = settings
         self.name = 'hotstuff'
         print("Inside hotstuff")
 
-        self.cmd = [
+        self.install_cmd = [
             'sudo apt-get update',
             'sudo apt-get -y upgrade',
             'sudo apt-get -y autoremove',
@@ -23,6 +25,21 @@ class HotStuffMechanism:
 
             # Clone the repo.
             f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))'
+        ]
+        
+        # check_repo_cmd = f'[ -d {self.settings.repo_name} ] || git clone {self.settings.repo_url}'
+        
+        self.update_cmd = [
+            # Check if the repo directory exists
+            f'[ -d {self.settings.repo_name} ] || git clone {self.settings.repo_url}',
+            f'(cd {self.settings.repo_name} && git fetch -f)',
+            f'(cd {self.settings.repo_name} && git checkout -f {self.settings.branch})',
+            f'(cd {self.settings.repo_name} && git pull origin -f)',
+            'source $HOME/.cargo/env',
+            f'(cd {self.settings.repo_name}/node && {CommandMaker.compile()})',
+            CommandMaker.alias_binaries(
+                f'./{self.settings.repo_name}/target/release/'
+            )
         ]
 
     def install(self):

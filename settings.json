@@ -51,8 +51,8 @@
             },
             "repo": {
                 "name": "cometbft",
-                "url": "https://github.com/cometbft/cometbft.git",
-                "branch": "v0.38.5"
+                "url": "https://github.com/GeoDecConsensus/cometbft",
+                "branch": "v0.38.6-geodec"
             },
             "geodec": {
                 "interface": "ens3",
@@ -74,6 +74,29 @@
             "configuration": {
                 "provider": "google_compute_engine",
                 "ip_file": "/home/ubuntu/geodec/gcp-scripts/instances_ip.csv"
+            }
+        },
+        "bullshark": {
+            "testbed": "bullshark",
+            "key": {
+                "name": "ubuntu",
+                "path": "/home/ubuntu/.ssh/geodec"
+            },
+            "port": 5000,
+            "repo": {
+                "name": "narwhal",
+                "url": "https://github.com/asonnino/narwhal",
+                "branch": "bullshark"
+            },
+            "instances": {
+                "type": "m5d.8xlarge",
+                "regions": [
+                    "us-east-1",
+                    "eu-north-1",
+                    "ap-southeast-2",
+                    "us-west-1",
+                    "ap-northeast-1"
+                ]
             }
         }
     }
