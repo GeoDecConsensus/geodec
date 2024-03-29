@@ -88,7 +88,8 @@ class CommandMaker:
                     # f' --endpoints ws://localhost:26657/websocket -v --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
         elif mechanism == 'bullshark':
             nodes = f'--nodes {" ".join(nodes)}' if nodes else ''
-            return f'./client {address} --size {size} --rate {rate} {nodes}'
+            return f'./benchmark_client {address} --size {size} --rate {rate} {nodes}'
+    
     @staticmethod
     def kill():
         return 'tmux kill-server'
@@ -98,3 +99,9 @@ class CommandMaker:
         assert isinstance(origin, str)
         node, client = join(origin, 'node'), join(origin, 'client')
         return f'rm node ; rm client ; ln -s {node} . ; ln -s {client} .'
+    
+    @staticmethod
+    def alias_binaries_bullshark(origin):
+        assert isinstance(origin, str)
+        node, client = join(origin, 'node'), join(origin, 'benchmark_client')
+        return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'

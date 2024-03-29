@@ -102,8 +102,8 @@ class InstanceManager:
                 },
                 {
                     'IpProtocol': 'tcp',
-                    'FromPort': self.settings.ports["front"],
-                    'ToPort': self.settings.ports["front"],
+                    'FromPort': self.settings.ports["mempool"],
+                    'ToPort': self.settings.ports["mempool"],
                     'IpRanges': [{
                         'CidrIp': '0.0.0.0/0',
                         'Description': 'Mempool port',

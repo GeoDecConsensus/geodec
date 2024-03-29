@@ -54,7 +54,7 @@
                 "collocate": true,
                 "rate": [20000],
                 "tx_size": 512,
-                "duration": 20,
+                "duration": 30,
                 "runs": 1
             },
             "node_params": {

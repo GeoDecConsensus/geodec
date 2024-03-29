@@ -82,7 +82,7 @@
                 "name": "ubuntu",
                 "path": "/home/ubuntu/.ssh/geodec"
             },
-            "port": {
+            "ports": {
                 "base": 5000
             },
             "repo": {

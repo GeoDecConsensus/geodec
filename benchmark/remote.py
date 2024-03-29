@@ -10,6 +10,7 @@ from json import dump, load
 from collections import OrderedDict
 import csv
 import subprocess
+from copy import deepcopy
 # import pandas as pd
 
 from benchmark.config import Committee, Key, NodeParameters, BenchParameters, ConfigError
@@ -73,18 +74,18 @@ class Bench:
 
     def install(self):
         Print.info(f'Installing {self.settings.testbed}')
-        cmds = self.mechanism.install_cmd
+        cmd = self.mechanism.install_cmd
         hosts = self._select_hosts()
         # hosts = self.manager.hosts(flat=True)
         
-        for cmd in cmds:
-            try:
-                g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-                g.run(' && '.join(cmd), hide=True)
-                Print.heading(f'Initialized testbed of {len(hosts)} nodes')
-            except (GroupException, ExecutionError) as e:
-                e = FabricError(e) if isinstance(e, GroupException) else e
-                raise BenchError('Failed to install repo on testbed', e)
+        # for cmd in cmds:
+        try:
+            g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
+            g.run(' && '.join(cmd), hide=True)
+            Print.heading(f'Initialized testbed of {len(hosts)} nodes')
+        except (GroupException, ExecutionError) as e:
+            e = FabricError(e) if isinstance(e, GroupException) else e
+            raise BenchError('Failed to install repo on testbed', e)
 
     def kill(self, hosts=[], delete_logs=False):
         assert isinstance(hosts, list)
@@ -206,7 +207,7 @@ class Bench:
             if self.mechanism.name == 'hotstuff':
                 consensus_addr = [f'{x}:{self.settings.ports["consensus"]}' for x in hosts]
                 front_addr = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-                mempool_addr = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
+                mempool_addr = [f'{x}:{self.settings.ports["mempool"]}' for x in hosts]
                 committee = Committee(names, consensus_addr, front_addr, mempool_addr)
             elif self.mechanism.name == 'bullshark':
                 if bench_parameters.collocate:
@@ -214,7 +215,7 @@ class Bench:
                     addresses = OrderedDict((x, [y] * (workers + 1)) for x, y in zip(names, hosts))
                 else:
                     addresses = OrderedDict((x, y) for x, y in zip(names, hosts))
-                committee = Committee(addresses, self.settings.ports["base"])
+                committee = BullsharkCommittee(addresses, self.settings.ports["base"])
 
             committee.print(PathMaker.committee_file())
             node_parameters.print(PathMaker.parameters_file())
@@ -233,7 +234,7 @@ class Bench:
 
             return committee
 
-    def _run_single(self, hosts, rate, bench_parameters, node_parameters, debug=False):
+    def _run_single(self, hosts, rate, bench_parameters, node_parameters, debug=False, committee=[]):
         Print.info('Booting testbed...')
 
         # Kill any potentially unfinished run and delete logs.
@@ -318,21 +319,21 @@ class Bench:
             rate_share = ceil(rate / committee.workers())
             for i, addresses in enumerate(workers_addresses):
                 for (id, address) in addresses:
-                    host = Committee.ip(address)
+                    host = BullsharkCommittee.ip(address)
                     cmd = CommandMaker.run_client(
                         address,
                         bench_parameters.tx_size,
                         rate_share,
+                        self.mechanism.name,
                         [x for y in workers_addresses for _, x in y],
-                        mechanism=self.mechanism.name
                     )
-                    log_file = PathMaker.client_log_file(i, id)
+                    log_file = PathMaker.client_log_file_bull(i, id)
                     self._background_run(host, cmd, log_file)
 
             # Run the primaries (except the faulty ones).
             Print.info('Booting primaries...')
             for i, address in enumerate(committee.primary_addresses(faults)):
-                host = Committee.ip(address)
+                host = BullsharkCommittee.ip(address)
                 cmd = CommandMaker.run_primary(
                     PathMaker.key_file(i),
                     PathMaker.committee_file(),
@@ -347,7 +348,7 @@ class Bench:
             Print.info('Booting workers...')
             for i, addresses in enumerate(workers_addresses):
                 for (id, address) in addresses:
-                    host = Committee.ip(address)
+                    host = BullsharkCommittee.ip(address)
                     cmd = CommandMaker.run_worker(
                         PathMaker.key_file(i),
                         PathMaker.committee_file(),
@@ -373,17 +374,43 @@ class Bench:
         self.kill(hosts=hosts, delete_logs=False)
 
 
-    def _logs(self, hosts, faults): #, servers, run_id):
+    def _logs(self, hosts, faults, committee=[]): #, servers, run_id):
         # Delete local logs (if any).
         cmd = CommandMaker.clean_logs()
         subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
 
         # Download log files.
         progress = progress_bar(hosts, prefix='Downloading logs:')
-        for i, host in enumerate(progress):
-            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-            c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
+        if self.mechanism.name == "bullshark":
+            workers_addresses = committee.workers_addresses(faults)
+            progress = progress_bar(workers_addresses, prefix='Downloading workers logs:')
+            for i, addresses in enumerate(progress):
+                for id, address in addresses:
+                    host = BullsharkCommittee.ip(address)
+                    c = Connection(host, user='ubuntu', connect_kwargs=self.connect)
+                    c.get(
+                        PathMaker.client_log_file_bull(i, id), 
+                        local=PathMaker.client_log_file_bull(i, id)
+                    )
+                    c.get(
+                        PathMaker.worker_log_file(i, id), 
+                        local=PathMaker.worker_log_file(i, id)
+                    )
+
+            primary_addresses = committee.primary_addresses(faults)
+            progress = progress_bar(primary_addresses, prefix='Downloading primaries logs:')
+            for i, address in enumerate(progress):
+                host = BullsharkCommittee.ip(address)
+                c = Connection(host, user='ubuntu', connect_kwargs=self.connect)
+                c.get(
+                    PathMaker.primary_log_file(i), 
+                    local=PathMaker.primary_log_file(i)
+                )
+        else:
+            for i, host in enumerate(progress):
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+                c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
+                c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
             
         # Parse logs and return the parser.
         Print.info('Parsing logs and computing performance...')
@@ -420,7 +447,7 @@ class Bench:
 
     def run(self, bench_parameters_dict, node_parameters_dict, geoInput, debug=False):
         assert isinstance(debug, bool)
-        Print.heading('Starting remote benchmark')
+        Print.heading(f'Starting {self.mechanism.name} remote benchmark')
 
         try:
             if self.mechanism.name == "bullshark":
@@ -471,11 +498,16 @@ class Bench:
 
                 # Upload all configuration files.
                 try:
-                    self._config(hosts, node_parameters, bench_parameters)
+                    committee = self._config(hosts, node_parameters, bench_parameters)
                 except (subprocess.SubprocessError, GroupException) as e:
                     e = FabricError(e) if isinstance(e, GroupException) else e
                     Print.error(BenchError('Failed to configure nodes', e))
                     continue
+                
+                committee_copy = []
+                if self.mechanism.name == "bullshark":
+                    committee_copy = deepcopy(committee)
+                    committee_copy.remove_nodes(committee.size() - n)
 
                 # Do not boot faulty nodes.
                 faults = bench_parameters.faults
@@ -490,9 +522,9 @@ class Bench:
         #             Print.heading(f'Run {i+1}/{bench_parameters.runs} with run_id {run_id}')
                     try:
                         self._run_single(
-                            hosts, r, bench_parameters, node_parameters, debug
+                            hosts, r, bench_parameters, node_parameters, debug, committee_copy
                         )
-                        logger = self._logs(hosts, faults)
+                        logger = self._logs(hosts, faults, committee_copy)
                         logger.print(PathMaker.result_file(
                             self.mechanism.name, faults, n, r, bench_parameters.tx_size
                         ))

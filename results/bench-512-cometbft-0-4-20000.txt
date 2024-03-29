@@ -124,3 +124,24 @@
  End-to-end BPS: 622,710 B/s
  End-to-end latency: 0 ms
 -----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 118 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,140 tx/s
+ Consensus BPS: 583,893 B/s
+ Consensus latency: 568 ms
+
+ End-to-end TPS: 1,145 tx/s
+ End-to-end BPS: 586,121 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------

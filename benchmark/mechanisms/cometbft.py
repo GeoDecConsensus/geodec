@@ -179,7 +179,7 @@ class CometBftLogParser:
         if not self.commits:
             return 0, 0, 0
         start, end = min(self.start), max(self.commits.values())
-        print(start, end)
+        # print(start, end)
         duration = end - start
         bytes = sum(self.sizes.values())
         bps = bytes / duration
