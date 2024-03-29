@@ -6,8 +6,7 @@ class SettingsError(Exception):
 
 
 class Settings:
-    def __init__(self, testbed, key_name, key_path, consensus_port, mempool_port,
-                 front_port, repo_name, repo_url, branch, instance_type, aws_regions, 
+    def __init__(self, testbed, key_name, key_path, ports, repo_name, repo_url, branch, instance_type, aws_regions, 
                  geodec_interface, geodec_servers_file, geodec_ping_grouped_file, geodec_ping_file,
                  provider, ip_file 
                 ):
@@ -20,7 +19,8 @@ class Settings:
             testbed, key_name, key_path, repo_name, repo_url, branch, instance_type
         ]
         inputs_str += regions
-        inputs_int = [consensus_port, mempool_port, front_port]
+        # inputs_int = [consensus_port, mempool_port, front_port]
+        inputs_int = ports
         ok = all(isinstance(x, str) for x in inputs_str)
         ok &= all(isinstance(x, int) for x in inputs_int)
         ok &= len(regions) > 0
@@ -32,9 +32,10 @@ class Settings:
         self.key_name = key_name
         self.key_path = key_path
 
-        self.consensus_port = consensus_port
-        self.mempool_port = mempool_port
-        self.front_port = front_port
+        # self.consensus_port = consensus_port
+        # self.mempool_port = mempool_port
+        # self.front_port = front_port
+        self.ports = ports
 
         self.repo_name = repo_name
         self.repo_url = repo_url
@@ -64,9 +65,10 @@ class Settings:
                 data['testbed'],
                 data['key']['name'],
                 data['key']['path'],
-                data['ports']['consensus'],
-                data['ports']['mempool'],
-                data['ports']['front'],
+                # data['ports']['consensus'],
+                # data['ports']['mempool'],
+                # data['ports']['front'],
+                data['ports'],
                 data['repo']['name'],
                 data['repo']['url'],
                 data['repo']['branch'],

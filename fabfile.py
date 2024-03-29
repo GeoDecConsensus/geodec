@@ -1,3 +1,4 @@
+import json
 from fabric import task
 
 from benchmark.local import LocalBench
@@ -8,6 +9,9 @@ from benchmark.instance import InstanceManager
 from benchmark.remote import Bench, BenchError
 from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
 
+# Open the JSON file and load its contents
+with open('fab-params.json') as f:
+    params_data = json.load(f)
 
 @task
 def local(ctx):
@@ -97,28 +101,8 @@ def install(ctx, mechanism):
 def remote(ctx, mechanism):
     ''' Run benchmarks on a cluster'''
     
-    bench_params = {
-        'faults': 0,
-        'nodes': [4],
-        'rate': [20000],
-        'tx_size': 512,
-        'duration': 20,
-        'runs': 1,
-    }
-    node_params = {
-        'consensus': {
-            'timeout_delay': 50_000,
-            'sync_retry_delay': 50_000,
-        },
-        'mempool': {
-            'gc_depth': 50,
-            'sync_retry_delay': 5_000,
-            'sync_retry_nodes': 3,
-            'batch_size': 204800,
-            'max_batch_delay': 100
-        }
-    }
-  
+    bench_params = params_data["remote"][mechanism]["bench_params"]
+    node_params = params_data["remote"][mechanism]["node_params"]
     
     try:
         Bench(ctx, mechanism).run(bench_params, node_params, None, debug=True)
@@ -191,6 +175,6 @@ def logs(ctx, mechanism):
         if mechanism == 'hotstuff':
             LogParser.process('./logs-hotstuff', faults='?').result()
         elif mechanism == 'cometbft':
-            CometbftLogParser.process('./logs-cometbft', faults='0').result()
+            CometBftLogParser.process('./logs-cometbft', faults='0').result()
     except ParseError as e:
         Print.error(BenchError('Failed to parse logs', e))
