@@ -304,17 +304,7 @@ class CometBftMechanism:
                 'echo export PATH=\"\$PATH:\$GOPATH/bin\" >> ~/.profile',
                 # 'export PATH=$PATH:/usr/local/go/bin'
                 'source ~/.profile',
-            ],
-            [
-                'source ~/.profile',
-                f'rm -rf {self.settings.repo_name}',
-                f'(git clone -b {self.settings.branch} {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))',
-                f'cd {self.settings.repo_name}',
-                # f'git fetch -f && git checkout -f {self.settings.branch}',
-                'make install',
-                'make build',
-                'cd ./test/loadtime',
-                'make build'
+                f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))',
             ]
         ]
         
