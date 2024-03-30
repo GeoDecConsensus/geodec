@@ -82,11 +82,20 @@
                 "name": "ubuntu",
                 "path": "/home/ubuntu/.ssh/geodec"
             },
-            "port": 5000,
+            "ports": {
+                "base": 5000
+            },
             "repo": {
                 "name": "narwhal",
                 "url": "https://github.com/asonnino/narwhal",
                 "branch": "bullshark"
+            },
+            "geodec": {
+                "interface": "ens3",
+                "servers_file": "/home/ubuntu/data/servers-2020-07-19.csv",
+                "ip_file": "/home/ubuntu/IP.txt",
+                "pings_grouped_file": "/home/ubuntu/data/pings-2020-07-19-2020-07-20-grouped.csv",
+                "pings_file": "/home/ubuntu/data/pings-2020-07-19-2020-07-20.csv"
             },
             "instances": {
                 "type": "m5d.8xlarge",
@@ -97,6 +106,10 @@
                     "us-west-1",
                     "ap-northeast-1"
                 ]
+            },
+            "configuration": {
+                "provider": "google_compute_engine",
+                "ip_file": "/home/ubuntu/geodec/gcp-scripts/instances_ip.csv"
             }
         }
     }

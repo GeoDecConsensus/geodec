@@ -140,5 +140,6 @@ cython_debug/
 mytestnet/
 
 *.json
+!fab-params.json
 
 persistent_peer.txt

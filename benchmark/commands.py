@@ -37,7 +37,7 @@ class CommandMaker:
         return (f'sudo tc qdisc del dev {interface} parent root')
 
     @staticmethod
-    def run_node(keys, committee, store, parameters, debug=False, mechanism='hotstuff'):
+    def run_node(keys, committee, store, parameters, mechanism, debug=False):
         assert isinstance(keys, str)
         assert isinstance(committee, str)
         assert isinstance(parameters, str)
@@ -52,7 +52,27 @@ class CommandMaker:
                     f'--proxy_app=kvstore --consensus.create_empty_blocks=true')
     
     @staticmethod
-    def run_client(address, size, rate, timeout, nodes=[], mechanism='hotstuff'):
+    def run_primary(keys, committee, store, parameters, debug=False):
+        assert isinstance(keys, str)
+        assert isinstance(committee, str)
+        assert isinstance(parameters, str)
+        assert isinstance(debug, bool)
+        v = '-vvv' if debug else '-vv'
+        return (f'./node {v} run --keys {keys} --committee {committee} '
+                f'--store {store} --parameters {parameters} primary')
+
+    @staticmethod
+    def run_worker(keys, committee, store, parameters, id, debug=False):
+        assert isinstance(keys, str)
+        assert isinstance(committee, str)
+        assert isinstance(parameters, str)
+        assert isinstance(debug, bool)
+        v = '-vvv' if debug else '-vv'
+        return (f'./node {v} run --keys {keys} --committee {committee} '
+                f'--store {store} --parameters {parameters} worker --id {id}')
+
+    @staticmethod
+    def run_client(address, size, rate, mechanism, timeout=None, nodes=[]):
         assert isinstance(address, str)
         assert isinstance(size, int) and size > 0
         assert isinstance(rate, int) and rate >= 0
@@ -66,6 +86,10 @@ class CommandMaker:
             return (f'~/cometbft/test/loadtime/build/load -c 1 --size {size} --rate {rate} --time {timeout}'
                     f' --endpoints ws://localhost:26657/websocket -v --broadcast-tx-method sync --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
                     # f' --endpoints ws://localhost:26657/websocket -v --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
+        elif mechanism == 'bullshark':
+            nodes = f'--nodes {" ".join(nodes)}' if nodes else ''
+            return f'./benchmark_client {address} --size {size} --rate {rate} {nodes}'
+    
     @staticmethod
     def kill():
         return 'tmux kill-server'
@@ -75,3 +99,9 @@ class CommandMaker:
         assert isinstance(origin, str)
         node, client = join(origin, 'node'), join(origin, 'client')
         return f'rm node ; rm client ; ln -s {node} . ; ln -s {client} .'
+    
+    @staticmethod
+    def alias_binaries_bullshark(origin):
+        assert isinstance(origin, str)
+        node, client = join(origin, 'node'), join(origin, 'benchmark_client')
+        return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'

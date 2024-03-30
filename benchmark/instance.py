@@ -89,8 +89,8 @@ class InstanceManager:
                 },
                 {
                     'IpProtocol': 'tcp',
-                    'FromPort': self.settings.consensus_port,
-                    'ToPort': self.settings.consensus_port,
+                    'FromPort': self.settings.ports["consensus"],
+                    'ToPort': self.settings.ports["consensus"],
                     'IpRanges': [{
                         'CidrIp': '0.0.0.0/0',
                         'Description': 'Consensus port',
@@ -102,8 +102,8 @@ class InstanceManager:
                 },
                 {
                     'IpProtocol': 'tcp',
-                    'FromPort': self.settings.mempool_port,
-                    'ToPort': self.settings.mempool_port,
+                    'FromPort': self.settings.ports["mempool"],
+                    'ToPort': self.settings.ports["mempool"],
                     'IpRanges': [{
                         'CidrIp': '0.0.0.0/0',
                         'Description': 'Mempool port',
@@ -115,8 +115,8 @@ class InstanceManager:
                 },
                 {
                     'IpProtocol': 'tcp',
-                    'FromPort': self.settings.front_port,
-                    'ToPort': self.settings.front_port,
+                    'FromPort': self.settings.ports["front"],
+                    'ToPort': self.settings.ports["front"],
                     'IpRanges': [{
                         'CidrIp': '0.0.0.0/0',
                         'Description': 'Front end to accept clients transactions',

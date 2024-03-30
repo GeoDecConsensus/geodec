@@ -39,7 +39,14 @@ class PathMaker:
     def db_path(i):
         assert isinstance(i, int) and i >= 0
         return f'.db-{i}'
-
+    
+    @staticmethod
+    def db_path(i, j=None):
+        assert isinstance(i, int) and i >= 0
+        assert (isinstance(j, int) and i >= 0) or j is None
+        worker_id = f'-{j}' if j is not None else ''
+        return f'.db-{i}{worker_id}'
+        
     @staticmethod
     def logs_path():
         return 'logs'
@@ -53,6 +60,23 @@ class PathMaker:
     def client_log_file(i):
         assert isinstance(i, int) and i >= 0
         return join(PathMaker.logs_path(), f'client-{i}.log')
+    
+    @staticmethod
+    def primary_log_file(i):
+        assert isinstance(i, int) and i >= 0
+        return join(PathMaker.logs_path(), f'primary-{i}.log')
+
+    @staticmethod
+    def worker_log_file(i, j):
+        assert isinstance(i, int) and i >= 0
+        assert isinstance(j, int) and i >= 0
+        return join(PathMaker.logs_path(), f'worker-{i}-{j}.log')
+
+    @staticmethod
+    def client_log_file_bull(i, j):
+        assert isinstance(i, int) and i >= 0
+        assert isinstance(j, int) and i >= 0
+        return join(PathMaker.logs_path(), f'client-{i}-{j}.log')
 
     @staticmethod
     def results_path():
