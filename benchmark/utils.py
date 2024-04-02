@@ -15,12 +15,12 @@ class PathMaker:
         return 'persistent_peers.json'
         
     @staticmethod
-    def binary_path():
-        return join('..', 'target', 'release')
+    def binary_path(repo_name):
+        return join('..', {repo_name}, 'target', 'release')
 
     @staticmethod
-    def node_crate_path():
-        return join('..', 'node')
+    def node_crate_path(repo_name):
+        return join('..', {repo_name}, 'node')
 
     @staticmethod
     def committee_file():
