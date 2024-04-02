@@ -135,6 +135,10 @@ class Bench:
         )
         
         cmd = self.mechanism.update_cmd
+        print("Update command: ", " && ".join(cmd))
+        print("hosts: ", hosts)
+        print("user name: ", self.settings.key_name)
+        print("connect_kwargs: ", self.connect)
         
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(' && '.join(cmd), hide=True)

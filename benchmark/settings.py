@@ -30,6 +30,9 @@ class Settings:
 
         self.key_name = key_name
         self.key_path = key_path
+        # print key_name nad key_path
+        print("Key Name: ", key_name)
+        print("Key Path: ", key_path)
 
         self.ports = ports
 
