@@ -42,7 +42,7 @@
             "testbed": "cometbft",
             "key": {
                 "name": "ubuntu",
-                "path": "/home/ubuntu/.ssh/geodec"
+                "path": "/home/zhuph/.ssh/geodec"
             },
             "ports": {
                 "consensus": 8000,
@@ -56,10 +56,10 @@
             },
             "geodec": {
                 "interface": "ens3",
-                "servers_file": "/home/ubuntu/data/servers-2020-07-19.csv",
-                "ip_file": "/home/ubuntu/IP.txt",
-                "pings_grouped_file": "/home/ubuntu/data/pings-2020-07-19-2020-07-20-grouped.csv",
-                "pings_file": "/home/ubuntu/data/pings-2020-07-19-2020-07-20.csv"
+                "servers_file": "/home/zhuph/ut/24_winter/blockchain/geodec/testdata/servers.csv",
+                "ip_file": "/home/zhuph/ut/24_winter/blockchain/geodec/testdata/IP.txt",
+                "pings_grouped_file": "",
+                "pings_file": ""
             },
             "instances": {
                 "type": "m5d.8xlarge",
@@ -72,8 +72,8 @@
                 ]
             },
             "configuration": {
-                "provider": "google_compute_engine",
-                "ip_file": "/home/ubuntu/geodec/gcp-scripts/instances_ip.csv"
+                "provider": "shashank",
+                "ip_file": "/home/zhuph/ut/24_winter/blockchain/geodec/testdata/instances_ip.csv"
             }
         },
         "bullshark": {
