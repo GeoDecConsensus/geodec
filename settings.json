@@ -12,8 +12,8 @@
                 "front": 6000
             },
             "repo": {
-                "name": "geodec-hotstuff",
-                "url": "https://github.com/sm86/geodec-hotstuff.git",
+                "name": "hotstuff",
+                "url": "https://github.com/GeoDecConsensus/hotstuff",
                 "branch": "main"
             },
             "geodec": {
