@@ -27,8 +27,6 @@ class HotStuffMechanism:
             f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))'
         ]
         
-        # check_repo_cmd = f'[ -d {self.settings.repo_name} ] || git clone {self.settings.repo_url}'
-        
         self.update_cmd = [
             # Check if the repo directory exists
             f'[ -d {self.settings.repo_name} ] || git clone {self.settings.repo_url}',
@@ -41,6 +39,3 @@ class HotStuffMechanism:
                 f'./{self.settings.repo_name}/target/release/', self.settings.repo_name
             )
         ]
-
-    def install(self):
-        print('Installing HotStuff ...')

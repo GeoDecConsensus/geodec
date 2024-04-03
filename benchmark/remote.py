@@ -161,7 +161,7 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec-hotstuff/benchmark/cometbft-config.toml']
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/cometbft-config.toml']
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             
             # Run the bash file and store the ouput in this file
@@ -176,7 +176,7 @@ class Bench:
             for i, host in enumerate(hosts):
                 # Print.info("Sent node config file to " + host)
                 # NOTE: Path of the node config files
-                cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec-hotstuff/benchmark/mytestnet/node{i} ubuntu@{host}:~/']
+                cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec/mytestnet/node{i} ubuntu@{host}:~/']
                 subprocess.run(cmd, shell=True)
         
         else:
@@ -307,7 +307,7 @@ class Bench:
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
                 # cmd = f'source ~/.profile && cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=true'
-                cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error" --consensus.create_empty_blocks=true'
+                cmd = f'./cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error" --consensus.create_empty_blocks=true'
                 # cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="*:debug,rpc-server:none" --consensus.create_empty_blocks=true'
                 self._background_run(host, cmd, log_file)
 

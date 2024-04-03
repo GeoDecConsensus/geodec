@@ -83,7 +83,7 @@ class CommandMaker:
             return (f'./client {address} --size {size} '
                     f'--rate {rate} --timeout {timeout} {nodes}')
         elif mechanism == 'cometbft':
-            return (f'~/cometbft/test/loadtime/build/load -c 1 --size {size} --rate {rate} --time {timeout}'
+            return (f'./load -c 1 --size {size} --rate {rate} --time {timeout}'
                     f' --endpoints ws://localhost:26657/websocket -v --broadcast-tx-method sync --expect-peers {len(nodes)} --min-peer-connectivity {len(nodes)}')
                     # f' --endpoints ws://localhost:26657/websocket -v --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
         elif mechanism == 'bullshark':
@@ -97,9 +97,12 @@ class CommandMaker:
     @staticmethod
     def alias_binaries(origin, repo_name):
         assert isinstance(origin, str)
-        if repo_name == 'narwhal':
-            node, client = join(origin, 'node'), join(origin, 'benchmark_client')
-            return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'
-        else:
+        if repo_name == 'hotstuff':
             node, client = join(origin, 'node'), join(origin, 'client')
             return f'rm node ; rm client ; ln -s {node} . ; ln -s {client} .'
+        elif repo_name == 'cometbft':
+            cometbft, load = join(origin, 'cometbft'), './cometbft/test/loadtime/build/load'
+            return f'rm cometbft ; rm load ; ln -s {cometbft} . ; ln -s {load} .'
+        elif repo_name == 'narwhal':
+            node, client = join(origin, 'node'), join(origin, 'benchmark_client')
+            return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'
