@@ -33,9 +33,9 @@ rm -r cometbft_0.38.6_linux_amd64.tar.gz cometbft-dir
 
 Install rust (non-interactive)
 ``` bash
-'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y',
-'source $HOME/.cargo/env',
-'rustup default stable',
+curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+source $HOME/.cargo/env
+rustup default stable
 ```
 
 ## Progress
