@@ -6,14 +6,11 @@ GeoDec aims to address the geographic concentration of validator nodes in existi
 
 **Emulator Development**
 - [x] Develop HotStuff emulator
-- [ ] Extend emulator for Tendermint consensus mechanisms (like CometBFT)
-    - [x] Implement install scripts
-    - [x] Implement CometBFT run scripts
-    - [ ] Read and write log files
-    - [ ] Output summarized results
-
-- [ ] Extend emulator for BullShark consensus mechanism
+- [x] Extend emulator for Tendermint consensus mechanisms (like CometBFT)
+- [x] Extend emulator for BullShark consensus mechanism
 - [ ] Implement and improvise a modular and extensible code structure
+    - [ ] Improve the cometbft benchmark by making changes in the forked repo
+    - [ ] Improve code structure and documentation
 - [ ] Get feedback from the community
 - [ ] Improve emulator based on the feedback
 
