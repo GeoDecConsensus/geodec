@@ -563,6 +563,6 @@ class BullsharkMechanism:
             'source $HOME/.cargo/env',
             f'(cd {self.settings.repo_name}/node && {CommandMaker.compile()})',
             CommandMaker.alias_binaries(
-                f'./{self.settings.repo_name}/target/release/', self.settings.repo_name
+                f'./{self.settings.repo_name}/target/release/', self.name
             )
         ]     

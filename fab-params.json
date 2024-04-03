@@ -52,9 +52,9 @@
                 "nodes": [4],
                 "workers": 1,
                 "collocate": true,
-                "rate": [20000],
+                "rate": [10000],
                 "tx_size": 512,
-                "duration": 30,
+                "duration": 300,
                 "runs": 1
             },
             "node_params": {

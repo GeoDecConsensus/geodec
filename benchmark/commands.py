@@ -24,9 +24,12 @@ class CommandMaker:
         return 'cargo build --quiet --release --features benchmark'
 
     @staticmethod
-    def generate_key(filename):
+    def generate_key(filename, mechanism):
         assert isinstance(filename, str)
-        return f'./node keys --filename {filename}'
+        if mechanism == "hotstuff":
+            return f'./node keys --filename {filename}'
+        elif mechanism == "bullshark":
+            return f'./node generate_keys --filename {filename}'
     
     @staticmethod
     def initalizeDelayQDisc(interface):
@@ -88,19 +91,19 @@ class CommandMaker:
                     # f' --endpoints ws://localhost:26657/websocket -v --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
         elif mechanism == 'bullshark':
             nodes = f'--nodes {" ".join(nodes)}' if nodes else ''
-            return f'./benchmark_client {address} --size {size} --rate {rate} {nodes}'
+            return f'./client {address} --size {size} --rate {rate} {nodes}'
     
     @staticmethod
     def kill():
         return 'tmux kill-server'
 
     @staticmethod
-    def alias_binaries(origin, repo_name):
+    def alias_binaries(origin, mechanism):
         assert isinstance(origin, str)
-        if repo_name == 'hotstuff':
+        if mechanism == 'hotstuff':
             node, client = join(origin, 'node'), join(origin, 'client')
-        elif repo_name == 'cometbft':
+        elif mechanism == 'cometbft':
             node, client = './cometbft/build/cometbft', './cometbft/test/loadtime/build/load'
-        elif repo_name == 'narwhal':
+        elif mechanism == 'bullshark':
             node, client = join(origin, 'node'), join(origin, 'benchmark_client')
         return f'rm node ; rm client ; ln -s {node} node ; ln -s {client} client'

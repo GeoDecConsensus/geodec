@@ -143,3 +143,6 @@ mytestnet/
 !fab-params.json
 
 persistent_peer.txt
+
+./node
+./client

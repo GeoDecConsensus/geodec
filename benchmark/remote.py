@@ -186,19 +186,19 @@ class Bench:
 
             # Recompile the latest code.
             cmd = CommandMaker.compile().split()
-            # subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
-            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path('hotstuff'))
+            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
+            # subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path('hotstuff'))
 
             # Create alias for the client and nodes binary.
-            # cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name))
-            cmd = CommandMaker.alias_binaries(PathMaker.binary_path('hotstuff'), self.settings.repo_name)
+            cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name), self.mechanism.name)
+            # cmd = CommandMaker.alias_binaries(PathMaker.binary_path('hotstuff'), self.settings.repo_name)
             subprocess.run([cmd], shell=True)
 
             # Generate configuration files.
             keys = []
             key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
             for filename in key_files:
-                cmd = CommandMaker.generate_key(filename).split()
+                cmd = CommandMaker.generate_key(filename, self.mechanism.name).split()
                 subprocess.run(cmd, check=True)
                 keys += [Key.from_file(filename)]
                 
@@ -275,6 +275,10 @@ class Bench:
                     mechanism=self.mechanism.name
                 )
                 self._background_run(host, cmd, log_file)
+            
+            # Wait for the nodes to synchronize
+            Print.info('Waiting for the nodes to synchronize...')
+            sleep(2 * node_parameters.timeout_delay / 1000)
 
         elif self.mechanism.name == 'cometbft':
             persistent_peers = []
@@ -362,12 +366,12 @@ class Bench:
                     log_file = PathMaker.worker_log_file(i, id)
                     self._background_run(host, cmd, log_file)
 
-        try:
-            # Wait for the nodes to synchronize
-            Print.info('Waiting for the nodes to synchronize...')
-            sleep(2 * node_parameters.timeout_delay / 1000)
-        except:
-            Print.info('No timeout delay')
+        # try:
+        #     # Wait for the nodes to synchronize
+        #     Print.info('Waiting for the nodes to synchronize...')
+        #     sleep(2 * node_parameters.timeout_delay / 1000)
+        # except:
+        #     Print.info('No timeout delay')
 
         # Wait for all transactions to be processed.
         duration = bench_parameters.duration
