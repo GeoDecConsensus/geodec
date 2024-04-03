@@ -42,7 +42,7 @@
             "testbed": "cometbft",
             "key": {
                 "name": "ubuntu",
-                "path": "/home/zhuph/.ssh/geodec"
+                "path": "/home/ubuntu/.ssh/geodec"
             },
             "ports": {
                 "consensus": 8000,
@@ -52,12 +52,12 @@
             "repo": {
                 "name": "cometbft",
                 "url": "https://github.com/GeoDecConsensus/cometbft",
-                "branch": "v0.38.6-geodec"
+                "branch": "v0.38.6"
             },
             "geodec": {
                 "interface": "ens3",
-                "servers_file": "/home/zhuph/ut/24_winter/blockchain/geodec/testdata/servers.csv",
-                "ip_file": "/home/zhuph/ut/24_winter/blockchain/geodec/testdata/IP.txt",
+                "servers_file": "/home/ubuntu/geodec/testdata/servers.csv",
+                "ip_file": "/home/ubuntu/geodec/testdata/IP.txt",
                 "pings_grouped_file": "",
                 "pings_file": ""
             },
@@ -72,8 +72,8 @@
                 ]
             },
             "configuration": {
-                "provider": "shashank",
-                "ip_file": "/home/zhuph/ut/24_winter/blockchain/geodec/testdata/instances_ip.csv"
+                "provider": "google_compute_engine",
+                "ip_file": "/home/ubuntu/geodec/testdata/instances_ip.csv"
             }
         },
         "bullshark": {

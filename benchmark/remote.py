@@ -165,9 +165,10 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec-hotstuff/benchmark/cometbft-config.toml']
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config /home/ubuntu/geodec/testdata/cometbft-config.toml']
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             
+            print("gen persistent, hosts_string: ", hosts_string)
             # Run the bash file and store the ouput in this file
             cmd = [
                 # 'chmod u+x ./persistent.sh',
@@ -180,7 +181,7 @@ class Bench:
             for i, host in enumerate(hosts):
                 # Print.info("Sent node config file to " + host)
                 # NOTE: Path of the node config files
-                cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec-hotstuff/benchmark/mytestnet/node{i} ubuntu@{host}:~/']
+                cmd = [f'scp -i {self.settings.key_path} -r /home/ubuntu/geodec/mytestnet/node{i} ubuntu@{host}:~/']
                 subprocess.run(cmd, shell=True)
         
         else:
@@ -285,7 +286,7 @@ class Bench:
             with open('persistent_peer.txt', 'r') as f:
                 persistent_peers = f.read()
                 persistent_peers = persistent_peers[:-1]
-            # Print.info("Persistent Peers: " + persistent_peers)
+            Print.info("Persistent Peers: " + persistent_peers)
             
             # Run the clients
             # committee = Committee.load(PathMaker.committee_file())
