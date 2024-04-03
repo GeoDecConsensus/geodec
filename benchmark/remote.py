@@ -184,13 +184,14 @@ class Bench:
             cmd = CommandMaker.cleanup()
             subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
 
-            # FIXME: breaking here when standalone benchmark folder
             # Recompile the latest code.
             cmd = CommandMaker.compile().split()
-            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
+            # subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
+            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path('hotstuff'))
 
             # Create alias for the client and nodes binary.
-            cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name))
+            # cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name))
+            cmd = CommandMaker.alias_binaries(PathMaker.binary_path('hotstuff'), self.settings.repo_name)
             subprocess.run([cmd], shell=True)
 
             # Generate configuration files.

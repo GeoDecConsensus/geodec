@@ -95,13 +95,11 @@ class CommandMaker:
         return 'tmux kill-server'
 
     @staticmethod
-    def alias_binaries(origin):
+    def alias_binaries(origin, repo_name):
         assert isinstance(origin, str)
-        node, client = join(origin, 'node'), join(origin, 'client')
-        return f'rm node ; rm client ; ln -s {node} . ; ln -s {client} .'
-    
-    @staticmethod
-    def alias_binaries_bullshark(origin):
-        assert isinstance(origin, str)
-        node, client = join(origin, 'node'), join(origin, 'benchmark_client')
-        return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'
+        if repo_name == 'narwhal':
+            node, client = join(origin, 'node'), join(origin, 'benchmark_client')
+            return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'
+        else:
+            node, client = join(origin, 'node'), join(origin, 'client')
+            return f'rm node ; rm client ; ln -s {node} . ; ln -s {client} .'

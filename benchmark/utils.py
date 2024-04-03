@@ -16,11 +16,11 @@ class PathMaker:
         
     @staticmethod
     def binary_path(repo_name):
-        return join('..', {repo_name}, 'target', 'release')
+        return join('..', f'{repo_name}', 'target', 'release')
 
     @staticmethod
     def node_crate_path(repo_name):
-        return join('..', {repo_name}, 'node')
+        return join('..', f'{repo_name}', 'node')
 
     @staticmethod
     def committee_file():
