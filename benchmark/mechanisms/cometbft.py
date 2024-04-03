@@ -320,8 +320,6 @@ class CometBftMechanism:
             'make build',
             'cd ./test/loadtime',
             'make build',
-            'cd ~',
-            CommandMaker.alias_binaries(
-                f'./{self.settings.repo_name}/build/', self.settings.repo_name
-            )
+            'cd',
+            CommandMaker.alias_binaries('', self.settings.repo_name)
         ]

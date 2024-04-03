@@ -289,7 +289,7 @@ class Bench:
             addresses = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
             # rate_share = ceil(rate / committee.size())  # Take faults into account.
             rate_share = ceil(rate / len(hosts))
-            timeout = int(node_parameters.timeout_delay / 1000) # In seconds
+            # timeout = int(node_parameters.timeout_delay / 1000) # In seconds
             timeout = bench_parameters.duration
             client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
             for host, addr, log_file in zip(hosts, addresses, client_logs):
@@ -307,8 +307,7 @@ class Bench:
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
                 # cmd = f'source ~/.profile && cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=true'
-                cmd = f'./cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error" --consensus.create_empty_blocks=true'
-                # cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="*:debug,rpc-server:none" --consensus.create_empty_blocks=true'
+                cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error"'
                 self._background_run(host, cmd, log_file)
 
         elif self.mechanism.name == 'bullshark':

@@ -99,10 +99,8 @@ class CommandMaker:
         assert isinstance(origin, str)
         if repo_name == 'hotstuff':
             node, client = join(origin, 'node'), join(origin, 'client')
-            return f'rm node ; rm client ; ln -s {node} . ; ln -s {client} .'
         elif repo_name == 'cometbft':
-            cometbft, load = join(origin, 'cometbft'), './cometbft/test/loadtime/build/load'
-            return f'rm cometbft ; rm load ; ln -s {cometbft} . ; ln -s {load} .'
+            node, client = './cometbft/build/cometbft', './cometbft/test/loadtime/build/load'
         elif repo_name == 'narwhal':
             node, client = join(origin, 'node'), join(origin, 'benchmark_client')
-            return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'
+        return f'rm node ; rm client ; ln -s {node} node ; ln -s {client} client'
