@@ -1,6 +1,6 @@
 # GeoDec: Enhancing Blockchain Resilience through Geospatial Validator Distribution
 
-GeoDec aims to address the geographic concentration of validator nodes in existing blockchain networks, particularly in the context of PoS consensus mechanisms. The project involves the development of an emulator to analyze geospatial distribution, the design of a geospatial-aware proposer selection mechanism, and the deployment of the revised protocol for evaluation.
+GeoDec aims to address the geographic concentration of validator nodes in existing blockchain networks, particularly in the context of PoS consensus mechanisms. The project involves the development of an emulator to analyze geospatial distribution, the design of a geospatial-aware proposer selection mechanism, and deploying the revised protocol for evaluation.
 
 ### Progress
 
@@ -29,7 +29,7 @@ The node config is same for hotstuff and bullshark
 git clone https://github.com/GeoDecConsensus/geodec.git
 git clone https://github.com/GeoDecConsensus/hotstuff.git
 wget https://github.com/cometbft/cometbft/releases/download/v0.38.6/cometbft_0.38.6_linux_amd64.tar.gz
-``
+```
 
 ### Vision
 Success for GeoDec entails advancing geospatial decentralization in blockchain validator networks. The desired impact includes the development of a widely-used open-source emulator, an effective mechanism for geographically decentralized block proposers, and influential academic research. The goal is to set new standards for blockchain networks globally.
