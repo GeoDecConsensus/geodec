@@ -82,11 +82,13 @@ class CometBftLogParser:
 
         # tmp = search(r'\[(.*Z) .* Starting ', log).group(1)
         tmp = search(r'time="(.*Z)" .* msg="Starting transactor"', log).group(1)
+        print("length of Starting transactor found: ", len(tmp))
         start = self._to_posix(tmp, name='client')
 
         misses = len(findall(r'rate too high', log))
 
         tmp = findall(r'time="(.*Z)".* msg="Sending batch of transactions" .* ', log)
+        print("length of Sending batch fo trans found: ", len(tmp))
         samples = {int(i+1): self._to_posix(t, name='client') for i, t in enumerate(tmp)}
  
         return size, rate, start, misses, samples
@@ -97,16 +99,19 @@ class CometBftLogParser:
         
         # tmp = findall(r'\[(.*Z) .* Created B\d+ -> ([^ ]+=)', log)
         tmp = findall(r'I\[(.*?)\].*received complete proposal block.*hash=([A-Fa-f0-9]+)', log)
+        print("length of complete proposal found: ", len(tmp))
         tmp = [(d, self._to_posix(t)) for t, d in tmp]
         proposals = self._merge_results([tmp])
 
         # tmp = findall(r'\[(.*Z) .* Committed B\d+ -> ([^ ]+=)', log)
         tmp = findall(r'D\[(.*?)\].*committed block.*block=([A-Fa-f0-9]+).*', log)
+        print("length of committed block found: ", len(tmp))
         tmp = [(d, self._to_posix(t)) for t, d in tmp]
         commits = self._merge_results([tmp])
 
         # tmp = findall(r'Batch ([^ ]+) contains (\d+) B', log)
         tmp = findall(r'hash=([A-Fa-f0-9]+).*num_txs=(\d+)', log)
+        print("length of num_txs found: ", len(tmp))
         sizes = {d: int(s) * int(self.size[0]) for d, s in tmp}
 
         # NOTE
@@ -163,6 +168,7 @@ class CometBftLogParser:
 
     def _consensus_throughput(self):
         if not self.commits:
+            print("commits are none, all zero throughput")
             return 0, 0, 0
         start, end = min(self.proposals.values()), max(self.commits.values())
         duration = end - start
@@ -314,7 +320,7 @@ class CometBftMechanism:
             f'[ -d {self.settings.repo_name} ] || git clone {self.settings.repo_url}',
             f'(cd {self.settings.repo_name} && git fetch -f)',
             f'(cd {self.settings.repo_name} && git checkout -f {self.settings.branch})',
-            f'(cd {self.settings.repo_name} && git pull origin -f)',
+            # f'(cd {self.settings.repo_name} && git pull origin -f)',
             f'cd {self.settings.repo_name}',
             'make install',
             'make build',
