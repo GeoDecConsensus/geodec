@@ -61,8 +61,6 @@ class LogParser:
         if self.timeouts > 2:
             Print.warn(f'Nodes timed out {self.timeouts:,} time(s)')
 
-        print(self.result())
-
     def _merge_results(self, input):
         # Keep the earliest timestamp.
         merged = {}

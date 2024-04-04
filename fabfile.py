@@ -8,6 +8,7 @@ from benchmark.plot import Ploter, PlotError
 from benchmark.instance import InstanceManager
 from benchmark.remote import Bench, BenchError
 from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
+from benchmark.mechanisms.bullshark import BullsharkLogParser
 
 # Open the JSON file and load its contents
 with open('fab-params.json') as f:
@@ -173,8 +174,10 @@ def logs(ctx, mechanism):
     ''' Print a summary of the logs '''
     try:
         if mechanism == 'hotstuff':
-            LogParser.process('./logs-hotstuff', faults='?').result()
+            LogParser.process('./logs', faults='?').result()
         elif mechanism == 'cometbft':
             CometBftLogParser.process('./logs', faults='0').result()
+        elif mechanism == 'bullshark':
+            BullsharkLogParser.process('./logs').result()
     except ParseError as e:
         Print.error(BenchError('Failed to parse logs', e))

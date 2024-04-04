@@ -6,7 +6,7 @@
                 "nodes": [4],
                 "rate": [10000],
                 "tx_size": 512,
-                "duration": 300,
+                "duration": 30,
                 "runs": 1
             },
             "node_params": {
@@ -54,7 +54,7 @@
                 "collocate": true,
                 "rate": [10000],
                 "tx_size": 512,
-                "duration": 300,
+                "duration": 30,
                 "runs": 1
             },
             "node_params": {
