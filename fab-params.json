@@ -37,7 +37,7 @@
                     20000
                 ],
                 "tx_size": 512,
-                "duration": 300,
+                "duration": 20,
                 "runs": 1
             },
             "node_params": {
