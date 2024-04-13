@@ -208,3 +208,1242 @@
  End-to-end BPS: 0 B/s
  End-to-end latency: 0 ms
 -----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 918 tx/s
+ Consensus BPS: 469,840 B/s
+ Consensus latency: 680 ms
+
+ End-to-end TPS: 924 tx/s
+ End-to-end BPS: 472,987 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 121 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,190 tx/s
+ Consensus BPS: 609,044 B/s
+ Consensus latency: 790 ms
+
+ End-to-end TPS: 1,188 tx/s
+ End-to-end BPS: 608,025 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 121 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,140 tx/s
+ Consensus BPS: 583,488 B/s
+ Consensus latency: 694 ms
+
+ End-to-end TPS: 1,128 tx/s
+ End-to-end BPS: 577,580 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,380 tx/s
+ Consensus BPS: 706,767 B/s
+ Consensus latency: 862 ms
+
+ End-to-end TPS: 1,376 tx/s
+ End-to-end BPS: 704,681 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,329 tx/s
+ Consensus BPS: 680,372 B/s
+ Consensus latency: 740 ms
+
+ End-to-end TPS: 1,325 tx/s
+ End-to-end BPS: 678,412 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 220 s
+
+
+ + RESULTS:
+ Consensus TPS: 617 tx/s
+ Consensus BPS: 315,967 B/s
+ Consensus latency: 422 ms
+
+ End-to-end TPS: 618 tx/s
+ End-to-end BPS: 316,196 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 401 s
+
+
+ + RESULTS:
+ Consensus TPS: 344 tx/s
+ Consensus BPS: 176,295 B/s
+ Consensus latency: 356 ms
+
+ End-to-end TPS: 344 tx/s
+ End-to-end BPS: 176,104 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,230 tx/s
+ Consensus BPS: 629,768 B/s
+ Consensus latency: 684 ms
+
+ End-to-end TPS: 1,227 tx/s
+ End-to-end BPS: 627,976 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 121 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,195 tx/s
+ Consensus BPS: 611,977 B/s
+ Consensus latency: 746 ms
+
+ End-to-end TPS: 1,192 tx/s
+ End-to-end BPS: 610,485 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 117 s
+
+
+ + RESULTS:
+ Consensus TPS: 209 tx/s
+ Consensus BPS: 107,107 B/s
+ Consensus latency: 21,707 ms
+
+ End-to-end TPS: 216 tx/s
+ End-to-end BPS: 110,409 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 117 s
+
+
+ + RESULTS:
+ Consensus TPS: 164 tx/s
+ Consensus BPS: 84,188 B/s
+ Consensus latency: 27,778 ms
+
+ End-to-end TPS: 170 tx/s
+ End-to-end BPS: 87,290 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 7 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 7,273 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 773 tx/s
+ Consensus BPS: 396,031 B/s
+ Consensus latency: 1,112 ms
+
+ End-to-end TPS: 791 tx/s
+ End-to-end BPS: 405,045 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 879 tx/s
+ Consensus BPS: 450,045 B/s
+ Consensus latency: 998 ms
+
+ End-to-end TPS: 893 tx/s
+ End-to-end BPS: 457,434 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 858 tx/s
+ Consensus BPS: 439,428 B/s
+ Consensus latency: 883 ms
+
+ End-to-end TPS: 875 tx/s
+ End-to-end BPS: 447,997 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 897 tx/s
+ Consensus BPS: 459,368 B/s
+ Consensus latency: 719 ms
+
+ End-to-end TPS: 925 tx/s
+ End-to-end BPS: 473,488 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 1 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 1,598 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 5 s
+
+
+ + RESULTS:
+ Consensus TPS: 10 tx/s
+ Consensus BPS: 5,140 B/s
+ Consensus latency: 2,224 ms
+
+ End-to-end TPS: 16 tx/s
+ End-to-end BPS: 8,364 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 4 s
+
+
+ + RESULTS:
+ Consensus TPS: 40 tx/s
+ Consensus BPS: 20,688 B/s
+ Consensus latency: 1,817 ms
+
+ End-to-end TPS: 49 tx/s
+ End-to-end BPS: 25,017 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 5 s
+
+
+ + RESULTS:
+ Consensus TPS: 73 tx/s
+ Consensus BPS: 37,187 B/s
+ Consensus latency: 2,224 ms
+
+ End-to-end TPS: 83 tx/s
+ End-to-end BPS: 42,373 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 5 s
+
+
+ + RESULTS:
+ Consensus TPS: 13 tx/s
+ Consensus BPS: 6,743 B/s
+ Consensus latency: 2,648 ms
+
+ End-to-end TPS: 15 tx/s
+ End-to-end BPS: 7,810 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 1 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 1,505 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 5 s
+
+
+ + RESULTS:
+ Consensus TPS: 192 tx/s
+ Consensus BPS: 98,482 B/s
+ Consensus latency: 1,871 ms
+
+ End-to-end TPS: 181 tx/s
+ End-to-end BPS: 92,633 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 4 s
+
+
+ + RESULTS:
+ Consensus TPS: 126 tx/s
+ Consensus BPS: 64,298 B/s
+ Consensus latency: 1,087 ms
+
+ End-to-end TPS: 166 tx/s
+ End-to-end BPS: 84,770 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 5 s
+
+
+ + RESULTS:
+ Consensus TPS: 229 tx/s
+ Consensus BPS: 117,087 B/s
+ Consensus latency: 1,819 ms
+
+ End-to-end TPS: 232 tx/s
+ End-to-end BPS: 118,834 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 5 s
+
+
+ + RESULTS:
+ Consensus TPS: 443 tx/s
+ Consensus BPS: 227,065 B/s
+ Consensus latency: 1,759 ms
+
+ End-to-end TPS: 393 tx/s
+ End-to-end BPS: 201,468 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 2 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 1,330 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 1 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 1,059 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 4 s
+
+
+ + RESULTS:
+ Consensus TPS: 78 tx/s
+ Consensus BPS: 39,694 B/s
+ Consensus latency: 2,197 ms
+
+ End-to-end TPS: 111 tx/s
+ End-to-end BPS: 56,696 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 7 s
+
+
+ + RESULTS:
+ Consensus TPS: 89 tx/s
+ Consensus BPS: 45,320 B/s
+ Consensus latency: 2,002 ms
+
+ End-to-end TPS: 105 tx/s
+ End-to-end BPS: 53,532 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 3 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 1,078 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 1 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 635 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 954 tx/s
+ Consensus BPS: 488,222 B/s
+ Consensus latency: 652 ms
+
+ End-to-end TPS: 944 tx/s
+ End-to-end BPS: 483,544 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 964 tx/s
+ Consensus BPS: 493,624 B/s
+ Consensus latency: 832 ms
+
+ End-to-end TPS: 965 tx/s
+ End-to-end BPS: 494,335 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 121 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,217 tx/s
+ Consensus BPS: 623,290 B/s
+ Consensus latency: 1,019 ms
+
+ End-to-end TPS: 1,213 tx/s
+ End-to-end BPS: 621,098 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 120 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,183 tx/s
+ Consensus BPS: 605,558 B/s
+ Consensus latency: 921 ms
+
+ End-to-end TPS: 1,180 tx/s
+ End-to-end BPS: 603,987 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 117 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,052 tx/s
+ Consensus BPS: 538,678 B/s
+ Consensus latency: 829 ms
+
+ End-to-end TPS: 1,073 tx/s
+ End-to-end BPS: 549,513 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 115 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,135 tx/s
+ Consensus BPS: 581,016 B/s
+ Consensus latency: 827 ms
+
+ End-to-end TPS: 1,153 tx/s
+ End-to-end BPS: 590,304 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,023 tx/s
+ Consensus BPS: 523,708 B/s
+ Consensus latency: 525 ms
+
+ End-to-end TPS: 1,017 tx/s
+ End-to-end BPS: 520,552 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 6 s
+
+
+ + RESULTS:
+ Consensus TPS: 354 tx/s
+ Consensus BPS: 181,469 B/s
+ Consensus latency: 2,336 ms
+
+ End-to-end TPS: 337 tx/s
+ End-to-end BPS: 172,684 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 2 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 382 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 1 s
+
+
+ + RESULTS:
+ Consensus TPS: 0 tx/s
+ Consensus BPS: 0 B/s
+ Consensus latency: 666 ms
+
+ End-to-end TPS: 0 tx/s
+ End-to-end BPS: 0 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 5 s
+
+
+ + RESULTS:
+ Consensus TPS: 237 tx/s
+ Consensus BPS: 121,479 B/s
+ Consensus latency: 1,535 ms
+
+ End-to-end TPS: 205 tx/s
+ End-to-end BPS: 104,756 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 4 s
+
+
+ + RESULTS:
+ Consensus TPS: 79 tx/s
+ Consensus BPS: 40,609 B/s
+ Consensus latency: 1,106 ms
+
+ End-to-end TPS: 135 tx/s
+ End-to-end BPS: 69,264 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,280 tx/s
+ Consensus BPS: 655,174 B/s
+ Consensus latency: 759 ms
+
+ End-to-end TPS: 1,264 tx/s
+ End-to-end BPS: 647,024 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 118 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,181 tx/s
+ Consensus BPS: 604,675 B/s
+ Consensus latency: 878 ms
+
+ End-to-end TPS: 1,198 tx/s
+ End-to-end BPS: 613,421 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,161 tx/s
+ Consensus BPS: 594,271 B/s
+ Consensus latency: 801 ms
+
+ End-to-end TPS: 1,173 tx/s
+ End-to-end BPS: 600,567 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 970 tx/s
+ Consensus BPS: 496,741 B/s
+ Consensus latency: 869 ms
+
+ End-to-end TPS: 966 tx/s
+ End-to-end BPS: 494,802 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,349 tx/s
+ Consensus BPS: 690,696 B/s
+ Consensus latency: 1,243 ms
+
+ End-to-end TPS: 1,360 tx/s
+ End-to-end BPS: 696,088 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 116 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,007 tx/s
+ Consensus BPS: 515,525 B/s
+ Consensus latency: 1,275 ms
+
+ End-to-end TPS: 1,027 tx/s
+ End-to-end BPS: 525,906 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 119 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,009 tx/s
+ Consensus BPS: 516,365 B/s
+ Consensus latency: 1,107 ms
+
+ End-to-end TPS: 1,003 tx/s
+ End-to-end BPS: 513,558 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 117 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,053 tx/s
+ Consensus BPS: 539,002 B/s
+ Consensus latency: 922 ms
+
+ End-to-end TPS: 1,066 tx/s
+ End-to-end BPS: 545,536 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 118 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,257 tx/s
+ Consensus BPS: 643,346 B/s
+ Consensus latency: 1,394 ms
+
+ End-to-end TPS: 1,258 tx/s
+ End-to-end BPS: 644,006 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 117 s
+
+
+ + RESULTS:
+ Consensus TPS: 1,010 tx/s
+ Consensus BPS: 517,108 B/s
+ Consensus latency: 946 ms
+
+ End-to-end TPS: 1,029 tx/s
+ End-to-end BPS: 526,713 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 116 s
+
+
+ + RESULTS:
+ Consensus TPS: 845 tx/s
+ Consensus BPS: 432,518 B/s
+ Consensus latency: 1,484 ms
+
+ End-to-end TPS: 872 tx/s
+ End-to-end BPS: 446,719 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 5 s
+
+
+ + RESULTS:
+ Consensus TPS: 122 tx/s
+ Consensus BPS: 62,690 B/s
+ Consensus latency: 1,321 ms
+
+ End-to-end TPS: 207 tx/s
+ End-to-end BPS: 105,817 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 4 s
+
+
+ + RESULTS:
+ Consensus TPS: 86 tx/s
+ Consensus BPS: 43,777 B/s
+ Consensus latency: 846 ms
+
+ End-to-end TPS: 95 tx/s
+ End-to-end BPS: 48,406 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 3 s
+
+
+ + RESULTS:
+ Consensus TPS: 14 tx/s
+ Consensus BPS: 6,912 B/s
+ Consensus latency: 2,111 ms
+
+ End-to-end TPS: 27 tx/s
+ End-to-end BPS: 13,590 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------
+
+-----------------------------------------
+ SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 20,000 tx/s
+ Transaction size: 512 B
+ Execution time: 4 s
+
+
+ + RESULTS:
+ Consensus TPS: 33 tx/s
+ Consensus BPS: 16,724 B/s
+ Consensus latency: 682 ms
+
+ End-to-end TPS: 56 tx/s
+ End-to-end BPS: 28,906 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------

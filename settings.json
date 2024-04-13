@@ -12,8 +12,8 @@
                 "front": 6000
             },
             "repo": {
-                "name": "geodec-hotstuff",
-                "url": "https://github.com/sm86/geodec-hotstuff.git",
+                "name": "hotstuff",
+                "url": "https://github.com/GeoDecConsensus/hotstuff",
                 "branch": "main"
             },
             "geodec": {
@@ -51,8 +51,8 @@
             },
             "repo": {
                 "name": "cometbft",
-                "url": "https://github.com/GeoDecConsensus/cometbft",
-                "branch": "v0.38.6-geodec"
+                "url": "https://github.com/Zhuph31/cometbft",
+                "branch": "main"
             },
             "geodec": {
                 "interface": "ens3",

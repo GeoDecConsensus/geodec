@@ -84,7 +84,7 @@ class CommandMaker:
                     f'--rate {rate} --timeout {timeout} {nodes}')
         elif mechanism == 'cometbft':
             return (f'~/cometbft/test/loadtime/build/load -c 1 --size {size} --rate {rate} --time {timeout}'
-                    f' --endpoints ws://localhost:26657/websocket -v --broadcast-tx-method sync --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
+                    f' --endpoints ws://localhost:26657/websocket -v --broadcast-tx-method sync --expect-peers {len(nodes)} --min-peer-connectivity {len(nodes)}')
                     # f' --endpoints ws://localhost:26657/websocket -v --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
         elif mechanism == 'bullshark':
             nodes = f'--nodes {" ".join(nodes)}' if nodes else ''
@@ -95,13 +95,11 @@ class CommandMaker:
         return 'tmux kill-server'
 
     @staticmethod
-    def alias_binaries(origin):
+    def alias_binaries(origin, repo_name):
         assert isinstance(origin, str)
-        node, client = join(origin, 'node'), join(origin, 'client')
-        return f'rm node ; rm client ; ln -s {node} . ; ln -s {client} .'
-    
-    @staticmethod
-    def alias_binaries_bullshark(origin):
-        assert isinstance(origin, str)
-        node, client = join(origin, 'node'), join(origin, 'benchmark_client')
-        return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'
+        if repo_name == 'narwhal':
+            node, client = join(origin, 'node'), join(origin, 'benchmark_client')
+            return f'rm node ; rm benchmark_client ; ln -s {node} . ; ln -s {client} .'
+        else:
+            node, client = join(origin, 'node'), join(origin, 'client')
+            return f'rm node ; rm client ; ln -s {node} . ; ln -s {client} .'

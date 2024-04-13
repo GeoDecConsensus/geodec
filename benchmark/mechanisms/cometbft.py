@@ -320,7 +320,7 @@ class CometBftMechanism:
             f'[ -d {self.settings.repo_name} ] || git clone {self.settings.repo_url}',
             f'(cd {self.settings.repo_name} && git fetch -f)',
             f'(cd {self.settings.repo_name} && git checkout -f {self.settings.branch})',
-            # f'(cd {self.settings.repo_name} && git pull origin -f)',
+            f'(cd {self.settings.repo_name} && git pull origin -f)',
             f'cd {self.settings.repo_name}',
             'make install',
             'make build',
