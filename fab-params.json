@@ -3,20 +3,17 @@
         "hotstuff": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [
-                    4
-                ],
-                "rate": [
-                    20000
-                ],
+                "nodes": [4],
+                "rate": [10000],
+
                 "tx_size": 512,
-                "duration": 20,
+                "duration": 300,
                 "runs": 1
             },
             "node_params": {
                 "consensus": {
-                    "timeout_delay": 50000,
-                    "sync_retry_delay": 50000
+                    "timeout_delay": 5000,
+                    "sync_retry_delay": 5000
                 },
                 "mempool": {
                     "gc_depth": 50,
@@ -30,20 +27,16 @@
         "cometbft": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [
-                    4
-                ],
-                "rate": [
-                    20000
-                ],
+                "nodes": [4],
+                "rate": [10000],
                 "tx_size": 512,
-                "duration": 20,
+                "duration": 300,
                 "runs": 1
             },
             "node_params": {
                 "consensus": {
-                    "timeout_delay": 50000,
-                    "sync_retry_delay": 50000
+                    "timeout_delay": 5000,
+                    "sync_retry_delay": 5000
                 },
                 "mempool": {
                     "gc_depth": 50,
