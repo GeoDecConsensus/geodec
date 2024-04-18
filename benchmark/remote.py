@@ -287,12 +287,11 @@ class Bench:
             # Print.info("Persistent Peers: " + persistent_peers)
             
             # Run the clients
-            # committee = Committee.load(PathMaker.committee_file())
+            # committee = Committee.load(PathMaker.committee_file())    # TODO for cometbft
             addresses = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-            # rate_share = ceil(rate / committee.size())  # Take faults into account.
+            # rate_share = ceil(rate / committee.size())  # TODO Take faults into account.
             rate_share = ceil(rate / len(hosts))
-            # timeout = int(node_parameters.timeout_delay / 1000) # In seconds
-            timeout = bench_parameters.duration
+            duration = bench_parameters.duration    # Duration for which the client should run
             client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
             for host, addr, log_file in zip(hosts, addresses, client_logs):
                 cmd = CommandMaker.run_client(
@@ -300,7 +299,7 @@ class Bench:
                     bench_parameters.tx_size,
                     rate_share,
                     self.mechanism.name,
-                    timeout,
+                    duration,
                     nodes=addresses
                 )
                 self._background_run(host, cmd, log_file)
@@ -363,13 +362,6 @@ class Bench:
                     )
                     log_file = PathMaker.worker_log_file(i, id)
                     self._background_run(host, cmd, log_file)
-
-        # try:
-        #     # Wait for the nodes to synchronize
-        #     Print.info('Waiting for the nodes to synchronize...')
-        #     sleep(2 * node_parameters.timeout_delay / 1000)
-        # except:
-        #     Print.info('No timeout delay')
 
         # Wait for all transactions to be processed.
         duration = bench_parameters.duration
