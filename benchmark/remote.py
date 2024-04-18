@@ -153,16 +153,14 @@ class Bench:
             PathMaker.persistent_peers()
 
             hosts_string = " ".join(hosts)
-            # Print.info("Combined hosts: " + hosts_string)
 
-            # cmd = [f'~/cometbft show_node_id --home ./mytestnet/node{i}']
             with open('persistent_peer.txt', 'w') as f:
                 f.write("")
                 f.close()
 
             # Create testnet config files
-            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/cometbft-config.toml']
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml']
+            subprocess.run(cmd, shell=True)
             
             # Run the bash file and store the ouput in this file
             cmd = [
@@ -176,7 +174,7 @@ class Bench:
             for i, host in enumerate(hosts):
                 # Print.info("Sent node config file to " + host)
                 # NOTE: Path of the node config files
-                cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec/mytestnet/node{i} ubuntu@{host}:~/']
+                cmd = [f'scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/']
                 subprocess.run(cmd, shell=True)
         
         else:
