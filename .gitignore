@@ -144,5 +144,5 @@ mytestnet/
 
 persistent_peer.txt
 
-./node
-./client
+node
+client

@@ -99,14 +99,14 @@ def install(ctx, mechanism):
 
 
 @task
-def remote(ctx, mechanism):
+def remote(ctx, mech):
     ''' Run benchmarks on a cluster'''
     
-    bench_params = params_data["remote"][mechanism]["bench_params"]
-    node_params = params_data["remote"][mechanism]["node_params"]
+    bench_params = params_data["remote"][mech]["bench_params"]
+    node_params = params_data["remote"][mech]["node_params"]
     
     try:
-        Bench(ctx, mechanism).run(bench_params, node_params, None, debug=True)
+        Bench(ctx, mech).run(bench_params, node_params, None, debug=True)
     except BenchError as e:
         Print.error(e)
 
