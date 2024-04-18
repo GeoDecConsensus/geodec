@@ -81,19 +81,19 @@ def stop(ctx):
 
 
 @task
-def info(ctx, mechanism):
+def info(ctx, mech):
     ''' Display connect information about all the available machines '''
     try:
-        InstanceManager.make(mechanism).print_info()
+        InstanceManager.make(mech).print_info()
     except BenchError as e:
         Print.error(e)
 
 
 @task
-def install(ctx, mechanism):
+def install(ctx, mech):
     ''' Install the codebase on all machines '''
     try:
-        Bench(ctx, mechanism).install()
+        Bench(ctx, mech).install()
     except BenchError as e:
         Print.error(e)
 
@@ -161,23 +161,23 @@ def plot(ctx):
 
 
 @task
-def kill(ctx, mechanism):
+def kill(ctx, mech):
     ''' Stop any HotStuff execution on all machines '''
     try:
-        Bench(ctx, mechanism).kill()
+        Bench(ctx, mech).kill()
     except BenchError as e:
         Print.error(e)
 
 
 @task
-def logs(ctx, mechanism):
+def logs(ctx, mech):
     ''' Print a summary of the logs '''
     try:
-        if mechanism == 'hotstuff':
+        if mech == 'hotstuff':
             LogParser.process('./logs', faults='?').result()
-        elif mechanism == 'cometbft':
+        elif mech == 'cometbft':
             CometBftLogParser.process('./logs', faults='0').result()
-        elif mechanism == 'bullshark':
+        elif mech == 'bullshark':
             BullsharkLogParser.process('./logs').result()
     except ParseError as e:
         Print.error(BenchError('Failed to parse logs', e))

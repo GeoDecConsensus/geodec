@@ -50,6 +50,11 @@ class PathMaker:
     @staticmethod
     def logs_path():
         return 'logs'
+    
+    @staticmethod
+    def latency_log_file(i):
+        assert isinstance(i, int) and i >= 0
+        return join(PathMaker.logs_path(), f'latency-{i}.log')
 
     @staticmethod
     def node_log_file(i):
