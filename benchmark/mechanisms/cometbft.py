@@ -6,7 +6,7 @@ from re import findall, search
 from statistics import mean
 
 from benchmark.utils import Print
-
+from benchmark.commands import CommandMaker
 
 class ParseError(Exception):
     pass
@@ -319,8 +319,7 @@ class CometBftMechanism:
             'make install',
             'make build',
             'cd ./test/loadtime',
-            'make build'
+            'make build',
+            'cd',
+            CommandMaker.alias_binaries('', self.settings.repo_name)
         ]
-
-    def install(self):
-        print('Installing CometBft ...')

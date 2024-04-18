@@ -60,7 +60,7 @@ class LogParser:
         # Note that nodes are expected to time out once at the beginning.
         if self.timeouts > 2:
             Print.warn(f'Nodes timed out {self.timeouts:,} time(s)')
-
+            
         print(self.result())
 
     def _merge_results(self, input):
@@ -157,7 +157,23 @@ class LogParser:
         return tps, bps, duration
 
     def _consensus_latency(self):
-        latency = [c - self.proposals[d] for d, c in self.commits.items()]
+        # latency = [c - self.proposals[d] for d, c in self.commits.items()]
+        latency = []
+
+        for d,c in self.commits.items():
+            try:
+                var = c - self.proposals[d]
+                if (var) > 0:
+                    # print(f"{d} = {c} - {self.proposals[d]}")
+                    latency.append(var)
+            except:
+                # print("Positive")
+                pass
+        # print(latency)
+        # print(f"len latency:{len(latency)}")
+        print(mean(latency))
+        # print(f"len commits:{len(self.commits)}")
+        # print(f"len proposals:{len(self.proposals)}")
         return mean(latency) if latency else 0
 
     def _end_to_end_throughput(self):

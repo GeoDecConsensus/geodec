@@ -8,6 +8,7 @@ from benchmark.plot import Ploter, PlotError
 from benchmark.instance import InstanceManager
 from benchmark.remote import Bench, BenchError
 from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
+from benchmark.mechanisms.bullshark import BullsharkLogParser
 
 # Open the JSON file and load its contents
 with open('fab-params.json') as f:
@@ -98,14 +99,14 @@ def install(ctx, mechanism):
 
 
 @task
-def remote(ctx, mechanism):
+def remote(ctx, mech):
     ''' Run benchmarks on a cluster'''
     
-    bench_params = params_data["remote"][mechanism]["bench_params"]
-    node_params = params_data["remote"][mechanism]["node_params"]
+    bench_params = params_data["remote"][mech]["bench_params"]
+    node_params = params_data["remote"][mech]["node_params"]
     
     try:
-        Bench(ctx, mechanism).run(bench_params, node_params, None, debug=True)
+        Bench(ctx, mech).run(bench_params, node_params, None, debug=True)
     except BenchError as e:
         Print.error(e)
 
@@ -173,8 +174,10 @@ def logs(ctx, mechanism):
     ''' Print a summary of the logs '''
     try:
         if mechanism == 'hotstuff':
-            LogParser.process('./logs-hotstuff', faults='?').result()
+            LogParser.process('./logs', faults='?').result()
         elif mechanism == 'cometbft':
             CometBftLogParser.process('./logs', faults='0').result()
+        elif mechanism == 'bullshark':
+            BullsharkLogParser.process('./logs').result()
     except ParseError as e:
         Print.error(BenchError('Failed to parse logs', e))

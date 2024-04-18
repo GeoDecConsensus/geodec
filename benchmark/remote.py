@@ -153,16 +153,14 @@ class Bench:
             PathMaker.persistent_peers()
 
             hosts_string = " ".join(hosts)
-            # Print.info("Combined hosts: " + hosts_string)
 
-            # cmd = [f'~/cometbft show_node_id --home ./mytestnet/node{i}']
             with open('persistent_peer.txt', 'w') as f:
                 f.write("")
                 f.close()
 
             # Create testnet config files
-            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec-hotstuff/benchmark/cometbft-config.toml']
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml']
+            subprocess.run(cmd, shell=True)
             
             # Run the bash file and store the ouput in this file
             cmd = [
@@ -176,7 +174,7 @@ class Bench:
             for i, host in enumerate(hosts):
                 # Print.info("Sent node config file to " + host)
                 # NOTE: Path of the node config files
-                cmd = [f'scp -i {self.settings.key_path} -r {self.settings.key_name}@206.12.100.21:./geodec-hotstuff/benchmark/mytestnet/node{i} ubuntu@{host}:~/']
+                cmd = [f'scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/']
                 subprocess.run(cmd, shell=True)
         
         else:
@@ -186,19 +184,19 @@ class Bench:
 
             # Recompile the latest code.
             cmd = CommandMaker.compile().split()
-            # subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
-            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path('hotstuff'))
+            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
+            # subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path('hotstuff'))
 
             # Create alias for the client and nodes binary.
-            # cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name))
-            cmd = CommandMaker.alias_binaries(PathMaker.binary_path('hotstuff'), self.settings.repo_name)
+            cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name), self.mechanism.name)
+            # cmd = CommandMaker.alias_binaries(PathMaker.binary_path('hotstuff'), self.settings.repo_name)
             subprocess.run([cmd], shell=True)
 
             # Generate configuration files.
             keys = []
             key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
             for filename in key_files:
-                cmd = CommandMaker.generate_key(filename).split()
+                cmd = CommandMaker.generate_key(filename, self.mechanism.name).split()
                 subprocess.run(cmd, check=True)
                 keys += [Key.from_file(filename)]
                 
@@ -275,6 +273,10 @@ class Bench:
                     mechanism=self.mechanism.name
                 )
                 self._background_run(host, cmd, log_file)
+            
+            # Wait for the nodes to synchronize
+            Print.info('Waiting for the nodes to synchronize...')
+            sleep(2 * node_parameters.timeout_delay / 1000)
 
         elif self.mechanism.name == 'cometbft':
             persistent_peers = []
@@ -285,12 +287,11 @@ class Bench:
             # Print.info("Persistent Peers: " + persistent_peers)
             
             # Run the clients
-            # committee = Committee.load(PathMaker.committee_file())
+            # committee = Committee.load(PathMaker.committee_file())    # TODO for cometbft
             addresses = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-            # rate_share = ceil(rate / committee.size())  # Take faults into account.
+            # rate_share = ceil(rate / committee.size())  # TODO Take faults into account.
             rate_share = ceil(rate / len(hosts))
-            timeout = int(node_parameters.timeout_delay / 1000) # In seconds
-            timeout = bench_parameters.duration
+            duration = bench_parameters.duration    # Duration for which the client should run
             client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
             for host, addr, log_file in zip(hosts, addresses, client_logs):
                 cmd = CommandMaker.run_client(
@@ -298,7 +299,7 @@ class Bench:
                     bench_parameters.tx_size,
                     rate_share,
                     self.mechanism.name,
-                    timeout,
+                    duration,
                     nodes=addresses
                 )
                 self._background_run(host, cmd, log_file)
@@ -307,8 +308,7 @@ class Bench:
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
                 # cmd = f'source ~/.profile && cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=true'
-                cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error" --consensus.create_empty_blocks=true'
-                # cmd = f'~/cometbft/build/cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="*:debug,rpc-server:none" --consensus.create_empty_blocks=true'
+                cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error"'
                 self._background_run(host, cmd, log_file)
 
         elif self.mechanism.name == 'bullshark':
@@ -362,13 +362,6 @@ class Bench:
                     )
                     log_file = PathMaker.worker_log_file(i, id)
                     self._background_run(host, cmd, log_file)
-
-        try:
-            # Wait for the nodes to synchronize
-            Print.info('Waiting for the nodes to synchronize...')
-            sleep(2 * node_parameters.timeout_delay / 1000)
-        except:
-            Print.info('No timeout delay')
 
         # Wait for all transactions to be processed.
         duration = bench_parameters.duration

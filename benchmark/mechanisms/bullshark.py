@@ -435,6 +435,11 @@ class BullsharkLogParser:
 
     def _consensus_latency(self):
         latency = [c - self.proposals[d] for d, c in self.commits.items()]
+        # print(latency)
+        # print(f"len latency:{len(latency)}")
+        # print(mean(latency))
+        # print(f"len commits:{len(self.commits)}")
+        # print(f"len proposals:{len(self.proposals)}")
         return mean(latency) if latency else 0
 
     def _end_to_end_throughput(self):
@@ -563,6 +568,6 @@ class BullsharkMechanism:
             'source $HOME/.cargo/env',
             f'(cd {self.settings.repo_name}/node && {CommandMaker.compile()})',
             CommandMaker.alias_binaries(
-                f'./{self.settings.repo_name}/target/release/', self.settings.repo_name
+                f'./{self.settings.repo_name}/target/release/', self.name
             )
         ]     
