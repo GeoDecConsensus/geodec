@@ -480,7 +480,7 @@ class BullsharkLogParser:
         return (
             '\n'
             '-----------------------------------------\n'
-            ' SUMMARY:\n'
+            ' BULLSHARK SUMMARY:\n'
             '-----------------------------------------\n'
             ' + CONFIG:\n'
             f' Faults: {self.faults} node(s)\n'

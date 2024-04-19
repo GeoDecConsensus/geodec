@@ -1,15 +1,15 @@
 
 -----------------------------------------
- SUMMARY:
+ BULLSHARK SUMMARY:
 -----------------------------------------
  + CONFIG:
  Faults: 0 node(s)
  Committee size: 4 node(s)
  Worker(s) per node: 1 worker(s)
  Collocate primary and workers: True
- Input rate: 10,000 tx/s
- Transaction size: 512 B
- Execution time: 300 s
+ Input rate: 100,000 tx/s
+ Transaction size: 256 B
+ Execution time: 100 s
 
  Header size: 50 B
  Max header delay: 5,000 ms
@@ -20,11 +20,11 @@
  Max batch delay: 200 ms
 
  + RESULTS:
- Consensus TPS: 9,950 tx/s
- Consensus BPS: 5,094,450 B/s
- Consensus latency: 2,515 ms
+ Consensus TPS: 99,890 tx/s
+ Consensus BPS: 25,571,729 B/s
+ Consensus latency: 1,545 ms
 
- End-to-end TPS: 9,943 tx/s
- End-to-end BPS: 5,090,710 B/s
- End-to-end latency: 3,721 ms
+ End-to-end TPS: 99,772 tx/s
+ End-to-end BPS: 25,541,701 B/s
+ End-to-end latency: 3,803 ms
 -----------------------------------------

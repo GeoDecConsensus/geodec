@@ -182,16 +182,22 @@ class CometBftLogParser:
         return tps, bps, duration
 
     def _end_to_end_latency(self):
-        latency = []
-        tmp = findall(r'Average Latency: (\d+\.\d+)', self.latency[0])
-        latency = [float(t) for t in tmp]
-        return mean(latency) if latency else 0
+        result = []
+        for log in self.latency:
+            tmp = findall(r'Average Latency: (\d+\.\d+)', log)
+            latency = [float(t) for t in tmp]
+            if latency:
+                result.append(mean(latency))
+        output = mean(result)
+        if output > 100:
+            output = round(output)
+        return output if output else 0
 
     def result(self):
         consensus_latency = self._consensus_latency() * 1000
         consensus_tps, consensus_bps, _ = self._consensus_throughput()
         end_to_end_tps, end_to_end_bps, duration = self._end_to_end_throughput()
-        end_to_end_latency = self._end_to_end_latency()
+        end_to_end_latency = self._end_to_end_latency() * 1000
 
         # consensus_timeout_delay = self.configs[0]['consensus']['timeout_delay']
         # consensus_sync_retry_delay = self.configs[0]['consensus']['sync_retry_delay']
@@ -204,7 +210,7 @@ class CometBftLogParser:
         return (
             '\n'
             '-----------------------------------------\n'
-            ' SUMMARY:\n'
+            ' COMETBFT SUMMARY:\n'
             '-----------------------------------------\n'
             ' + CONFIG:\n'
             f' Faults: {self.faults} nodes\n'

@@ -372,6 +372,7 @@ class Bench:
             sleep(ceil(duration / 20))
         self.kill(hosts=hosts, delete_logs=False)
         
+        sleep(1)
         if self.mechanism.name == 'cometbft':
             latency_logs = [PathMaker.latency_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, latency_logs)):

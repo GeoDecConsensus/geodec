@@ -1,0 +1,21 @@
+
+-----------------------------------------
+ COMETBFT SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 100,000 tx/s
+ Transaction size: 256 B
+ Execution time: 96 s
+
+
+ + RESULTS:
+ Consensus TPS: 2,222 tx/s
+ Consensus BPS: 568,762 B/s
+ Consensus latency: 474 ms
+
+ End-to-end TPS: 2,289 tx/s
+ End-to-end BPS: 586,038 B/s
+ End-to-end latency: 6,327 ms
+-----------------------------------------

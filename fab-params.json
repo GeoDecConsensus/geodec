@@ -4,7 +4,7 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [4],
-                "rate": [1000],
+                "rate": [200000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
@@ -27,7 +27,7 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [4],
-                "rate": [1000],
+                "rate": [100000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
@@ -52,7 +52,7 @@
                 "nodes": [4],
                 "workers": 1,
                 "collocate": true,
-                "rate": [1000],
+                "rate": [250000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
