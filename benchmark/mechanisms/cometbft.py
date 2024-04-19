@@ -13,7 +13,8 @@ class ParseError(Exception):
 
 
 class CometBftLogParser:
-    def __init__(self, clients, nodes, faults):
+    def __init__(self, clients, nodes, latency, faults):
+        self.latency = latency
         inputs = [clients, nodes]
         assert all(isinstance(x, list) for x in inputs)
         assert all(isinstance(x, str) for y in inputs for x in y)
@@ -41,7 +42,7 @@ class CometBftLogParser:
                 results = p.map(self._parse_nodes, nodes)
         except (ValueError, IndexError) as e:
             raise ParseError(f'Failed to parse node logs: {e}')
-        proposals, commits, sizes, self.received_samples, timeouts, self.configs \
+        proposals, commits, sizes, timeouts, self.configs \
             = zip(*results)
         self.proposals = self._merge_results([x.items() for x in proposals])
         self.commits = self._merge_results([x.items() for x in commits])
@@ -108,15 +109,9 @@ class CometBftLogParser:
         # tmp = findall(r'Batch ([^ ]+) contains (\d+) B', log)
         tmp = findall(r'hash=([A-Fa-f0-9]+).*num_txs=(\d+)', log)
         sizes = {d: int(s) * int(self.size[0]) for d, s in tmp}
-
-        # NOTE
-        # tmp = findall(r'Batch ([^ ]+) contains sample tx (\d+)', log)
-        # samples = {int(s): d for d, s in tmp}
-        samples = {}
         
         tmp = findall(r'.* WARN .* Timeout', log)
-        # timeouts = len(tmp)
-        timeouts = 2
+        timeouts = len(tmp)
 
         configs = {
             # 'consensus': {
@@ -148,7 +143,7 @@ class CometBftLogParser:
             # }
         }
 
-        return proposals, commits, sizes, samples, timeouts, configs
+        return proposals, commits, sizes, timeouts, configs
 
     def _to_posix(self, string, name='node'):
         if name == 'node':
@@ -186,23 +181,17 @@ class CometBftLogParser:
         tps = bps / self.size[0]
         return tps, bps, duration
 
-    # NOTE Not functional
     def _end_to_end_latency(self):
         latency = []
-        for sent, received in zip(self.sent_samples, self.received_samples):
-            for tx_id, batch_id in received.items():
-                if batch_id in self.commits:
-                    assert tx_id in sent  # We receive txs that we sent.
-                    start = sent[tx_id]
-                    end = self.commits[batch_id]
-                    latency += [end-start]
+        tmp = findall(r'Average Latency: (\d+\.\d+)', self.latency[0])
+        latency = [float(t) for t in tmp]
         return mean(latency) if latency else 0
 
     def result(self):
         consensus_latency = self._consensus_latency() * 1000
         consensus_tps, consensus_bps, _ = self._consensus_throughput()
         end_to_end_tps, end_to_end_bps, duration = self._end_to_end_throughput()
-        end_to_end_latency = self._end_to_end_latency() * 1000
+        end_to_end_latency = self._end_to_end_latency()
 
         # consensus_timeout_delay = self.configs[0]['consensus']['timeout_delay']
         # consensus_sync_retry_delay = self.configs[0]['consensus']['sync_retry_delay']
@@ -260,8 +249,12 @@ class CometBftLogParser:
         for filename in sorted(glob(join(directory, 'node-*.log'))):
             with open(filename, 'r') as f:
                 nodes += [f.read()]
+        latency = []
+        for filename in sorted(glob(join(directory, 'latency-*.log'))):
+            with open(filename, 'r') as f:
+                latency += [f.read()]
 
-        return cls(clients, nodes, faults)
+        return cls(clients, nodes, latency, faults)
 
 class CometBftMechanism:
     def __init__(self, settings):

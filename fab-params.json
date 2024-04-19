@@ -4,9 +4,9 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [4],
-                "rate": [10000],
-                "tx_size": 128,
-                "duration": 600,
+                "rate": [1000],
+                "tx_size": 256,
+                "duration": 100,
                 "runs": 1
             },
             "node_params": {
@@ -27,7 +27,7 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [4],
-                "rate": [10000],
+                "rate": [1000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
@@ -52,9 +52,9 @@
                 "nodes": [4],
                 "workers": 1,
                 "collocate": true,
-                "rate": [10000],
-                "tx_size": 512,
-                "duration": 30,
+                "rate": [1000],
+                "tx_size": 256,
+                "duration": 100,
                 "runs": 1
             },
             "node_params": {

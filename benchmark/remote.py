@@ -5,8 +5,6 @@ from paramiko.ssh_exception import PasswordRequiredException, SSHException
 from os.path import basename, splitext
 from time import sleep
 from math import ceil
-from os.path import join
-from json import dump, load
 from collections import OrderedDict
 import csv
 import subprocess
@@ -159,8 +157,9 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml']
-            subprocess.run(cmd, shell=True)
+            # cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml']
+            cmd = [f'~/cometbft testnet --v {len(hosts)}']
+            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             
             # Run the bash file and store the ouput in this file
             cmd = [
@@ -175,7 +174,7 @@ class Bench:
                 # Print.info("Sent node config file to " + host)
                 # NOTE: Path of the node config files
                 cmd = [f'scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/']
-                subprocess.run(cmd, shell=True)
+                subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         
         else:
             # Cleanup all local configuration files.
@@ -307,8 +306,12 @@ class Bench:
             # Run the nodes.
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
-                # cmd = f'source ~/.profile && cometbft node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --consensus.create_empty_blocks=true'
-                cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error"'
+                """
+                Mempool:info - lots of output when mempool full
+                """
+                # cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:info,*:error"'
+                cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,consensus:debug,*:error"'
+                # cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error"'
                 self._background_run(host, cmd, log_file)
 
         elif self.mechanism.name == 'bullshark':
@@ -368,6 +371,12 @@ class Bench:
         for _ in progress_bar(range(20), prefix=f'Running benchmark ({duration} sec):'):
             sleep(ceil(duration / 20))
         self.kill(hosts=hosts, delete_logs=False)
+        
+        if self.mechanism.name == 'cometbft':
+            latency_logs = [PathMaker.latency_log_file(i) for i in range(len(hosts))]
+            for i, (host, log_file) in enumerate(zip(hosts, latency_logs)):
+                cmd = f'./cometbft/test/loadtime/build/report --database-type goleveldb --data-dir ~/node{i}/data'
+                self._background_run(host, cmd, log_file)
 
 
     def _logs(self, hosts, faults, committee=[]): #, servers, run_id):
@@ -407,6 +416,8 @@ class Bench:
                 c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
                 c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
+                if self.mechanism.name == "cometbft":
+                    c.get(PathMaker.latency_log_file(i), local=PathMaker.latency_log_file(i))
             
         # Parse logs and return the parser.
         Print.info('Parsing logs and computing performance...')
