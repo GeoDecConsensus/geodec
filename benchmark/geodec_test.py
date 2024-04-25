@@ -142,3 +142,17 @@ class GeoDec:
             GDI_df = pd.concat([GDI_df, new_data], ignore_index = True)
         GDI_df = GDI_df.merge(data,  on='name',  how='right')
         return GDI_df
+
+geoInput = {23: 20, 45: 20, 50: 1, 46: 1, 95: 1, 169: 1, 18: 1, 7: 2, 37: 1, 24: 2, 16: 1, 13: 1, 47: 2, 54: 1, 19: 2, 89: 1, 4: 1, 76: 1, 12: 2, 22: 1, 140: 1}
+
+# with open("servers.csv", "w") as f:
+#     f.write(servers_data)
+
+# Instantiate the ServerManager class
+geodec = GeoDec()
+
+# Call the _getServers method
+selected_servers = geodec.getAllServers(geoInput, "/Users/namangarg/code/geodec/testdata/servers.csv", '/Users/namangarg/code/geodec/testdata/IP.txt')
+pingDelays = geodec.getPingDelay(geoInput, '/Users/namangarg/code/geodec/testdata/ping_grouped.csv', '/Users/namangarg/code/geodec/testdata/pings.csv')
+print(selected_servers)
+print(pingDelays)

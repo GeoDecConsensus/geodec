@@ -111,36 +111,16 @@ def remote(ctx, mech):
         Print.error(e)
 
 @task
-def georemote(ctx):
+def georemote(ctx, mech):
     ''' Run benchmarks on ComputeCanada/AWS '''
     # test GeoInput  
     geoInput = {23: 20, 45: 20, 50: 1, 46: 1, 95: 1, 169: 1, 18: 1, 7: 2, 37: 1, 24: 2, 16: 1, 13: 1, 47: 2, 54: 1, 19: 2, 89: 1, 4: 1, 76: 1, 12: 2, 22: 1, 140: 1}
     
-    bench_params = {
-        'faults': 0,
-        'nodes': [64],
-        'rate': [20000],
-        'tx_size': 512,
-        'duration': 300,
-        'runs': 5,
-    }
-    node_params = {
-        'consensus': {
-            'timeout_delay': 50_000,
-            'sync_retry_delay': 50_000,
-        },
-        'mempool': {
-            'gc_depth': 50,
-            'sync_retry_delay': 5_000,
-            'sync_retry_nodes': 3,
-            'batch_size': 204800,
-            'max_batch_delay': 100
-        }
-    }
-  
+    bench_params = params_data["remote"][mech]["bench_params"]
+    node_params = params_data["remote"][mech]["node_params"]
     
     try:
-        Bench(ctx).run(bench_params, node_params, geoInput, debug=True)
+        Bench(ctx, mech).run(bench_params, node_params, geoInput, debug=True)
     except BenchError as e:
         Print.error(e)
 
