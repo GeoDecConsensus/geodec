@@ -4,7 +4,6 @@ class HotStuffMechanism:
     def __init__(self, settings):
         self.settings = settings
         self.name = 'hotstuff'
-        print("Inside hotstuff")
 
         self.install_cmd = [
             'sudo apt-get update',

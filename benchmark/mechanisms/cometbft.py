@@ -267,20 +267,7 @@ class CometBftMechanism:
         self.settings = settings
         self.name = 'cometbft'
 
-        self.old_cmd = [
-            'sudo apt-get update',
-            'sudo apt-get -y upgrade',
-            'sudo apt-get -y autoremove',
-            'sudo apt-get install -y wget tar git',
-            'wget https://github.com/cometbft/cometbft/releases/download/v0.38.5/cometbft_0.38.5_linux_amd64.tar.gz',
-            'mkdir -p cometbft-repo && tar -xzf cometbft_0.38.5_linux_amd64.tar.gz -C cometbft-repo',
-            'rm cometbft_0.38.5_linux_amd64.tar.gz',
-            'mv cometbft-repo/cometbft ~/',
-            'rm -rf cometbft-repo'
-        ]
-
         self.install_cmd = [
-            [
                 'sudo apt-get update',
                 'sudo apt-get -y upgrade',
                 'sudo apt-get -y autoremove',
@@ -303,8 +290,7 @@ class CometBftMechanism:
                 'echo export PATH=\"\$PATH:\$GOPATH/bin\" >> ~/.profile',
                 # 'export PATH=$PATH:/usr/local/go/bin'
                 'source ~/.profile',
-                f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))',
-            ]
+                f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))'
         ]
         
         self.update_cmd = [
