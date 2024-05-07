@@ -1,0 +1,30 @@
+
+-----------------------------------------
+ BULLSHARK SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 node(s)
+ Committee size: 4 node(s)
+ Worker(s) per node: 1 worker(s)
+ Collocate primary and workers: True
+ Input rate: 10,000 tx/s
+ Transaction size: 256 B
+ Execution time: 65 s
+
+ Header size: 50 B
+ Max header delay: 5,000 ms
+ GC depth: 50 round(s)
+ Sync retry delay: 5,000 ms
+ Sync retry nodes: 3 node(s)
+ batch size: 204,800 B
+ Max batch delay: 100 ms
+
+ + RESULTS:
+ Consensus TPS: 117 tx/s
+ Consensus BPS: 30,019 B/s
+ Consensus latency: 46,674 ms
+
+ End-to-end TPS: 114 tx/s
+ End-to-end BPS: 29,170 B/s
+ End-to-end latency: 55,024 ms
+-----------------------------------------

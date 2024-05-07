@@ -40,3 +40,66 @@
  End-to-end BPS: 244,879 B/s
  End-to-end latency: 1,202 ms
 -----------------------------------------
+
+-----------------------------------------
+ COMETBFT SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 1,000 tx/s
+ Transaction size: 256 B
+ Execution time: 97 s
+
+
+ + RESULTS:
+ Consensus TPS: 934 tx/s
+ Consensus BPS: 239,018 B/s
+ Consensus latency: 330 ms
+
+ End-to-end TPS: 971 tx/s
+ End-to-end BPS: 248,661 B/s
+ End-to-end latency: 1,078 ms
+-----------------------------------------
+
+-----------------------------------------
+ COMETBFT SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 1,000 tx/s
+ Transaction size: 256 B
+ Execution time: 95 s
+
+
+ + RESULTS:
+ Consensus TPS: 922 tx/s
+ Consensus BPS: 236,120 B/s
+ Consensus latency: 341 ms
+
+ End-to-end TPS: 959 tx/s
+ End-to-end BPS: 245,519 B/s
+ End-to-end latency: 1,118 ms
+-----------------------------------------
+
+-----------------------------------------
+ COMETBFT SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 1,000 tx/s
+ Transaction size: 256 B
+ Execution time: 7 s
+
+
+ + RESULTS:
+ Consensus TPS: 47 tx/s
+ Consensus BPS: 12,002 B/s
+ Consensus latency: 1,371 ms
+
+ End-to-end TPS: 74 tx/s
+ End-to-end BPS: 18,959 B/s
+ End-to-end latency: 0 ms
+-----------------------------------------

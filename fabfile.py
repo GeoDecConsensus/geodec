@@ -1,3 +1,4 @@
+import csv
 import json
 from fabric import task
 
@@ -7,7 +8,8 @@ from benchmark.utils import Print
 from benchmark.plot import Ploter, PlotError
 from benchmark.instance import InstanceManager
 from benchmark.remote import Bench, BenchError
-from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
+from benchmark.mechanisms.hotstuff import HotStuffLogParser
+from benchmark.mechanisms.cometbft import CometBftLogParser
 from benchmark.mechanisms.bullshark import BullsharkLogParser
 
 # Open the JSON file and load its contents
@@ -113,8 +115,18 @@ def remote(ctx, mech):
 @task
 def georemote(ctx, mech):
     ''' Run benchmarks on ComputeCanada/AWS '''
-    # test GeoInput  
-    geoInput = {23: 20, 45: 20, 50: 1, 46: 1, 95: 1, 169: 1, 18: 1, 7: 2, 37: 1, 24: 2, 16: 1, 13: 1, 47: 2, 54: 1, 19: 2, 89: 1, 4: 1, 76: 1, 12: 2, 22: 1, 140: 1}
+    # geoInput = {23: 20, 45: 20, 50: 1, 46: 1, 95: 1, 169: 1, 18: 1, 7: 2, 37: 1, 24: 2, 16: 1, 13: 1, 47: 2, 54: 1, 19: 2, 89: 1, 4: 1, 76: 1, 12: 2, 22: 1, 140: 1}
+    # geoInput = {1:1, 2:1, 3:1, 4:1}
+    
+    # Define the file path to your CSV file
+    file_path = 'geo-input.csv'
+    geo_input = {}
+
+    with open(file_path, mode='r') as file:
+        csv_reader = csv.reader(file)
+        next(csv_reader)
+        for row in csv_reader:
+            geo_input[int(row[0])] = int(row[1])
     
     bench_params = params_data["remote"][mech]["bench_params"]
     node_params = params_data["remote"][mech]["node_params"]
@@ -154,7 +166,7 @@ def logs(ctx, mech):
     ''' Print a summary of the logs '''
     try:
         if mech == 'hotstuff':
-            LogParser.process('./logs', faults='?').result()
+            HotStuffLogParser.process('./logs', faults='?').result()
         elif mech == 'cometbft':
             CometBftLogParser.process('./logs', faults='0').result()
         elif mech == 'bullshark':

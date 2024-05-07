@@ -485,18 +485,20 @@ class Bench:
         
         if isGeoRemote:
             geodec = GeoDec()
-            servers = geodec.getAllServers(geoInput, self.settings.servers_file, self.settings.ip_file)
-            # pingDelays = geodec.getPingDelay(geoInput, "/home/ubuntu/data/pings-2020-07-19-2020-07-20-grouped.csv", "/home/ubuntu/data/pings-2020-07-19-2020-07-20.csv")
+            servers = geodec.getAllServers(geoInput, self.settings.servers_file, self.settings.geodec_ip_file)
             pingDelays = geodec.getPingDelay(geoInput, self.settings.ping_grouped_file, self.settings.pings_file)
-            
             # Set delay parameters.
             try:
                 self._configDelay(selected_hosts)
                 print("Delays configured")
                 self._addDelays(servers, pingDelays, self.settings.interface)
             except (subprocess.SubprocessError, GroupException) as e:
-                e = FabricError(e) if isinstance(e, GroupException) else e
-                Print.error(BenchError('Failed to initalize delays', e))
+                self._deleteDelay(selected_hosts)
+                self._configDelay(selected_hosts)
+                print("Delays configured")
+                self._addDelays(servers, pingDelays, self.settings.interface)
+                # e = FabricError(e) if isinstance(e, GroupException) else e
+                # Print.error(BenchError('Failed to initalize delays', e))
          
         # Run benchmarks.
         for n in bench_parameters.nodes:

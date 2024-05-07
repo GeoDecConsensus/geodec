@@ -183,12 +183,14 @@ class CometBftLogParser:
 
     def _end_to_end_latency(self):
         result = []
+        output = 0
         for log in self.latency:
             tmp = findall(r'Average Latency: (\d+\.\d+)', log)
             latency = [float(t) for t in tmp]
             if latency:
                 result.append(mean(latency))
-        output = mean(result)
+        if result:
+            output = mean(result)
         if output > 100:
             output = round(output)
         return output if output else 0

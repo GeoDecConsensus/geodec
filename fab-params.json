@@ -3,8 +3,8 @@
         "hotstuff": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [4],
-                "rate": [200000],
+                "nodes": [8],
+                "rate": [100000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
@@ -26,8 +26,8 @@
         "cometbft": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [4],
-                "rate": [1000],
+                "nodes": [8],
+                "rate": [15000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
@@ -49,10 +49,10 @@
         "bullshark": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [4],
+                "nodes": [8],
                 "workers": 1,
                 "collocate": true,
-                "rate": [300000],
+                "rate": [100000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
@@ -61,10 +61,10 @@
                 "header_size": 50,
                 "max_header_delay": 5000,
                 "gc_depth": 50,
-                "sync_retry_delay": 10000,
+                "sync_retry_delay": 5000,
                 "sync_retry_nodes": 3,
-                "batch_size": 500000,
-                "max_batch_delay": 200
+                "batch_size": 204800,
+                "max_batch_delay": 100
             }
         }
     }
