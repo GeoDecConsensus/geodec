@@ -41,16 +41,15 @@ class GeoDec:
 
     def _addIPtoServers(self, servers, ip_file):
         serversIP = servers
-        with open(ip_file) as f:
-            lines = f.readlines()
-            
-            # check the total available IP addresses less than or more than total servers
-            if(len(lines) < len(servers)):
-                print.WARN("ERROR: NEED MORE IP ADDRESSES")
-                return 
-            
-            lines = [line.strip() for line in lines]
-            serversIP = servers.assign(ip=lines[:len(servers)])
+        data = pd.read_csv(ip_file)
+        lines = data['Internal IP'].tolist()
+        
+        # check the total available IP addresses less than or more than total servers
+        if(len(lines) < len(servers)):
+            print.WARN("ERROR: NEED MORE IP ADDRESSES")
+            return 
+        
+        serversIP = servers.assign(ip=lines[:len(servers)])
         return serversIP 
 
     # get distance between two points in 2D array

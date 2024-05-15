@@ -41,16 +41,18 @@ class GeoDec:
 
     def _addIPtoServers(self, servers, ip_file):
         serversIP = servers
-        with open(ip_file) as f:
-            lines = f.readlines()
+        print(servers)
+        data = pd.read_csv(ip_file)
+        lines = data['Internal IP'].tolist()
             
-            # check the total available IP addresses less than or more than total servers
-            if(len(lines) < len(servers)):
-                print.WARN("ERROR: NEED MORE IP ADDRESSES")
-                return 
-            
-            lines = [line.strip() for line in lines]
-            serversIP = servers.assign(ip=lines[:len(servers)])
+        # check the total available IP addresses less than or more than total servers
+        if(len(lines) < len(servers)):
+            print("ERROR: NEED MORE IP ADDRESSES")
+            return 
+        
+        # lines = [line.strip() for line in lines]
+        print(lines)
+        serversIP = servers.assign(ip=lines[:len(servers)])
         return serversIP 
 
     # get distance between two points in 2D array
@@ -143,7 +145,7 @@ class GeoDec:
         GDI_df = GDI_df.merge(data,  on='name',  how='right')
         return GDI_df
 
-geoInput = {23: 20, 45: 20, 50: 1, 46: 1, 95: 1, 169: 1, 18: 1, 7: 2, 37: 1, 24: 2, 16: 1, 13: 1, 47: 2, 54: 1, 19: 2, 89: 1, 4: 1, 76: 1, 12: 2, 22: 1, 140: 1}
+geoInput = {23: 2, 45: 2, 50: 2, 46: 2}
 
 # with open("servers.csv", "w") as f:
 #     f.write(servers_data)
@@ -152,7 +154,7 @@ geoInput = {23: 20, 45: 20, 50: 1, 46: 1, 95: 1, 169: 1, 18: 1, 7: 2, 37: 1, 24:
 geodec = GeoDec()
 
 # Call the _getServers method
-selected_servers = geodec.getAllServers(geoInput, "/Users/namangarg/code/geodec/testdata/servers.csv", '/Users/namangarg/code/geodec/testdata/IP.txt')
-pingDelays = geodec.getPingDelay(geoInput, '/Users/namangarg/code/geodec/testdata/ping_grouped.csv', '/Users/namangarg/code/geodec/testdata/pings.csv')
+selected_servers = geodec.getAllServers(geoInput, "/Users/namangarg/code/geodec/rundata/servers.csv", '/Users/namangarg/code/geodec/rundata/instances_ip.csv')
+# pingDelays = geodec.getPingDelay(geoInput, '/Users/namangarg/code/geodec/rundata/ping_grouped.csv', '/Users/namangarg/code/geodec/rundata/pings.csv')
 print(selected_servers)
-print(pingDelays)
+# print(pingDelays)

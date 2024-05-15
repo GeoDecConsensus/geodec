@@ -311,7 +311,6 @@ class Bench:
                 """
                 # cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:info,*:error"'
                 cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,consensus:debug,*:error"'
-                # cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error"'
                 self._background_run(host, cmd, log_file)
 
         elif self.mechanism.name == 'bullshark':
@@ -453,7 +452,7 @@ class Bench:
         # Print.info('Parsing logs and computing performance...')
         # return LogParser.process(PathMaker.logs_path(), faults=faults, servers=servers, run_id =run_id)
 
-    def run(self, bench_parameters_dict, node_parameters_dict, geoInput, debug=False):
+    def run(self, bench_parameters_dict, node_parameters_dict, isGeoRemote, debug=False):
         assert isinstance(debug, bool)
         Print.heading(f'Starting {self.mechanism.name} remote benchmark')
 
@@ -481,12 +480,18 @@ class Bench:
             e = FabricError(e) if isinstance(e, GroupException) else e
             raise BenchError('Failed to update nodes', e)
         
-        isGeoRemote = True if geoInput else False
-        
         if isGeoRemote:
+            # geoInput = {1:1, 2:1, 3:1, 4:1}
+            geo_input = {}
+            with open(self.settings.geo_input, mode='r') as file:
+                csv_reader = csv.reader(file)
+                next(csv_reader)
+                for row in csv_reader:
+                    geo_input[int(row[0])] = int(row[1])
+                    
             geodec = GeoDec()
-            servers = geodec.getAllServers(geoInput, self.settings.servers_file, self.settings.geodec_ip_file)
-            pingDelays = geodec.getPingDelay(geoInput, self.settings.ping_grouped_file, self.settings.pings_file)
+            servers = geodec.getAllServers(geo_input, self.settings.servers_file, self.settings.ip_file)
+            pingDelays = geodec.getPingDelay(geo_input, self.settings.ping_grouped_file, self.settings.pings_file)
             # Set delay parameters.
             try:
                 self._configDelay(selected_hosts)
