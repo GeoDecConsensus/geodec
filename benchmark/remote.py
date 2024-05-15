@@ -16,8 +16,8 @@ from benchmark.utils import BenchError, Print, PathMaker, progress_bar
 from benchmark.commands import CommandMaker
 from benchmark.logs import LogParser, ParseError
 from benchmark.instance import InstanceManager
-# from benchmark.geodec import GeoDec
-# from benchmark.geo_logs import GeoLogParser
+from benchmark.geodec import GeoDec
+from benchmark.geo_logs import GeoLogParser
 
 from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
@@ -311,7 +311,6 @@ class Bench:
                 """
                 # cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:info,*:error"'
                 cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,consensus:debug,*:error"'
-                # cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:debug,consensus:debug,*:error"'
                 self._background_run(host, cmd, log_file)
 
         elif self.mechanism.name == 'bullshark':
@@ -372,6 +371,7 @@ class Bench:
             sleep(ceil(duration / 20))
         self.kill(hosts=hosts, delete_logs=False)
         
+        sleep(1)
         if self.mechanism.name == 'cometbft':
             latency_logs = [PathMaker.latency_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, latency_logs)):
@@ -452,7 +452,7 @@ class Bench:
         # Print.info('Parsing logs and computing performance...')
         # return LogParser.process(PathMaker.logs_path(), faults=faults, servers=servers, run_id =run_id)
 
-    def run(self, bench_parameters_dict, node_parameters_dict, geoInput, debug=False):
+    def run(self, bench_parameters_dict, node_parameters_dict, isGeoRemote, debug=False):
         assert isinstance(debug, bool)
         Print.heading(f'Starting {self.mechanism.name} remote benchmark')
 
@@ -466,14 +466,6 @@ class Bench:
         except ConfigError as e:
             raise BenchError('Invalid nodes or bench parameters', e)
         
-        isGeoRemote = True
-        if not geoInput:
-            isGeoRemote = False
-            
-        # geodec = GeoDec()
-        # servers = geodec.getAllServers(geoInput, "/home/ubuntu/data/servers-2020-07-19.csv", self.settings.)
-        # pingDelays = geodec.getPingDelay(geoInput, "/home/ubuntu/data/pings-2020-07-19-2020-07-20-grouped.csv", "/home/ubuntu/data/pings-2020-07-19-2020-07-20.csv")
-
         # Select which hosts to use.
         # selected_hosts = self._select_hosts(bench_parameters.nodes[0])
         selected_hosts = self._select_hosts()
@@ -488,14 +480,31 @@ class Bench:
             e = FabricError(e) if isinstance(e, GroupException) else e
             raise BenchError('Failed to update nodes', e)
         
-        # # Set delay parameters.
-        # try:
-        #     self._configDelay(selected_hosts)
-        #     print("configured delays")
-        #     self._addDelays(servers, pingDelays, self.settings.interface)
-        # except (subprocess.SubprocessError, GroupException) as e:
-        #     e = FabricError(e) if isinstance(e, GroupException) else e
-        #     Print.error(BenchError('Failed to initalize delays', e))
+        if isGeoRemote:
+            # geoInput = {1:1, 2:1, 3:1, 4:1}
+            geo_input = {}
+            with open(self.settings.geo_input, mode='r') as file:
+                csv_reader = csv.reader(file)
+                next(csv_reader)
+                for row in csv_reader:
+                    geo_input[int(row[0])] = int(row[1])
+                    
+            geodec = GeoDec()
+            servers = geodec.getAllServers(geo_input, self.settings.servers_file, self.settings.ip_file)
+            print(servers)
+            pingDelays = geodec.getPingDelay(geo_input, self.settings.ping_grouped_file, self.settings.pings_file)
+            # Set delay parameters.
+            try:
+                self._configDelay(selected_hosts)
+                print("Delays configured")
+                self._addDelays(servers, pingDelays, self.settings.interface)
+            except (subprocess.SubprocessError, GroupException) as e:
+                self._deleteDelay(selected_hosts)
+                self._configDelay(selected_hosts)
+                print("Delays configured")
+                self._addDelays(servers, pingDelays, self.settings.interface)
+                # e = FabricError(e) if isinstance(e, GroupException) else e
+                # Print.error(BenchError('Failed to initalize delays', e))
          
         # Run benchmarks.
         for n in bench_parameters.nodes:
@@ -525,8 +534,8 @@ class Bench:
                 # Run the benchmark.
                 for i in range(bench_parameters.runs):
                     Print.heading(f'Run {i+1}/{bench_parameters.runs}')
-        #             run_id = GeoLogParser.get_new_run_id()
-        #             Print.heading(f'Run {i+1}/{bench_parameters.runs} with run_id {run_id}')
+                    # run_id = GeoLogParser.get_new_run_id()
+                    # Print.heading(f'Run {i+1}/{bench_parameters.runs} with run_id {run_id}')
                     try:
                         self._run_single(
                             hosts, r, bench_parameters, node_parameters, debug, committee_copy
@@ -547,12 +556,13 @@ class Bench:
         #         print(aggregated_results)
         #         aggregated_results.to_csv('/home/ubuntu/results/64node-fixed-mean-geo-dec-metrics.csv', mode='a', index=False, header=False)
 
-        # # Delte delay parameters.
-        # try:
-        #     self._deleteDelay(selected_hosts)
-        # except (subprocess.SubprocessError, GroupException) as e:
-        #     e = FabricError(e) if isinstance(e, GroupException) else e
-        #     Print.error(BenchError('Failed to initalize delays', e))
+        if isGeoRemote:
+            # Delete delay parameters.
+            try:
+                self._deleteDelay(selected_hosts)
+            except (subprocess.SubprocessError, GroupException) as e:
+                e = FabricError(e) if isinstance(e, GroupException) else e
+                Print.error(BenchError('Failed to initalize delays', e))
             
     ################ GEODEC Emulator methods #########################
     def _configDelay(self, hosts):

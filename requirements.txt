@@ -1,3 +1,5 @@
 boto3==1.16.0
 fabric==2.6.0
 matplotlib==3.3.4
+pandas==2.2.2
+haversine==2.8.1

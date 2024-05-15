@@ -480,7 +480,7 @@ class BullsharkLogParser:
         return (
             '\n'
             '-----------------------------------------\n'
-            ' SUMMARY:\n'
+            ' BULLSHARK SUMMARY:\n'
             '-----------------------------------------\n'
             ' + CONFIG:\n'
             f' Faults: {self.faults} node(s)\n'
@@ -538,7 +538,6 @@ class BullsharkMechanism:
     def __init__(self, settings):
         self.settings = settings
         self.name = 'bullshark'
-        print("Inside BullShark")
         
         self.install_cmd = [
             'sudo apt-get update',

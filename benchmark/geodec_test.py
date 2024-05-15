@@ -4,9 +4,6 @@ import numpy as np
 import os.path
 import pandas as pd
 
-import warnings
-warnings.simplefilter(action='ignore', category=FutureWarning)
-
 #########################################################################################
 #########################################################################################
 #### GeoDec emulator to study impacts of geospatial diversity on blockchain networks ####
@@ -44,14 +41,17 @@ class GeoDec:
 
     def _addIPtoServers(self, servers, ip_file):
         serversIP = servers
+        print(servers)
         data = pd.read_csv(ip_file)
         lines = data['Internal IP'].tolist()
-        
+            
         # check the total available IP addresses less than or more than total servers
         if(len(lines) < len(servers)):
-            print.WARN("ERROR: NEED MORE IP ADDRESSES")
+            print("ERROR: NEED MORE IP ADDRESSES")
             return 
         
+        # lines = [line.strip() for line in lines]
+        print(lines)
         serversIP = servers.assign(ip=lines[:len(servers)])
         return serversIP 
 
@@ -144,3 +144,17 @@ class GeoDec:
             GDI_df = pd.concat([GDI_df, new_data], ignore_index = True)
         GDI_df = GDI_df.merge(data,  on='name',  how='right')
         return GDI_df
+
+geoInput = {23: 2, 45: 2, 50: 2, 46: 2}
+
+# with open("servers.csv", "w") as f:
+#     f.write(servers_data)
+
+# Instantiate the ServerManager class
+geodec = GeoDec()
+
+# Call the _getServers method
+selected_servers = geodec.getAllServers(geoInput, "/Users/namangarg/code/geodec/rundata/servers.csv", '/Users/namangarg/code/geodec/rundata/instances_ip.csv')
+# pingDelays = geodec.getPingDelay(geoInput, '/Users/namangarg/code/geodec/rundata/ping_grouped.csv', '/Users/namangarg/code/geodec/rundata/pings.csv')
+print(selected_servers)
+# print(pingDelays)

@@ -182,16 +182,24 @@ class CometBftLogParser:
         return tps, bps, duration
 
     def _end_to_end_latency(self):
-        latency = []
-        tmp = findall(r'Average Latency: (\d+\.\d+)', self.latency[0])
-        latency = [float(t) for t in tmp]
-        return mean(latency) if latency else 0
+        result = []
+        output = 0
+        for log in self.latency:
+            tmp = findall(r'Average Latency: (\d+\.\d+)', log)
+            latency = [float(t) for t in tmp]
+            if latency:
+                result.append(mean(latency))
+        if result:
+            output = mean(result)
+        if output > 100:
+            output = round(output)
+        return output if output else 0
 
     def result(self):
         consensus_latency = self._consensus_latency() * 1000
         consensus_tps, consensus_bps, _ = self._consensus_throughput()
         end_to_end_tps, end_to_end_bps, duration = self._end_to_end_throughput()
-        end_to_end_latency = self._end_to_end_latency()
+        end_to_end_latency = self._end_to_end_latency() * 1000
 
         # consensus_timeout_delay = self.configs[0]['consensus']['timeout_delay']
         # consensus_sync_retry_delay = self.configs[0]['consensus']['sync_retry_delay']
@@ -204,7 +212,7 @@ class CometBftLogParser:
         return (
             '\n'
             '-----------------------------------------\n'
-            ' SUMMARY:\n'
+            ' COMETBFT SUMMARY:\n'
             '-----------------------------------------\n'
             ' + CONFIG:\n'
             f' Faults: {self.faults} nodes\n'
@@ -261,20 +269,7 @@ class CometBftMechanism:
         self.settings = settings
         self.name = 'cometbft'
 
-        self.old_cmd = [
-            'sudo apt-get update',
-            'sudo apt-get -y upgrade',
-            'sudo apt-get -y autoremove',
-            'sudo apt-get install -y wget tar git',
-            'wget https://github.com/cometbft/cometbft/releases/download/v0.38.5/cometbft_0.38.5_linux_amd64.tar.gz',
-            'mkdir -p cometbft-repo && tar -xzf cometbft_0.38.5_linux_amd64.tar.gz -C cometbft-repo',
-            'rm cometbft_0.38.5_linux_amd64.tar.gz',
-            'mv cometbft-repo/cometbft ~/',
-            'rm -rf cometbft-repo'
-        ]
-
         self.install_cmd = [
-            [
                 'sudo apt-get update',
                 'sudo apt-get -y upgrade',
                 'sudo apt-get -y autoremove',
@@ -297,8 +292,7 @@ class CometBftMechanism:
                 'echo export PATH=\"\$PATH:\$GOPATH/bin\" >> ~/.profile',
                 # 'export PATH=$PATH:/usr/local/go/bin'
                 'source ~/.profile',
-                f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))',
-            ]
+                f'(git clone {self.settings.repo_url} || (cd {self.settings.repo_name} ; git pull))'
         ]
         
         self.update_cmd = [

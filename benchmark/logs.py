@@ -209,7 +209,7 @@ class LogParser:
         return (
             '\n'
             '-----------------------------------------\n'
-            ' SUMMARY:\n'
+            ' HOTSTUFF SUMMARY:\n'
             '-----------------------------------------\n'
             ' + CONFIG:\n'
             f' Faults: {self.faults} nodes\n'
