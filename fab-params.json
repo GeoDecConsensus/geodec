@@ -3,8 +3,8 @@
         "hotstuff": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [8],
-                "rate": [100000],
+                "nodes": [4],
+                "rate": [10000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
@@ -49,10 +49,10 @@
         "bullshark": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [8],
+                "nodes": [4],
                 "workers": 1,
                 "collocate": true,
-                "rate": [100000],
+                "rate": [10000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1

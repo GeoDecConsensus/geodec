@@ -4,6 +4,9 @@ import numpy as np
 import os.path
 import pandas as pd
 
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 #########################################################################################
 #########################################################################################
 #### GeoDec emulator to study impacts of geospatial diversity on blockchain networks ####

@@ -491,6 +491,7 @@ class Bench:
                     
             geodec = GeoDec()
             servers = geodec.getAllServers(geo_input, self.settings.servers_file, self.settings.ip_file)
+            print(servers)
             pingDelays = geodec.getPingDelay(geo_input, self.settings.ping_grouped_file, self.settings.pings_file)
             # Set delay parameters.
             try:
