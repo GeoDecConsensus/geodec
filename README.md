@@ -7,7 +7,7 @@ GeoDec aims to address the geographic concentration of validator nodes in existi
 ## Table of Contents
 
 -   [Table of Contents](#table-of-contents)
--   [Get Started](#install)
+-   [Get Started](#get-started)
 -   [How does it work?](#how-does-it-work)
     -   [`Remote`](#remote)
     -   [`Geodec`](#geodec)
@@ -23,15 +23,12 @@ GeoDec aims to address the geographic concentration of validator nodes in existi
 
 ### Pre-requisites
 
-Cometbft and Hotstuff (or Bullshark - same configs) is required to create the node config files. \
-
-For cometbft you can use the binary (light weight and easy) \
-For hotstuff you need to clone the repo and install cargo rust\
-
+-   Cometbft and Hotstuff (or Bullshark - same configs) is required to create the node config files.
 -   Rust
 -   Python3
--   CometBFT
--   Hotstuff
+
+For cometbft you can use the binary (light weight and easy) \
+For hotstuff you need to clone the repo and install cargo rust
 
 Clone hotstuff
 
@@ -78,9 +75,9 @@ pip install -r requirements.txt
 
 Geodec supports the following consensus mechanisms:
 
--   Cometbft
--   Hotstuff
--   Bullshark
+-   Cometbft - https://github.com/cometbft/cometbft
+-   Hotstuff - https://github.com/asonnino/hotstuff
+-   Bullshark - https://github.com/asonnino/narwhal/tree/bullshark
 
 ### Remote
 
