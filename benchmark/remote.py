@@ -596,4 +596,6 @@ class Bench:
             c.run(source_commands, hide=True)
 
     def _getDelayCommand(self, n, ip, interface, delay, delay_dev):
-        return (f'sudo tc class add dev {interface} parent 1:0 classid 1:{n+1} htb rate 1000kbit; sudo tc filter add dev {interface} parent 1:0 protocol ip u32 match ip dst {ip} flowid 1:{n+1}; sudo tc qdisc add dev {interface} parent 1:{n+1} handle {n*10}:0 netem delay {delay}ms {delay_dev}ms; ')
+        return (f'sudo tc class add dev {interface} parent 1:0 classid 1:{n+1} htb rate 1gbit; 
+                sudo tc filter add dev {interface} parent 1:0 protocol ip u32 match ip dst {ip} flowid 1:{n+1}; 
+                sudo tc qdisc add dev {interface} parent 1:{n+1} handle {n*10}:0 netem delay {delay}ms {delay_dev}ms; ')
