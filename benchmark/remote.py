@@ -486,21 +486,24 @@ class Bench:
             selected_servers = GeoDec.getAllServers(geo_input, self.settings.servers_file, self.settings.ip_file)
             pingDelays = GeoDec.getPingDelay(geo_input, self.settings.ping_grouped_file, self.settings.pings_file)
             
-            Print.info("Selected servers:")
+            Print.heading("\nSelected servers:")
             print(selected_servers[['ip', 'id', 'name', 'latitude', 'longitude']].to_string(index=False))
-            Print.info("Ping Delays:")
+            Print.heading("\nPing Delays:")
             print(pingDelays[['source', 'destination', 'avg', 'mdev']].to_string(index=False))
             
             # Set delay parameters.
+            latencySetter = LatencySetter(self.settings, self.connect)
             try:
-                LatencySetter.configDelay(selected_hosts)
-                LatencySetter.addDelays(selected_servers, pingDelays, self.settings.interface)
+                latencySetter.deleteDelay(selected_hosts)
+            except:
+                pass
+                
+            try:
+                latencySetter.configDelay(selected_hosts)
+                latencySetter.addDelays(selected_servers, pingDelays, self.settings.interface)
             except (subprocess.SubprocessError, GroupException) as e:
-                LatencySetter.deleteDelay(selected_hosts)
-                LatencySetter.configDelay(selected_hosts)
-                LatencySetter.addDelays(selected_servers, pingDelays, self.settings.interface)
-                # e = FabricError(e) if isinstance(e, GroupException) else e
-                # Print.error(BenchError('Failed to initalize delays', e))
+                e = FabricError(e) if isinstance(e, GroupException) else e
+                Print.error(BenchError('Failed to initalize delays', e))
          
         # Run benchmarks.
         for n in bench_parameters.nodes:
@@ -554,8 +557,9 @@ class Bench:
 
         if isGeoRemote:
             # Delete delay parameters.
+            latencySetter = LatencySetter(self.settings, self.connect)
             try:
-                self._deleteDelay(selected_hosts)
+                latencySetter.deleteDelay(selected_hosts)
             except (subprocess.SubprocessError, GroupException) as e:
                 e = FabricError(e) if isinstance(e, GroupException) else e
                 Print.error(BenchError('Failed to initalize delays', e))

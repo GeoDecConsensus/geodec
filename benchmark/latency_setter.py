@@ -2,6 +2,9 @@ from fabric import Connection, ThreadingGroup as Group
 from benchmark.utils import Print
 
 class LatencySetter:
+    def __init__(self, settings, connect):
+        self.settings = settings
+        self.connect = connect
         
     @staticmethod
     def _initalizeDelayQDisc(interface):
@@ -13,13 +16,13 @@ class LatencySetter:
 
     def configDelay(self, hosts):
         Print.info('Delay qdisc initalization...')
-        cmd = self._initalizeDelayQDisc(self.settings.interface)
+        cmd = LatencySetter._initalizeDelayQDisc(self.settings.interface)
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(cmd, hide=True)
 
     def deleteDelay(self, hosts):
         Print.info('Delete qdisc configurations...')
-        cmd = self._deleteDelayQDisc(self.settings.interface)
+        cmd = LatencySetter._deleteDelayQDisc(self.settings.interface)
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(cmd, hide=True)
 
@@ -33,7 +36,7 @@ class LatencySetter:
                     delay_data = pingDelays.query(query) 
                     delay = delay_data['avg'].values.astype(float)[0]
                     delay_dev = delay_data['mdev'].values.astype(float)[0]
-                    cmd = self._getDelayCommand(counter, destination['ip'], interface, delay/2, delay_dev/2)
+                    cmd = LatencySetter._getDelayCommand(counter, destination['ip'], interface, delay/2, delay_dev/2)
                     source_commands = source_commands + cmd
                     counter = counter + 1
             host = source['ip']
@@ -41,7 +44,8 @@ class LatencySetter:
             c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
             c.run(source_commands, hide=True)
 
-    def _getDelayCommand(self, n, ip, interface, delay, delay_dev):
+    @staticmethod
+    def _getDelayCommand(n, ip, interface, delay, delay_dev):
         return (f'sudo tc class add dev {interface} parent 1:0 classid 1:{n+1} htb rate 1gbit;' 
                 f'sudo tc filter add dev {interface} parent 1:0 protocol ip u32 match ip dst {ip} flowid 1:{n+1};' 
                 f'sudo tc qdisc add dev {interface} parent 1:{n+1} handle {n*10}:0 netem delay {delay}ms {delay_dev}ms; ')
