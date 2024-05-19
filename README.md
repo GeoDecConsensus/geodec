@@ -10,7 +10,7 @@ GeoDec aims to address the geographic concentration of validator nodes in existi
 -   [Get Started](#get-started)
 -   [How does it work?](#how-does-it-work)
     -   [`Remote`](#remote)
-    -   [`Geodec`](#geodec)
+    -   [`GeoRemote`](#georemote)
 -   [Development](#development)
 -   [Demo](#demo)
 -   [Maintainers](#maintainers)
@@ -112,7 +112,12 @@ fab georemote <mechanism_name> # ["cometbft", "hotstuff", "bullshark"]
 
 ## Demo
 
-Demo of geodec running the remote and geodec
+Demo of geodec running CometBFT with georemote and remote both.
+
+
+https://github.com/GeoDecConsensus/geodec/assets/97289118/dcf9a365-8528-42f4-b7d4-de49a7162804
+
+
 
 ## Maintainers
 
