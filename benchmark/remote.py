@@ -14,15 +14,15 @@ from copy import deepcopy
 from benchmark.config import Committee, Key, NodeParameters, BenchParameters, ConfigError
 from benchmark.utils import BenchError, Print, PathMaker, progress_bar
 from benchmark.commands import CommandMaker
-from benchmark.logs import LogParser, ParseError
 from benchmark.instance import InstanceManager
 from benchmark.geodec import GeoDec
 from benchmark.geo_logs import GeoLogParser
 from benchmark.latency_setter import LatencySetter
 
-from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
+from benchmark.mechanisms.cometbft import CometBftMechanism
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
-from benchmark.mechanisms.bullshark import BullsharkMechanism, BullsharkLogParser, BullsharkBenchParameters, BullsharkNodeParameters, BullsharkCommittee
+from benchmark.mechanisms.bullshark import BullsharkMechanism, BullsharkBenchParameters, BullsharkNodeParameters, BullsharkCommittee
+from benchmark.logs import LogParser, ParseError
 
 class FabricError(Exception):
     ''' Wrapper for Fabric exception with a meaningfull error message. '''
@@ -422,13 +422,10 @@ class Bench:
             
         # Parse logs and return the parser.
         Print.info('Parsing logs and computing performance...')
-        
-        if self.mechanism.name == "hotstuff":
-            return LogParser.process(PathMaker.logs_path(), faults=faults)
-        elif self.mechanism.name == "cometbft":
-            return CometBftLogParser.process(PathMaker.logs_path(), faults=faults)
-        elif self.mechanism.name == "bullshark":
-            return BullsharkLogParser.process(PathMaker.logs_path(), faults=faults)
+
+        logParser = LogParser()
+        logParser.log_parser(self.mechanism.name, PathMaker.logs_path(), faults=faults)
+        return logParser
 
         # # Delete local logs (if any).
         # cmd = CommandMaker.clean_logs()
@@ -541,8 +538,8 @@ class Bench:
                         )
                         logger = self._logs(hosts, faults, committee_copy)
                         logger.print(PathMaker.result_file(
-                            self.mechanism.name, faults, n, r, bench_parameters.tx_size
-                        ))
+                            self.mechanism.name, n, r, bench_parameters.tx_size, faults
+                        ), isGeoRemote)
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)

@@ -14,6 +14,7 @@ class ParseError(Exception):
 
 class CometBftLogParser:
     def __init__(self, clients, nodes, latency, faults):
+        self.result_str = ""
         self.latency = latency
         inputs = [clients, nodes]
         assert all(isinstance(x, list) for x in inputs)
@@ -62,7 +63,8 @@ class CometBftLogParser:
         if self.timeouts > 2:
             Print.warn(f'Nodes timed out {self.timeouts:,} time(s)')
 
-        print(self.result())
+        self.result_str = self.result()
+        return self.result_str
 
     def _merge_results(self, input):
         # Keep the earliest timestamp.
@@ -208,11 +210,15 @@ class CometBftLogParser:
         # mempool_sync_retry_nodes = self.configs[0]['mempool']['sync_retry_nodes']
         # mempool_batch_size = self.configs[0]['mempool']['batch_size']
         # mempool_max_batch_delay = self.configs[0]['mempool']['max_batch_delay']
-
+        now = datetime.now()
+        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
+    
         return (
             '\n'
             '-----------------------------------------\n'
             ' COMETBFT SUMMARY:\n'
+            '-----------------------------------------\n'
+            f' Date and Time: {current_time}\n'
             '-----------------------------------------\n'
             ' + CONFIG:\n'
             f' Faults: {self.faults} nodes\n'
@@ -220,7 +226,7 @@ class CometBftLogParser:
             f' Input rate: {sum(self.rate):,} tx/s\n'
             f' Transaction size: {self.size[0]:,} B\n'
             f' Execution time: {round(duration):,} s\n'
-            '\n'
+            f' GeoRemote: \n' # TODO: Add GeoRemote
             # f' Consensus timeout delay: {consensus_timeout_delay:,} ms\n'
             # f' Consensus sync retry delay: {consensus_sync_retry_delay:,} ms\n'
             # f' Mempool GC depth: {mempool_gc_depth:,} rounds\n'
@@ -243,7 +249,7 @@ class CometBftLogParser:
     def print(self, filename):
         assert isinstance(filename, str)
         with open(filename, 'a') as f:
-            f.write(self.result())
+            f.write(self.result_str)
 
     @classmethod
     def process(cls, directory, faults):

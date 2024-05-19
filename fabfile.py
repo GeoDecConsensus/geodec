@@ -152,11 +152,9 @@ def kill(ctx, mech):
 def logs(ctx, mech):
     ''' Print a summary of the logs '''
     try:
-        if mech == 'hotstuff':
-            HotStuffLogParser.process('./logs', faults='?').result()
-        elif mech == 'cometbft':
-            CometBftLogParser.process('./logs', faults='0').result()
-        elif mech == 'bullshark':
-            BullsharkLogParser.process('./logs').result()
+        logParser = LogParser()
+        logParser.log_parser(mech, './logs')
+        print(logParser.result())
+        
     except ParseError as e:
         Print.error(BenchError('Failed to parse logs', e))
