@@ -36,14 +36,23 @@ class LogParser:
         assert isinstance(filename, str)
         with open(filename, 'a') as f:
             f.write(f'GeoRemote: {isGeoRemote}\n')
-            f.write(self.result)
+            f.write(self.result_str)
 
-    def log_parser(self, mechanism_name, directory, faults):
+    def log_parser(self, mechanism_name, directory, faults=0):
         if mechanism_name == "hotstuff":
-            result =  HotStuffLogParser.process(directory, faults)
+            result =  HotStuffLogParser.process(directory, faults).result_str
         elif mechanism_name == "cometbft":
-            result = CometBftLogParser.process(directory, faults)
+            result = CometBftLogParser.process(directory, faults).result_str
         elif mechanism_name == "bullshark":
-            result = BullsharkLogParser.process(directory, faults)
+            result = BullsharkLogParser.process(directory, faults).result_str
         
         self.result_str = result
+        
+    def update_georemote(summary, new_georemote):
+        # Find the GeoRemote line and update its value
+        lines = summary.split('\n')
+        for i, line in enumerate(lines):
+            if 'GeoRemote:' in line:
+                lines[i] = f' GeoRemote: {new_georemote}'
+                break
+        return '\n'.join(lines)

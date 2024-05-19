@@ -537,6 +537,7 @@ class Bench:
                             hosts, r, bench_parameters, node_parameters, debug, committee_copy
                         )
                         logger = self._logs(hosts, faults, committee_copy)
+                        print(logger.result())
                         logger.print(PathMaker.result_file(
                             self.mechanism.name, n, r, bench_parameters.tx_size, faults
                         ), isGeoRemote)

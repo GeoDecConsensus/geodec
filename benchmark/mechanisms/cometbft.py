@@ -64,7 +64,6 @@ class CometBftLogParser:
             Print.warn(f'Nodes timed out {self.timeouts:,} time(s)')
 
         self.result_str = self.result()
-        return self.result_str
 
     def _merge_results(self, input):
         # Keep the earliest timestamp.
@@ -214,7 +213,6 @@ class CometBftLogParser:
         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     
         return (
-            '\n'
             '-----------------------------------------\n'
             ' COMETBFT SUMMARY:\n'
             '-----------------------------------------\n'
