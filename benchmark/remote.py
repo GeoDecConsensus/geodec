@@ -18,6 +18,7 @@ from benchmark.logs import LogParser, ParseError
 from benchmark.instance import InstanceManager
 from benchmark.geodec import GeoDec
 from benchmark.geo_logs import GeoLogParser
+from benchmark.latency_setter import LatencySetter
 
 from benchmark.mechanisms.cometbft import CometBftMechanism, CometBftLogParser
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
@@ -481,28 +482,23 @@ class Bench:
             raise BenchError('Failed to update nodes', e)
         
         if isGeoRemote:
-            # geoInput = {1:1, 2:1, 3:1, 4:1}
-            geo_input = {}
-            with open(self.settings.geo_input, mode='r') as file:
-                csv_reader = csv.reader(file)
-                next(csv_reader)
-                for row in csv_reader:
-                    geo_input[int(row[0])] = int(row[1])
-                    
-            geodec = GeoDec()
-            servers = geodec.getAllServers(geo_input, self.settings.servers_file, self.settings.ip_file)
-            print(servers)
-            pingDelays = geodec.getPingDelay(geo_input, self.settings.ping_grouped_file, self.settings.pings_file)
+            geo_input = GeoDec.getGeoInput(self.settings.geo_input)
+            selected_servers = GeoDec.getAllServers(geo_input, self.settings.servers_file, self.settings.ip_file)
+            pingDelays = GeoDec.getPingDelay(geo_input, self.settings.ping_grouped_file, self.settings.pings_file)
+            
+            Print.info("Selected servers:")
+            print(selected_servers[['ip', 'id', 'name', 'latitude', 'longitude']].to_string(index=False))
+            Print.info("Ping Delays:")
+            print(pingDelays[['source', 'destination', 'avg', 'mdev']].to_string(index=False))
+            
             # Set delay parameters.
             try:
-                self._configDelay(selected_hosts)
-                print("Delays configured")
-                self._addDelays(servers, pingDelays, self.settings.interface)
+                LatencySetter.configDelay(selected_hosts)
+                LatencySetter.addDelays(selected_servers, pingDelays, self.settings.interface)
             except (subprocess.SubprocessError, GroupException) as e:
-                self._deleteDelay(selected_hosts)
-                self._configDelay(selected_hosts)
-                print("Delays configured")
-                self._addDelays(servers, pingDelays, self.settings.interface)
+                LatencySetter.deleteDelay(selected_hosts)
+                LatencySetter.configDelay(selected_hosts)
+                LatencySetter.addDelays(selected_servers, pingDelays, self.settings.interface)
                 # e = FabricError(e) if isinstance(e, GroupException) else e
                 # Print.error(BenchError('Failed to initalize delays', e))
          
@@ -563,39 +559,3 @@ class Bench:
             except (subprocess.SubprocessError, GroupException) as e:
                 e = FabricError(e) if isinstance(e, GroupException) else e
                 Print.error(BenchError('Failed to initalize delays', e))
-            
-    ################ GEODEC Emulator methods #########################
-    def _configDelay(self, hosts):
-        Print.info('Delay qdisc initalization...')
-        cmd = CommandMaker.initalizeDelayQDisc(self.settings.interface)
-        g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-        g.run(cmd, hide=True)
-
-    def _deleteDelay(self, hosts):
-        Print.info('Delete qdisc configurations...')
-        cmd = CommandMaker.deleteDelayQDisc(self.settings.interface)
-        g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-        g.run(cmd, hide=True)
-
-    def _addDelays(self, servers, pingDelays, interface):
-        for index, source in servers.iterrows():
-            source_commands = ''
-            counter = 1
-            for index, destination in servers.iterrows():
-                if source['id'] != destination['id']:
-                    query = 'source == ' + str(source['id']) + ' and destination == '+ str(destination['id'])
-                    delay_data = pingDelays.query(query) 
-                    delay = delay_data['avg'].values.astype(float)[0]
-                    delay_dev = delay_data['mdev'].values.astype(float)[0]
-                    cmd = self._getDelayCommand(counter, destination['ip'], interface, delay/2, delay_dev/2)
-                    source_commands = source_commands + cmd
-                    counter = counter + 1
-            host = source['ip']
-            # execute the command for source IP
-            c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
-            c.run(source_commands, hide=True)
-
-    def _getDelayCommand(self, n, ip, interface, delay, delay_dev):
-        return (f'sudo tc class add dev {interface} parent 1:0 classid 1:{n+1} htb rate 1gbit; 
-                sudo tc filter add dev {interface} parent 1:0 protocol ip u32 match ip dst {ip} flowid 1:{n+1}; 
-                sudo tc qdisc add dev {interface} parent 1:{n+1} handle {n*10}:0 netem delay {delay}ms {delay_dev}ms; ')

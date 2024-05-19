@@ -30,15 +30,6 @@ class CommandMaker:
             return f'./node keys --filename {filename}'
         elif mechanism == "bullshark":
             return f'./node generate_keys --filename {filename}'
-    
-    @staticmethod
-    def initalizeDelayQDisc(interface):
-        # return (f'sudo tc qdisc del dev {interface} root && sudo tc qdisc add dev {interface} parent root handle 1:0 htb default 100')
-        return (f'sudo tc qdisc add dev {interface} parent root handle 1:0 htb default 100')
-    
-    @staticmethod
-    def deleteDelayQDisc(interface):
-        return (f'sudo tc qdisc del dev {interface} parent root')
 
     @staticmethod
     def run_node(keys, committee, store, parameters, mechanism, debug=False):
