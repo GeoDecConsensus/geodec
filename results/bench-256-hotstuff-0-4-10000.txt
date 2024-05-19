@@ -1,3 +1,30 @@
+-----------------------------------------
+ HOTSTUFF SUMMARY:
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 10,000 tx/s
+ Transaction size: 256 B
+ Execution time: 101 s
+
+ Consensus timeout delay: 5,000 ms
+ Consensus sync retry delay: 5,000 ms
+ Mempool GC depth: 50 rounds
+ Mempool sync retry delay: 5,000 ms
+ Mempool sync retry nodes: 3 nodes
+ Mempool batch size: 204,800 B
+ Mempool max batch delay: 100 ms
+
+ + RESULTS:
+ Consensus TPS: 9,962 tx/s
+ Consensus BPS: 2,550,193 B/s
+ Consensus latency: 378 ms
+
+ End-to-end TPS: 9,945 tx/s
+ End-to-end BPS: 2,546,033 B/s
+ End-to-end latency: 689 ms
+-----------------------------------------
 
 -----------------------------------------
  HOTSTUFF SUMMARY:
@@ -18,123 +45,11 @@
  Mempool max batch delay: 100 ms
 
  + RESULTS:
- Consensus TPS: 10,000 tx/s
- Consensus BPS: 2,559,886 B/s
+ Consensus TPS: 10,021 tx/s
+ Consensus BPS: 2,565,362 B/s
  Consensus latency: 3 ms
 
- End-to-end TPS: 9,997 tx/s
- End-to-end BPS: 2,559,250 B/s
- End-to-end latency: 58 ms
------------------------------------------
-
------------------------------------------
- HOTSTUFF SUMMARY:
------------------------------------------
- + CONFIG:
- Faults: 0 nodes
- Committee size: 4 nodes
- Input rate: 10,000 tx/s
- Transaction size: 256 B
- Execution time: 16 s
-
- Consensus timeout delay: 5,000 ms
- Consensus sync retry delay: 5,000 ms
- Mempool GC depth: 50 rounds
- Mempool sync retry delay: 5,000 ms
- Mempool sync retry nodes: 3 nodes
- Mempool batch size: 204,800 B
- Mempool max batch delay: 100 ms
-
- + RESULTS:
- Consensus TPS: 413 tx/s
- Consensus BPS: 105,718 B/s
- Consensus latency: 6,795 ms
-
- End-to-end TPS: 407 tx/s
- End-to-end BPS: 104,091 B/s
- End-to-end latency: 11,076 ms
------------------------------------------
-
------------------------------------------
- HOTSTUFF SUMMARY:
------------------------------------------
- + CONFIG:
- Faults: 0 nodes
- Committee size: 4 nodes
- Input rate: 10,000 tx/s
- Transaction size: 256 B
- Execution time: 11 s
-
- Consensus timeout delay: 5,000 ms
- Consensus sync retry delay: 5,000 ms
- Mempool GC depth: 50 rounds
- Mempool sync retry delay: 5,000 ms
- Mempool sync retry nodes: 3 nodes
- Mempool batch size: 204,800 B
- Mempool max batch delay: 100 ms
-
- + RESULTS:
- Consensus TPS: 283 tx/s
- Consensus BPS: 72,477 B/s
- Consensus latency: 6,350 ms
-
- End-to-end TPS: 268 tx/s
- End-to-end BPS: 68,535 B/s
- End-to-end latency: 9,010 ms
------------------------------------------
-
------------------------------------------
- HOTSTUFF SUMMARY:
------------------------------------------
- + CONFIG:
- Faults: 0 nodes
- Committee size: 4 nodes
- Input rate: 10,000 tx/s
- Transaction size: 256 B
- Execution time: 6 s
-
- Consensus timeout delay: 5,000 ms
- Consensus sync retry delay: 5,000 ms
- Mempool GC depth: 50 rounds
- Mempool sync retry delay: 5,000 ms
- Mempool sync retry nodes: 3 nodes
- Mempool batch size: 204,800 B
- Mempool max batch delay: 100 ms
-
- + RESULTS:
- Consensus TPS: 168 tx/s
- Consensus BPS: 43,006 B/s
- Consensus latency: 3,463 ms
-
- End-to-end TPS: 143 tx/s
- End-to-end BPS: 36,662 B/s
- End-to-end latency: 4,690 ms
------------------------------------------
-
------------------------------------------
- HOTSTUFF SUMMARY:
------------------------------------------
- + CONFIG:
- Faults: 0 nodes
- Committee size: 4 nodes
- Input rate: 10,000 tx/s
- Transaction size: 256 B
- Execution time: 18 s
-
- Consensus timeout delay: 5,000 ms
- Consensus sync retry delay: 5,000 ms
- Mempool GC depth: 50 rounds
- Mempool sync retry delay: 5,000 ms
- Mempool sync retry nodes: 3 nodes
- Mempool batch size: 204,800 B
- Mempool max batch delay: 100 ms
-
- + RESULTS:
- Consensus TPS: 553 tx/s
- Consensus BPS: 141,651 B/s
- Consensus latency: 7,125 ms
-
- End-to-end TPS: 536 tx/s
- End-to-end BPS: 137,192 B/s
- End-to-end latency: 12,461 ms
+ End-to-end TPS: 9,998 tx/s
+ End-to-end BPS: 2,559,377 B/s
+ End-to-end latency: 61 ms
 -----------------------------------------

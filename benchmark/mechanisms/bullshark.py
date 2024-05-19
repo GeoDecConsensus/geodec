@@ -284,6 +284,7 @@ class PlotParameters:
 
 class BullsharkLogParser:
     def __init__(self, clients, primaries, workers, faults=0):
+        self.result_str = ""
         inputs = [clients, primaries, workers]
         assert all(isinstance(x, list) for x in inputs)
         assert all(isinstance(x, str) for y in inputs for x in y)
@@ -337,7 +338,7 @@ class BullsharkLogParser:
                 f'Clients missed their target rate {self.misses:,} time(s)'
             )
 
-        print(self.result())
+        self.result_str = self.result()
 
     def _merge_results(self, input):
         # Keep the earliest timestamp.
@@ -435,11 +436,6 @@ class BullsharkLogParser:
 
     def _consensus_latency(self):
         latency = [c - self.proposals[d] for d, c in self.commits.items()]
-        # print(latency)
-        # print(f"len latency:{len(latency)}")
-        # print(mean(latency))
-        # print(f"len commits:{len(self.commits)}")
-        # print(f"len proposals:{len(self.proposals)}")
         return mean(latency) if latency else 0
 
     def _end_to_end_throughput(self):
@@ -476,11 +472,15 @@ class BullsharkLogParser:
         consensus_tps, consensus_bps, _ = self._consensus_throughput()
         end_to_end_tps, end_to_end_bps, duration = self._end_to_end_throughput()
         end_to_end_latency = self._end_to_end_latency() * 1_000
+        
+        now = datetime.now()
+        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
         return (
-            '\n'
             '-----------------------------------------\n'
             ' BULLSHARK SUMMARY:\n'
+            '-----------------------------------------\n'
+            f' Date and Time: {current_time}\n'
             '-----------------------------------------\n'
             ' + CONFIG:\n'
             f' Faults: {self.faults} node(s)\n'
@@ -490,6 +490,7 @@ class BullsharkLogParser:
             f' Input rate: {sum(self.rate):,} tx/s\n'
             f' Transaction size: {self.size[0]:,} B\n'
             f' Execution time: {round(duration):,} s\n'
+            f' GeoRemote: \n' # TODO: Add GeoRemote
             '\n'
             f' Header size: {header_size:,} B\n'
             f' Max header delay: {max_header_delay:,} ms\n'
@@ -513,7 +514,7 @@ class BullsharkLogParser:
     def print(self, filename):
         assert isinstance(filename, str)
         with open(filename, 'a') as f:
-            f.write(self.result())
+            f.write(self.result_str)
 
     @classmethod
     def process(cls, directory, faults=0):

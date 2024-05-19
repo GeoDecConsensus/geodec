@@ -26,8 +26,8 @@
         "cometbft": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [8],
-                "rate": [15000],
+                "nodes": [4],
+                "rate": [10000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1
