@@ -125,6 +125,8 @@ https://github.com/GeoDecConsensus/geodec/assets/97289118/dcf9a365-8528-42f4-b7d
 
 [Shashank Motepalli](https://x.com/sh1sh1nk)
 
+Advisor: [Arno Jacobsen](https://www.eecg.toronto.edu/~jacobsen/)
+
 ## Contributing
 
 Feel free to open issues, wait to receive confirmation from the maintainers before starting to work on it.
