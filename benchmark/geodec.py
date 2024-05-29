@@ -14,10 +14,12 @@ class GeoDec:
     def getGeoInput(geo_input_file):
         geo_input = {}
         with open(geo_input_file, mode='r') as file:
-            csv_reader = csv.reader(file)
-            next(csv_reader)
+            csv_reader = csv.DictReader(file)
             for row in csv_reader:
-                geo_input[int(row[0])] = int(row[1])
+                if row['id']:  # Ensure id is not empty
+                    geo_input[int(row['id'])] = 1
+                if row['count'] and row['id']:
+                    geo_input[int(row['id'])] = int(row['count'])
         return geo_input
        
     def _getServers(geoInput, servers_file):

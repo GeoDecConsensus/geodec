@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>World Map with Coordinates</title>
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet/dist/leaflet.css"
+        />
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background-color: #1b1b1b;
+                color: #ffffff;
+            }
+            #map {
+                height: 90vh;
+                width: 100%;
+            }
+            .leaflet-container {
+                background: #1b1b1b;
+            }
+            .leaflet-popup-content-wrapper,
+            .leaflet-popup-tip {
+                background: #282828;
+                color: #ffffff;
+            }
+            .neon-text {
+                color: #282828;
+            }
+            .controls {
+                padding: 10px;
+                background-color: #282828;
+                text-align: center;
+            }
+            .button {
+                padding: 10px 20px;
+                background-color: #0ff;
+                border: none;
+                cursor: pointer;
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="map"></div>
+        <div class="controls">
+            <button class="button" onclick="downloadSelected()">
+                Download Geo Input
+            </button>
+        </div>
+
+        <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
