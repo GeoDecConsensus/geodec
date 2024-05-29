@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
                             place.latitude,
                             place.longitude,
                         ])
+                        marker
+                            .setOpacity(0.5)
                             .addTo(map)
                             .on("click", function () {
                                 const index = selectedCoordinates.findIndex(
@@ -36,11 +38,11 @@ document.addEventListener("DOMContentLoaded", function () {
                                             className: "neon-text",
                                         })
                                         .openTooltip()
-                                    marker.setStyle({ fillOpacity: 0.5 })
+                                    marker.setOpacity(1)
                                 } else {
                                     selectedCoordinates.splice(index, 1)
                                     marker.unbindTooltip()
-                                    marker.setStyle({ fillOpacity: 1 })
+                                    marker.setOpacity(0.5)
                                 }
                             })
                         markers.push(marker)
