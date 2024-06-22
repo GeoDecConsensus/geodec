@@ -1,4 +1,4 @@
-id,name,title,location,state,country,state_abbv,continent,latitude,longitude,selected,,,11
+id,name,title,location,state,country,state_abbv,continent,latitude,longitude,selected,,,
 1,Melbourne,Melbourne,Melbourne,Victoria,Australia,VIC,4,-37.7833,144.9667,1,,,
 125,SaoPaulo,Sao Paulo,Sao Paulo,Sao Paulo,Brazil,SP,2,-23.55,-46.6333,1,,,
 2,Toronto,Toronto,Toronto,Ontario,Canada,ON,1,43.6481,-79.4042,1,,,
