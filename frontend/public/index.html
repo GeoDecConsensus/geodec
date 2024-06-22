@@ -42,10 +42,21 @@
                 cursor: pointer;
                 font-size: 16px;
             }
-            .count-input {
-            width: 50px;
-            margin-left: 10px;
-            font-size: 14px;
+            #selected-locations {
+            padding: 10px;
+            background-color: #282828;
+            color: #ffffff;
+            overflow-y: auto;
+            max-height: 50vh;
+            }
+            .location-entry {
+                margin-bottom: 10px;
+            }
+            .location-entry label {
+                margin-right: 10px;
+            }
+            .location-entry input {
+                width: 50px;
             }
         </style>
     </head>
@@ -56,6 +67,7 @@
                 Download Geo Input
             </button>
         </div>
+        <div id="selected-locations"></div>
 
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>

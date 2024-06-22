@@ -5,7 +5,7 @@ const path = require("path")
 const Papa = require("papaparse")
 
 const app = express()
-const PORT = 3000
+const PORT = process.argv[2] || 3000
 
 app.use(bodyParser.json())
 
