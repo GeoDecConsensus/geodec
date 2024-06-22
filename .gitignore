@@ -137,10 +137,12 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-mytestnet/
-
-persistent_peer.txt
-
 node
 client
+
+mytestnet/
+persistent_peer.txt
+
 frontend/node_modules
+
+.*.json
