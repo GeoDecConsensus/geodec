@@ -139,10 +139,8 @@ cython_debug/
 
 mytestnet/
 
-*.json
-!fab-params.json
-
 persistent_peer.txt
 
 node
 client
+frontend/node_modules
