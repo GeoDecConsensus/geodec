@@ -42,32 +42,45 @@
                 cursor: pointer;
                 font-size: 16px;
             }
-            #selected-locations {
-            padding: 10px;
-            background-color: #282828;
-            color: #ffffff;
-            overflow-y: auto;
-            max-height: 50vh;
+            #selected-locations-table {
+                width: 100%;
+                border-collapse: collapse;
             }
-            .location-entry {
-                margin-bottom: 10px;
+            #selected-locations-table th,
+            #selected-locations-table td {
+                border: 1px solid #0ff;
+                padding: 8px;
+                text-align: center;
             }
-            .location-entry label {
-                margin-right: 10px;
+            #selected-locations-table th {
+                background-color: #282828;
+                color: #0ff;
             }
-            .location-entry input {
-                width: 50px;
+            #selected-locations-table td {
+                background-color: #1b1b1b;
+                color: #ffffff;
             }
         </style>
     </head>
     <body>
         <div id="map"></div>
         <div class="controls">
-            <button class="button" onclick="saveSelected()">Save Selected Coordinates</button>
-                Download Geo Input
+            <button class="button" onclick="saveSelected()">
+                Save Selected Coordinates
             </button>
         </div>
-        <div id="selected-locations"></div>
+        <div id="selected-locations-container">
+            <table id="selected-locations-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Count</th>
+                        <th>Stake</th>
+                    </tr>
+                </thead>
+                <tbody id="selected-locations"></tbody>
+            </table>
+        </div>
 
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>

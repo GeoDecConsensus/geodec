@@ -27,9 +27,9 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [4],
-                "rate": [10000],
+                "rate": [1000],
                 "tx_size": 256,
-                "duration": 100,
+                "duration": 60,
                 "runs": 1
             },
             "node_params": {

@@ -12,7 +12,7 @@ from copy import deepcopy
 # import pandas as pd
 
 from benchmark.config import Committee, Key, NodeParameters, BenchParameters, ConfigError
-from benchmark.utils import BenchError, Print, PathMaker, progress_bar
+from benchmark.utils import BenchError, Print, PathMaker, progress_bar, set_weight_cometbft
 from benchmark.commands import CommandMaker
 from benchmark.instance import InstanceManager
 from benchmark.geodec import GeoDec
@@ -140,7 +140,11 @@ class Bench:
 
     def _config(self, hosts, node_parameters, bench_parameters=None):
         Print.info('Generating configuration files...')
-
+        
+        # Cleanup all local configuration files.
+        cmd = CommandMaker.cleanup()
+        subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
+            
         if self.mechanism.name == 'cometbft':
             # Cleanup node configuration files on hosts
             for i, host in enumerate(hosts):
@@ -158,9 +162,12 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            # cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml']
             cmd = [f'~/cometbft testnet --v {len(hosts)}']
+            # cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml'] # NOTE custom configuration
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            
+            # Update the stake weights in the configuration file
+            set_weight_cometbft(self.settings.geo_input)
             
             # Run the bash file and store the ouput in this file
             cmd = [
@@ -169,27 +176,19 @@ class Bench:
             ]
             subprocess.run(cmd, shell=True)
             
-            # NOTE Upload configuration files.
+            # Upload configuration files.
             progress = progress_bar(hosts, prefix='Uploading config files:')
             for i, host in enumerate(hosts):
-                # Print.info("Sent node config file to " + host)
-                # NOTE: Path of the node config files
-                cmd = [f'scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/']
+                cmd = [f'scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/'] # NOTE Path of the node config files
                 subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         
         else:
-            # Cleanup all local configuration files.
-            cmd = CommandMaker.cleanup()
-            subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
-
             # Recompile the latest code.
             cmd = CommandMaker.compile().split()
             subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
-            # subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path('hotstuff'))
 
             # Create alias for the client and nodes binary.
             cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name), self.mechanism.name)
-            # cmd = CommandMaker.alias_binaries(PathMaker.binary_path('hotstuff'), self.settings.repo_name)
             subprocess.run([cmd], shell=True)
 
             # Generate configuration files.
@@ -287,9 +286,9 @@ class Bench:
             # Print.info("Persistent Peers: " + persistent_peers)
             
             # Run the clients
-            # committee = Committee.load(PathMaker.committee_file())    # TODO for cometbft
+            # committee = Committee.load(PathMaker.committee_file()) # TODO for cometbft
             addresses = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-            # rate_share = ceil(rate / committee.size())  # TODO Take faults into account.
+            # rate_share = ceil(rate / committee.size()) # TODO Take faults into account.
             rate_share = ceil(rate / len(hosts))
             duration = bench_parameters.duration    # Duration for which the client should run
             client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]

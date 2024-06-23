@@ -1,3 +1,5 @@
+import csv
+import json
 from os.path import join
 
 
@@ -165,3 +167,26 @@ def progress_bar(iterable, prefix='', suffix='', decimals=1, length=30, fill='â–
         yield item
         printProgressBar(i + 1)
     print()
+
+def set_weight_cometbft(geo_input_file):
+    # Get the stake values
+    stakes = []
+    with open(geo_input_file, mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            if row['stake'] and row['id']:
+                stakes.append(row['stake'])
+
+    def get_path(i):
+        return './mytestnet/node{i}/config/genesis.json'.format(i=i)
+    
+    # Set the weights
+    for i in range(len(stakes)):
+        path = get_path(i)
+        with open(path, 'r') as file:
+            data = json.load(file)
+            for j, validator in enumerate(data['validators']):
+                validator['power'] = stakes[j]  # New value for the "power" field
+
+        with open(path, 'w') as file:
+            json.dump(data, file, indent=4)

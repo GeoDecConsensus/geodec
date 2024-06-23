@@ -31,3 +31,65 @@ GeoRemote: True
  End-to-end BPS: 2,544,894 B/s
  End-to-end latency: 642 ms
 -----------------------------------------
+GeoRemote: False
+-----------------------------------------
+ HOTSTUFF SUMMARY:
+-----------------------------------------
+ Date and Time: 2024-06-22 11:37:07
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 10,000 tx/s
+ Transaction size: 256 B
+ Execution time: 93 s
+ GeoRemote: 
+
+ Consensus timeout delay: 5,000 ms
+ Consensus sync retry delay: 5,000 ms
+ Mempool GC depth: 50 rounds
+ Mempool sync retry delay: 5,000 ms
+ Mempool sync retry nodes: 3 nodes
+ Mempool batch size: 204,800 B
+ Mempool max batch delay: 100 ms
+
+ + RESULTS:
+ Consensus TPS: 9,944 tx/s
+ Consensus BPS: 2,545,658 B/s
+ Consensus latency: 1,980 ms
+
+ End-to-end TPS: 9,942 tx/s
+ End-to-end BPS: 2,545,162 B/s
+ End-to-end latency: 6,793 ms
+-----------------------------------------
+GeoRemote: False
+-----------------------------------------
+ HOTSTUFF SUMMARY:
+-----------------------------------------
+ Date and Time: 2024-06-22 11:44:16
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 10,000 tx/s
+ Transaction size: 256 B
+ Execution time: 93 s
+ GeoRemote: 
+
+ Consensus timeout delay: 5,000 ms
+ Consensus sync retry delay: 5,000 ms
+ Mempool GC depth: 50 rounds
+ Mempool sync retry delay: 5,000 ms
+ Mempool sync retry nodes: 3 nodes
+ Mempool batch size: 204,800 B
+ Mempool max batch delay: 100 ms
+
+ + RESULTS:
+ Consensus TPS: 3,345 tx/s
+ Consensus BPS: 856,210 B/s
+ Consensus latency: 179 ms
+
+ End-to-end TPS: 3,197 tx/s
+ End-to-end BPS: 818,315 B/s
+ End-to-end latency: 3,027 ms
+-----------------------------------------

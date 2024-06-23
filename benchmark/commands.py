@@ -12,7 +12,7 @@ class CommandMaker:
     @staticmethod
     def cleanup():
         return (
-            f'rm -r .db-* ; rm .*.json ; mkdir -p {PathMaker.results_path()}'
+            f'rm -r .db-* ; rm .*.json ; rm -r mytestnet; mkdir -p {PathMaker.results_path()}'
         )
 
     @staticmethod
