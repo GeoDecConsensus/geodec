@@ -90,3 +90,49 @@ GeoRemote: False
  End-to-end BPS: 209,341 B/s
  End-to-end latency: 240,000 ms
 -----------------------------------------
+GeoRemote: False
+-----------------------------------------
+ COMETBFT SUMMARY:
+-----------------------------------------
+ Date and Time: 2024-06-23 21:42:26
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 1,000 tx/s
+ Transaction size: 256 B
+ Execution time: 55 s
+ GeoRemote: 
+
+ + RESULTS:
+ Consensus TPS: 908 tx/s
+ Consensus BPS: 232,519 B/s
+ Consensus latency: 341 ms
+
+ End-to-end TPS: 957 tx/s
+ End-to-end BPS: 245,099 B/s
+ End-to-end latency: 1,097 ms
+-----------------------------------------
+GeoRemote: False
+-----------------------------------------
+ COMETBFT SUMMARY:
+-----------------------------------------
+ Date and Time: 2024-06-23 21:46:57
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 1,000 tx/s
+ Transaction size: 256 B
+ Execution time: 55 s
+ GeoRemote: 
+
+ + RESULTS:
+ Consensus TPS: 885 tx/s
+ Consensus BPS: 226,530 B/s
+ Consensus latency: 361 ms
+
+ End-to-end TPS: 930 tx/s
+ End-to-end BPS: 238,197 B/s
+ End-to-end latency: 1,786 ms
+-----------------------------------------

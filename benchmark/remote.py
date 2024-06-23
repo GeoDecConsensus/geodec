@@ -140,7 +140,11 @@ class Bench:
 
     def _config(self, hosts, node_parameters, bench_parameters=None):
         Print.info('Generating configuration files...')
-
+        
+        # Cleanup all local configuration files.
+        cmd = CommandMaker.cleanup()
+        subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
+            
         if self.mechanism.name == 'cometbft':
             # Cleanup node configuration files on hosts
             for i, host in enumerate(hosts):
@@ -179,18 +183,12 @@ class Bench:
                 subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         
         else:
-            # Cleanup all local configuration files.
-            cmd = CommandMaker.cleanup()
-            subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
-
             # Recompile the latest code.
             cmd = CommandMaker.compile().split()
             subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
-            # subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path('hotstuff'))
 
             # Create alias for the client and nodes binary.
             cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name), self.mechanism.name)
-            # cmd = CommandMaker.alias_binaries(PathMaker.binary_path('hotstuff'), self.settings.repo_name)
             subprocess.run([cmd], shell=True)
 
             # Generate configuration files.
