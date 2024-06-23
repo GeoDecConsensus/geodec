@@ -59,40 +59,44 @@ document.addEventListener("DOMContentLoaded", function () {
         })
 
     function addLocationEntry(place) {
-        const entryDiv = document.createElement("div")
-        entryDiv.className = "location-entry"
-        entryDiv.dataset.latitude = place.latitude
-        entryDiv.dataset.longitude = place.longitude
+        const row = document.createElement("tr")
+        row.className = "location-entry"
+        row.dataset.latitude = place.latitude
+        row.dataset.longitude = place.longitude
 
-        const label = document.createElement("label")
-        label.textContent = place.name
+        const nameCell = document.createElement("td")
+        nameCell.textContent = place.name
 
+        const countCell = document.createElement("td")
         const countInput = document.createElement("input")
         countInput.type = "number"
         countInput.value = place.count
         countInput.addEventListener("input", function () {
             place.count = parseInt(countInput.value, 10)
         })
+        countCell.appendChild(countInput)
 
+        const stakeCell = document.createElement("td")
         const stakeInput = document.createElement("input")
         stakeInput.type = "number"
         stakeInput.value = place.stake
         stakeInput.addEventListener("input", function () {
             place.stake = parseInt(stakeInput.value, 10)
         })
+        stakeCell.appendChild(stakeInput)
 
-        entryDiv.appendChild(label)
-        entryDiv.appendChild(countInput)
-        entryDiv.appendChild(stakeInput)
-        selectedLocationsContainer.appendChild(entryDiv)
+        row.appendChild(nameCell)
+        row.appendChild(countCell)
+        row.appendChild(stakeCell)
+        selectedLocationsContainer.appendChild(row)
     }
 
     function removeLocationEntry(place) {
-        const entryDiv = selectedLocationsContainer.querySelector(
-            `.location-entry[data-latitude='${place.latitude}'][data-longitude='${place.longitude}']`
+        const row = selectedLocationsContainer.querySelector(
+            `tr.location-entry[data-latitude='${place.latitude}'][data-longitude='${place.longitude}']`
         )
-        if (entryDiv) {
-            selectedLocationsContainer.removeChild(entryDiv)
+        if (row) {
+            selectedLocationsContainer.removeChild(row)
         }
     }
 
@@ -111,6 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.removeChild(link)
         }
     }
+
     window.saveSelected = function () {
         fetch("/save-coordinates", {
             method: "POST",

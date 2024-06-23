@@ -42,21 +42,23 @@
                 cursor: pointer;
                 font-size: 16px;
             }
-            #selected-locations {
-                padding: 10px;
+            #selected-locations-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            #selected-locations-table th,
+            #selected-locations-table td {
+                border: 1px solid #0ff;
+                padding: 8px;
+                text-align: center;
+            }
+            #selected-locations-table th {
                 background-color: #282828;
+                color: #0ff;
+            }
+            #selected-locations-table td {
+                background-color: #1b1b1b;
                 color: #ffffff;
-                overflow-y: auto;
-                max-height: 50vh;
-            }
-            .location-entry {
-                margin-bottom: 10px;
-            }
-            .location-entry label {
-                margin-right: 10px;
-            }
-            .location-entry input {
-                width: 50px;
             }
         </style>
     </head>
@@ -67,7 +69,18 @@
                 Save Selected Coordinates
             </button>
         </div>
-        <div id="selected-locations"></div>
+        <div id="selected-locations-container">
+            <table id="selected-locations-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Count</th>
+                        <th>Stake</th>
+                    </tr>
+                </thead>
+                <tbody id="selected-locations"></tbody>
+            </table>
+        </div>
 
         <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
