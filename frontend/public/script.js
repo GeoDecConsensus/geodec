@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 )
                                 if (index === -1) {
                                     place.count = 1 // Initialize count
+                                    place.stake = 1 // Initialize stake to 1
                                     selectedCoordinates.push(place)
                                     addLocationEntry(place)
 
@@ -66,29 +67,23 @@ document.addEventListener("DOMContentLoaded", function () {
         const label = document.createElement("label")
         label.textContent = place.name
 
-        const input = document.createElement("input")
-        input.type = "number"
-        input.value = place.count ? place.count : 1
-        input.addEventListener("input", function () {
-            place.count = parseInt(input.value, 10)
-            const marker = markers.find(
-                (m) =>
-                    m.getLatLng().lat === place.latitude &&
-                    m.getLatLng().lng === place.longitude
-            )
-            if (marker) {
-                marker
-                    .bindTooltip(`${place.name} (Count: ${place.count})`, {
-                        permanent: true,
-                        direction: "right",
-                        className: "neon-text",
-                    })
-                    .openTooltip()
-            }
+        const countInput = document.createElement("input")
+        countInput.type = "number"
+        countInput.value = place.count
+        countInput.addEventListener("input", function () {
+            place.count = parseInt(countInput.value, 10)
+        })
+
+        const stakeInput = document.createElement("input")
+        stakeInput.type = "number"
+        stakeInput.value = place.stake
+        stakeInput.addEventListener("input", function () {
+            place.stake = parseInt(stakeInput.value, 10)
         })
 
         entryDiv.appendChild(label)
-        entryDiv.appendChild(input)
+        entryDiv.appendChild(countInput)
+        entryDiv.appendChild(stakeInput)
         selectedLocationsContainer.appendChild(entryDiv)
     }
 
