@@ -12,7 +12,7 @@ from copy import deepcopy
 # import pandas as pd
 
 from benchmark.config import Committee, Key, NodeParameters, BenchParameters, ConfigError
-from benchmark.utils import BenchError, Print, PathMaker, progress_bar
+from benchmark.utils import BenchError, Print, PathMaker, progress_bar, set_weight_cometbft
 from benchmark.commands import CommandMaker
 from benchmark.instance import InstanceManager
 from benchmark.geodec import GeoDec
@@ -161,6 +161,9 @@ class Bench:
             cmd = [f'~/cometbft testnet --v {len(hosts)}']
             # cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml'] # NOTE custom configuration
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            
+            # Update the stake weights in the configuration file
+            set_weight_cometbft(self.settings.geo_input)
             
             # Run the bash file and store the ouput in this file
             cmd = [
