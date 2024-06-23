@@ -158,8 +158,8 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            # cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml']
             cmd = [f'~/cometbft testnet --v {len(hosts)}']
+            # cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml'] # NOTE custom configuration
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             
             # Run the bash file and store the ouput in this file
@@ -169,12 +169,10 @@ class Bench:
             ]
             subprocess.run(cmd, shell=True)
             
-            # NOTE Upload configuration files.
+            # Upload configuration files.
             progress = progress_bar(hosts, prefix='Uploading config files:')
             for i, host in enumerate(hosts):
-                # Print.info("Sent node config file to " + host)
-                # NOTE: Path of the node config files
-                cmd = [f'scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/']
+                cmd = [f'scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/'] # NOTE Path of the node config files
                 subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
         
         else:
@@ -287,9 +285,9 @@ class Bench:
             # Print.info("Persistent Peers: " + persistent_peers)
             
             # Run the clients
-            # committee = Committee.load(PathMaker.committee_file())    # TODO for cometbft
+            # committee = Committee.load(PathMaker.committee_file()) # TODO for cometbft
             addresses = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-            # rate_share = ceil(rate / committee.size())  # TODO Take faults into account.
+            # rate_share = ceil(rate / committee.size()) # TODO Take faults into account.
             rate_share = ceil(rate / len(hosts))
             duration = bench_parameters.duration    # Duration for which the client should run
             client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
