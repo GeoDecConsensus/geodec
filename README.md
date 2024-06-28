@@ -144,3 +144,4 @@ This project is licensed under the Apache License - see the [LICENSE.md](LICENSE
 ## Credits
 
 Thanks and credits to [Alberto Sonnino](https://github.com/asonnino) for the initial hotstuff and bullsharks benchmark.
+Thank you PBS Foundation for supporting this work.
