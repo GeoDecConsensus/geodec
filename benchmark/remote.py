@@ -75,9 +75,7 @@ class Bench:
         Print.info(f'Installing {self.settings.testbed}')
         cmd = self.mechanism.install_cmd
         hosts = self._select_hosts()
-        # hosts = self.manager.hosts(flat=True)
         
-        # for cmd in cmds:
         try:
             g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
             g.run(' && '.join(cmd), hide=True)
@@ -89,8 +87,8 @@ class Bench:
     def kill(self, hosts=[], delete_logs=False):
         assert isinstance(hosts, list)
         assert isinstance(delete_logs, bool)
-        # hosts = hosts if hosts else self.manager.hosts(flat=True)
-        hosts = self._select_hosts()
+
+        hosts = self._select_hosts([len(hosts)])
         delete_logs = CommandMaker.clean_logs() if delete_logs else 'true'
         cmd = [delete_logs, f'({CommandMaker.kill()} || true)']
         try:
@@ -99,7 +97,9 @@ class Bench:
         except GroupException as e:
             raise BenchError('Failed to kill nodes', FabricError(e))
 
-    def _select_hosts(self):
+    def _select_hosts(self, nodes=[]):
+        max_count = max(nodes)
+         
         addrs = [] 
         # Retrieve values based on your scripts, note we use Internal IP addresses
         with open(self.settings.ip_file, 'r') as f:
@@ -110,16 +110,7 @@ class Bench:
                     addrs.append(row['Internal IP'])
             else:
                  addrs = [line.strip() for line in f.readlines()]
-        return addrs
-        # # Ensure there are enough hosts.
-        # hosts = self.manager.hosts()
-        # if sum(len(x) for x in hosts.values()) < nodes:
-        #     return []
-
-        # # Select the hosts in different data centers.
-        # ordered = zip(*hosts.values())
-        # ordered = [x for y in ordered for x in y]
-        # return ordered[:nodes]
+        return addrs[:max_count]
 
     def _background_run(self, host, command, log_file):
         name = splitext(basename(log_file))[0]
@@ -467,9 +458,8 @@ class Bench:
             raise BenchError('Invalid nodes or bench parameters', e)
         
         # Select which hosts to use.
-        # selected_hosts = self._select_hosts(bench_parameters.nodes[0])
-        selected_hosts = self._select_hosts()
-        if len(selected_hosts) < bench_parameters.nodes[0]:
+        selected_hosts = self._select_hosts(bench_parameters.nodes)
+        if len(selected_hosts) < max(bench_parameters.nodes):
             Print.warn('There are not enough instances available')
             return
 
