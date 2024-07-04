@@ -35,7 +35,7 @@
             },
             "configuration": {
                 "provider": "google_compute_engine",
-                "ip_file": "/home/ubuntu/geodec/rundata/instances_ip.csv"
+                "ip_file": "/home/ubuntu/geodec/rundata/ip_file.csv"
             }
         },
         "cometbft": {
@@ -73,7 +73,7 @@
             },
             "configuration": {
                 "provider": "google_compute_engine",
-                "ip_file": "/home/ubuntu/geodec/rundata/instances_ip.csv"
+                "ip_file": "/home/ubuntu/geodec/rundata/ip_file.csv"
             }
         },
         "bullshark": {
@@ -109,7 +109,7 @@
             },
             "configuration": {
                 "provider": "google_compute_engine",
-                "ip_file": "/home/ubuntu/geodec/rundata/instances_ip.csv"
+                "ip_file": "/home/ubuntu/geodec/rundata/ip_file.csv"
             }
         }
     }

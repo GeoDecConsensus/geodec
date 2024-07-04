@@ -3,8 +3,8 @@
         "hotstuff": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [4],
-                "rate": [10000],
+                "nodes": [8],
+                "rate": [100000],
                 "tx_size": 256,
                 "duration": 100,
                 "runs": 1

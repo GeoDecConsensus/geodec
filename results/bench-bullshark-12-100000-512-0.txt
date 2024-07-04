@@ -1,0 +1,33 @@
+GeoRemote: False
+-----------------------------------------
+ BULLSHARK SUMMARY:
+-----------------------------------------
+ Date and Time: 2024-06-29 11:33:04
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 node(s)
+ Committee size: 12 node(s)
+ Worker(s) per node: 1 worker(s)
+ Collocate primary and workers: True
+ Input rate: 100,008 tx/s
+ Transaction size: 512 B
+ Execution time: 60 s
+ GeoRemote: 
+
+ Header size: 50 B
+ Max header delay: 5,000 ms
+ GC depth: 50 round(s)
+ Sync retry delay: 5,000 ms
+ Sync retry nodes: 3 node(s)
+ batch size: 204,800 B
+ Max batch delay: 100 ms
+
+ + RESULTS:
+ Consensus TPS: 99,562 tx/s
+ Consensus BPS: 50,975,600 B/s
+ Consensus latency: 407 ms
+
+ End-to-end TPS: 99,453 tx/s
+ End-to-end BPS: 50,920,165 B/s
+ End-to-end latency: 2,530 ms
+-----------------------------------------

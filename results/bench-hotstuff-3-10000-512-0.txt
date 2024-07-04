@@ -1,0 +1,31 @@
+GeoRemote: False
+-----------------------------------------
+ HOTSTUFF SUMMARY:
+-----------------------------------------
+ Date and Time: 2024-06-27 16:20:34
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 3 nodes
+ Input rate: 10,002 tx/s
+ Transaction size: 512 B
+ Execution time: 60 s
+ GeoRemote: 
+
+ Consensus timeout delay: 5,000 ms
+ Consensus sync retry delay: 5,000 ms
+ Mempool GC depth: 50 rounds
+ Mempool sync retry delay: 5,000 ms
+ Mempool sync retry nodes: 3 nodes
+ Mempool batch size: 204,800 B
+ Mempool max batch delay: 100 ms
+
+ + RESULTS:
+ Consensus TPS: 9,960 tx/s
+ Consensus BPS: 5,099,688 B/s
+ Consensus latency: 28 ms
+
+ End-to-end TPS: 9,954 tx/s
+ End-to-end BPS: 5,096,561 B/s
+ End-to-end latency: 205 ms
+-----------------------------------------

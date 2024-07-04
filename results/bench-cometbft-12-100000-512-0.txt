@@ -1,0 +1,23 @@
+GeoRemote: False
+-----------------------------------------
+ COMETBFT SUMMARY:
+-----------------------------------------
+ Date and Time: 2024-06-29 11:42:39
+-----------------------------------------
+ + CONFIG:
+ Faults: 0 nodes
+ Committee size: 12 nodes
+ Input rate: 100,008 tx/s
+ Transaction size: 512 B
+ Execution time: 47 s
+ GeoRemote: 
+
+ + RESULTS:
+ Consensus TPS: 1,157 tx/s
+ Consensus BPS: 592,223 B/s
+ Consensus latency: 596 ms
+
+ End-to-end TPS: 1,436 tx/s
+ End-to-end BPS: 735,010 B/s
+ End-to-end latency: 6,996 ms
+-----------------------------------------
