@@ -12,7 +12,7 @@ from copy import deepcopy
 # import pandas as pd
 
 from benchmark.config import Committee, Key, NodeParameters, BenchParameters, ConfigError
-from benchmark.utils import BenchError, Print, PathMaker, progress_bar, set_weight_cometbft
+from benchmark.utils import BenchError, Print, PathMaker, progress_bar, set_weight
 from benchmark.commands import CommandMaker
 from benchmark.instance import InstanceManager
 from benchmark.geodec import GeoDec
@@ -155,7 +155,7 @@ class Bench:
             
             # Update the stake weights in the configuration file
             if isGeoremote:
-                set_weight_cometbft(self.settings.geo_input)
+                set_weight(self.mechanism.name, self.settings.geo_input)
             
             # Run the bash file and store the ouput in this file
             cmd = [
@@ -211,6 +211,9 @@ class Bench:
 
             committee.print(PathMaker.committee_file())
             node_parameters.print(PathMaker.parameters_file())
+            
+            if isGeoremote:
+                set_weight(self.mechanism.name, self.settings.geo_input)
             
             cmd = f'{CommandMaker.cleanup()} || true'
             g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
@@ -277,7 +280,6 @@ class Bench:
             with open('persistent_peer.txt', 'r') as f:
                 persistent_peers = f.read()
                 persistent_peers = persistent_peers[:-1]
-            # Print.info("Persistent Peers: " + persistent_peers)
             
             # Run the clients
             # committee = Committee.load(PathMaker.committee_file()) # TODO for cometbft
@@ -300,10 +302,6 @@ class Bench:
             # Run the nodes.
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
-                """
-                Mempool:info - lots of output when mempool full
-                """
-                # cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:info,*:error"'
                 cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,consensus:debug,*:error"'
                 self._background_run(host, cmd, log_file)
 
