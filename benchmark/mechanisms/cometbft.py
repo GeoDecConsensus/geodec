@@ -82,7 +82,6 @@ class CometBftLogParser:
         size = int(search(r'"size\\":(\d+)', log).group(1))
         rate = int(search(r'rate\\":(\d+)', log).group(1))
 
-        # tmp = search(r'\[(.*Z) .* Starting ', log).group(1)
         tmp = search(r'time="(.*Z)" .* msg="Starting transactor"', log).group(1)
         start = self._to_posix(tmp, name='client')
 
@@ -97,17 +96,14 @@ class CometBftLogParser:
         if search(r'panic', log) is not None:
             raise ParseError('Node(s) panicked')
         
-        # tmp = findall(r'\[(.*Z) .* Created B\d+ -> ([^ ]+=)', log)
         tmp = findall(r'I\[(.*?)\].*received complete proposal block.*hash=([A-Fa-f0-9]+)', log)
         tmp = [(d, self._to_posix(t)) for t, d in tmp]
         proposals = self._merge_results([tmp])
 
-        # tmp = findall(r'\[(.*Z) .* Committed B\d+ -> ([^ ]+=)', log)
         tmp = findall(r'D\[(.*?)\].*committed block.*block=([A-Fa-f0-9]+).*', log)
         tmp = [(d, self._to_posix(t)) for t, d in tmp]
         commits = self._merge_results([tmp])
 
-        # tmp = findall(r'Batch ([^ ]+) contains (\d+) B', log)
         tmp = findall(r'hash=([A-Fa-f0-9]+).*num_txs=(\d+)', log)
         sizes = {d: int(s) * int(self.size[0]) for d, s in tmp}
         
@@ -115,33 +111,6 @@ class CometBftLogParser:
         timeouts = len(tmp)
 
         configs = {
-            # 'consensus': {
-            #     'timeout_delay': int(
-            #         search(r'Timeout delay .* (\d+)', log).group(1)
-            #     ),
-            #     'sync_retry_delay': int(
-            #         search(
-            #             r'consensus.* Sync retry delay .* (\d+)', log
-            #         ).group(1)
-            #     ),
-            # },
-            # 'mempool': {
-            #     'gc_depth': int(
-            #         search(r'Garbage collection .* (\d+)', log).group(1)
-            #     ),
-            #     'sync_retry_delay': int(
-            #         search(r'mempool.* Sync retry delay .* (\d+)', log).group(1)
-            #     ),
-            #     'sync_retry_nodes': int(
-            #         search(r'Sync retry nodes .* (\d+)', log).group(1)
-            #     ),
-            #     'batch_size': int(
-            #         search(r'Batch size .* (\d+)', log).group(1)
-            #     ),
-            #     'max_batch_delay': int(
-            #         search(r'Max batch delay .* (\d+)', log).group(1)
-            #     ),
-            # }
         }
 
         return proposals, commits, sizes, timeouts, configs
@@ -202,13 +171,6 @@ class CometBftLogParser:
         end_to_end_tps, end_to_end_bps, duration = self._end_to_end_throughput()
         end_to_end_latency = self._end_to_end_latency() * 1000
 
-        # consensus_timeout_delay = self.configs[0]['consensus']['timeout_delay']
-        # consensus_sync_retry_delay = self.configs[0]['consensus']['sync_retry_delay']
-        # mempool_gc_depth = self.configs[0]['mempool']['gc_depth']
-        # mempool_sync_retry_delay = self.configs[0]['mempool']['sync_retry_delay']
-        # mempool_sync_retry_nodes = self.configs[0]['mempool']['sync_retry_nodes']
-        # mempool_batch_size = self.configs[0]['mempool']['batch_size']
-        # mempool_max_batch_delay = self.configs[0]['mempool']['max_batch_delay']
         now = datetime.now()
         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
     
@@ -224,13 +186,7 @@ class CometBftLogParser:
             f' Input rate: {sum(self.rate):,} tx/s\n'
             f' Transaction size: {self.size[0]:,} B\n'
             f' Execution time: {round(duration):,} s\n'
-            # f' Consensus timeout delay: {consensus_timeout_delay:,} ms\n'
-            # f' Consensus sync retry delay: {consensus_sync_retry_delay:,} ms\n'
-            # f' Mempool GC depth: {mempool_gc_depth:,} rounds\n'
-            # f' Mempool sync retry delay: {mempool_sync_retry_delay:,} ms\n'
-            # f' Mempool sync retry nodes: {mempool_sync_retry_nodes:,} nodes\n'
-            # f' Mempool batch size: {mempool_batch_size:,} B\n'
-            # f' Mempool max batch delay: {mempool_max_batch_delay:,} ms\n'
+            
             '\n'
             ' + RESULTS:\n'
             f' Consensus TPS: {round(consensus_tps):,} tx/s\n'
@@ -284,7 +240,6 @@ class CometBftMechanism:
                 'wget -c https://go.dev/dl/go1.21.8.linux-amd64.tar.gz',
                 
                 #Delete prev version and extract
-                # 'sudo rm -rf /usr/local/go && tar -xzf go1.21.8.linux-amd64.tar.gz',
                 'sudo rm -rf ~/go/ && tar -xzf go1.21.8.linux-amd64.tar.gz',
 
                 # Remove the tar.gz file
