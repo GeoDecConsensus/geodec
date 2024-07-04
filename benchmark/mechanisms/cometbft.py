@@ -119,11 +119,8 @@ class CometBftLogParser:
         if name == 'node':
             format_string = '%Y-%m-%d|%H:%M:%S.%f' # 2024-03-26|12:07:26.032
             x = datetime.strptime(string, format_string)
-        # elif name == 'client':
         else:
-            # format_string = '%Y-%m-%dT%H:%M:%fZ' # 2024-03-26T12:07:27Z
             x = datetime.fromisoformat(string.replace('Z', '+00:00'))
-            # x = datetime.strptime(string, format_string)
         return datetime.timestamp(x)
 
     def _consensus_throughput(self):
