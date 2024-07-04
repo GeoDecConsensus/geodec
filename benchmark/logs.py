@@ -32,10 +32,9 @@ class LogParser:
     def result(self):
         return self.result_str
 
-    def print(self, filename, isGeoRemote):
+    def print(self, filename):
         assert isinstance(filename, str)
         with open(filename, 'a') as f:
-            f.write(f'GeoRemote: {isGeoRemote}\n')
             f.write(self.result_str)
 
     def log_parser(self, mechanism_name, directory, faults=0):
@@ -47,12 +46,3 @@ class LogParser:
             result = BullsharkLogParser.process(directory, faults).result_str
         
         self.result_str = result
-        
-    def update_georemote(summary, new_georemote):
-        # Find the GeoRemote line and update its value
-        lines = summary.split('\n')
-        for i, line in enumerate(lines):
-            if 'GeoRemote:' in line:
-                lines[i] = f' GeoRemote: {new_georemote}'
-                break
-        return '\n'.join(lines)

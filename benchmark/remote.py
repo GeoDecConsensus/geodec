@@ -138,7 +138,7 @@ class Bench:
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(' && '.join(cmd), hide=True)
 
-    def _config(self, hosts, node_parameters, bench_parameters=None):
+    def _config(self, isGeoremote, hosts, node_parameters, bench_parameters=None):
         Print.info('Generating configuration files...')
 
         if self.mechanism.name == 'cometbft':
@@ -163,7 +163,8 @@ class Bench:
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             
             # Update the stake weights in the configuration file
-            set_weight_cometbft(self.settings.geo_input)
+            if isGeoremote:
+                set_weight_cometbft(self.settings.geo_input)
             
             # Run the bash file and store the ouput in this file
             cmd = [
@@ -511,7 +512,7 @@ class Bench:
 
                 # Upload all configuration files.
                 try:
-                    committee = self._config(hosts, node_parameters, bench_parameters)
+                    committee = self._config(isGeoRemote, hosts, node_parameters, bench_parameters)
                 except (subprocess.SubprocessError, GroupException) as e:
                     e = FabricError(e) if isinstance(e, GroupException) else e
                     Print.error(BenchError('Failed to configure nodes', e))
@@ -541,7 +542,7 @@ class Bench:
                         print(logger.result())
                         logger.print(PathMaker.result_file(
                             self.mechanism.name, n, r, bench_parameters.tx_size, faults
-                        ), isGeoRemote)
+                        ))
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)

@@ -224,7 +224,6 @@ class CometBftLogParser:
             f' Input rate: {sum(self.rate):,} tx/s\n'
             f' Transaction size: {self.size[0]:,} B\n'
             f' Execution time: {round(duration):,} s\n'
-            f' GeoRemote: \n' # TODO: Add GeoRemote
             # f' Consensus timeout delay: {consensus_timeout_delay:,} ms\n'
             # f' Consensus sync retry delay: {consensus_sync_retry_delay:,} ms\n'
             # f' Mempool GC depth: {mempool_gc_depth:,} rounds\n'

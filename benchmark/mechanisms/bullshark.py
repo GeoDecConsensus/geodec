@@ -490,7 +490,6 @@ class BullsharkLogParser:
             f' Input rate: {sum(self.rate):,} tx/s\n'
             f' Transaction size: {self.size[0]:,} B\n'
             f' Execution time: {round(duration):,} s\n'
-            f' GeoRemote: \n' # TODO: Add GeoRemote
             '\n'
             f' Header size: {header_size:,} B\n'
             f' Max header delay: {max_header_delay:,} ms\n'
