@@ -15,13 +15,13 @@ class LatencySetter:
         return (f'sudo tc qdisc del dev {interface} parent root')
 
     def configDelay(self, hosts):
-        Print.info('Delay qdisc initalization...')
+        # Print.info('Delay qdisc initalization...')
         cmd = LatencySetter._initalizeDelayQDisc(self.settings.interface)
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(cmd, hide=True)
 
     def deleteDelay(self, hosts):
-        Print.info('Delete qdisc configurations...')
+        # Print.info('Delete qdisc configurations...')
         cmd = LatencySetter._deleteDelayQDisc(self.settings.interface)
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(cmd, hide=True)
