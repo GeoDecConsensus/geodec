@@ -478,6 +478,10 @@ class Bench:
             Print.heading("\nPing Delays:")
             print(pingDelays[['source', 'destination', 'avg', 'mdev']].to_string(index=False))
             
+            if len(pingDelays) != len(selected_servers) * (len(selected_servers) - 1):
+                print('ERROR: Ping delays not available for all servers')
+                return
+            
             # Set delay parameters.
             latencySetter = LatencySetter(self.settings, self.connect)
             try:
