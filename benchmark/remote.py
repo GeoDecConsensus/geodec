@@ -12,7 +12,7 @@ from copy import deepcopy
 # import pandas as pd
 
 from benchmark.config import Committee, Key, NodeParameters, BenchParameters, ConfigError
-from benchmark.utils import BenchError, Print, PathMaker, progress_bar, set_weight_cometbft
+from benchmark.utils import BenchError, Print, PathMaker, progress_bar, set_weight
 from benchmark.commands import CommandMaker
 from benchmark.instance import InstanceManager
 from benchmark.geodec import GeoDec
@@ -75,9 +75,7 @@ class Bench:
         Print.info(f'Installing {self.settings.testbed}')
         cmd = self.mechanism.install_cmd
         hosts = self._select_hosts()
-        # hosts = self.manager.hosts(flat=True)
         
-        # for cmd in cmds:
         try:
             g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
             g.run(' && '.join(cmd), hide=True)
@@ -89,8 +87,8 @@ class Bench:
     def kill(self, hosts=[], delete_logs=False):
         assert isinstance(hosts, list)
         assert isinstance(delete_logs, bool)
-        # hosts = hosts if hosts else self.manager.hosts(flat=True)
-        hosts = self._select_hosts()
+
+        hosts = self._select_hosts([len(hosts)])
         delete_logs = CommandMaker.clean_logs() if delete_logs else 'true'
         cmd = [delete_logs, f'({CommandMaker.kill()} || true)']
         try:
@@ -99,7 +97,9 @@ class Bench:
         except GroupException as e:
             raise BenchError('Failed to kill nodes', FabricError(e))
 
-    def _select_hosts(self):
+    def _select_hosts(self, nodes=[]):
+        max_count = max(nodes)
+         
         addrs = [] 
         # Retrieve values based on your scripts, note we use Internal IP addresses
         with open(self.settings.ip_file, 'r') as f:
@@ -110,16 +110,7 @@ class Bench:
                     addrs.append(row['Internal IP'])
             else:
                  addrs = [line.strip() for line in f.readlines()]
-        return addrs
-        # # Ensure there are enough hosts.
-        # hosts = self.manager.hosts()
-        # if sum(len(x) for x in hosts.values()) < nodes:
-        #     return []
-
-        # # Select the hosts in different data centers.
-        # ordered = zip(*hosts.values())
-        # ordered = [x for y in ordered for x in y]
-        # return ordered[:nodes]
+        return addrs[:max_count]
 
     def _background_run(self, host, command, log_file):
         name = splitext(basename(log_file))[0]
@@ -138,7 +129,7 @@ class Bench:
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(' && '.join(cmd), hide=True)
 
-    def _config(self, hosts, node_parameters, bench_parameters=None):
+    def _config(self, isGeoremote, hosts, node_parameters, bench_parameters=None):
         Print.info('Generating configuration files...')
         
         # Cleanup all local configuration files.
@@ -167,7 +158,8 @@ class Bench:
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
             
             # Update the stake weights in the configuration file
-            set_weight_cometbft(self.settings.geo_input)
+            if isGeoremote:
+                set_weight(self.mechanism.name, self.settings.geo_input)
             
             # Run the bash file and store the ouput in this file
             cmd = [
@@ -217,6 +209,9 @@ class Bench:
 
             committee.print(PathMaker.committee_file())
             node_parameters.print(PathMaker.parameters_file())
+            
+            if isGeoremote:
+                set_weight(self.mechanism.name, self.settings.geo_input)
             
             cmd = f'{CommandMaker.cleanup()} || true'
             g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
@@ -283,7 +278,6 @@ class Bench:
             with open('persistent_peer.txt', 'r') as f:
                 persistent_peers = f.read()
                 persistent_peers = persistent_peers[:-1]
-            # Print.info("Persistent Peers: " + persistent_peers)
             
             # Run the clients
             # committee = Committee.load(PathMaker.committee_file()) # TODO for cometbft
@@ -306,10 +300,6 @@ class Bench:
             # Run the nodes.
             node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
             for i, (host, log_file) in enumerate(zip(hosts, node_logs)):
-                """
-                Mempool:info - lots of output when mempool full
-                """
-                # cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,mempool:info,*:error"'
                 cmd = f'./node node --home ~/node{i} --proxy_app=kvstore --p2p.persistent_peers="{persistent_peers}" --log_level="state:info,consensus:info,txindex:info,consensus:debug,*:error"'
                 self._background_run(host, cmd, log_file)
 
@@ -464,9 +454,8 @@ class Bench:
             raise BenchError('Invalid nodes or bench parameters', e)
         
         # Select which hosts to use.
-        # selected_hosts = self._select_hosts(bench_parameters.nodes[0])
-        selected_hosts = self._select_hosts()
-        if len(selected_hosts) < bench_parameters.nodes[0]:
+        selected_hosts = self._select_hosts(bench_parameters.nodes)
+        if len(selected_hosts) < max(bench_parameters.nodes):
             Print.warn('There are not enough instances available')
             return
 
@@ -486,6 +475,10 @@ class Bench:
             print(selected_servers[['ip', 'id', 'name', 'latitude', 'longitude']].to_string(index=False))
             Print.heading("\nPing Delays:")
             print(pingDelays[['source', 'destination', 'avg', 'mdev']].to_string(index=False))
+            
+            if len(pingDelays) != len(selected_servers) * (len(selected_servers) - 1):
+                print('ERROR: Ping delays not available for all servers')
+                return
             
             # Set delay parameters.
             latencySetter = LatencySetter(self.settings, self.connect)
@@ -509,7 +502,7 @@ class Bench:
 
                 # Upload all configuration files.
                 try:
-                    committee = self._config(hosts, node_parameters, bench_parameters)
+                    committee = self._config(isGeoRemote, hosts, node_parameters, bench_parameters)
                 except (subprocess.SubprocessError, GroupException) as e:
                     e = FabricError(e) if isinstance(e, GroupException) else e
                     Print.error(BenchError('Failed to configure nodes', e))
@@ -539,7 +532,7 @@ class Bench:
                         print(logger.result())
                         logger.print(PathMaker.result_file(
                             self.mechanism.name, n, r, bench_parameters.tx_size, faults
-                        ), isGeoRemote)
+                        ))
         #                 run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)

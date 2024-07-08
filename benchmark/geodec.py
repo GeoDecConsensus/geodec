@@ -138,7 +138,7 @@ class GeoDec:
 
 #     geodec = GeoDec()
 
-#     selected_servers = geodec.getAllServers(geoInput, "/Users/namangarg/code/geodec/rundata/servers.csv", '/Users/namangarg/code/geodec/rundata/instances_ip.csv')
+#     selected_servers = geodec.getAllServers(geoInput, "/Users/namangarg/code/geodec/rundata/servers.csv", '/Users/namangarg/code/geodec/rundata/ip_file.csv')
 #     pingDelays = geodec.getPingDelay(geoInput, '/Users/namangarg/code/geodec/rundata/ping_grouped.csv', '/Users/namangarg/code/geodec/rundata/pings.csv')
 
 #     # Printing selected_servers in proper format

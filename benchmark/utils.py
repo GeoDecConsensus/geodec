@@ -190,3 +190,60 @@ def set_weight_cometbft(geo_input_file):
 
         with open(path, 'w') as file:
             json.dump(data, file, indent=4)
+            
+def set_weight_hotstuff(geo_input_file):
+    # Get the stake values
+    stakes = []
+    with open(geo_input_file, mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            if row['stake'] and row['id']:
+                stakes.append(int(row['stake']))
+
+    def get_path():
+        return './.committee.json'
+    
+    # Set the weights
+    path = get_path()
+    with open(path, 'r') as file:
+        data = json.load(file)
+        # Update consensus authorities stakes
+        for i, authority in enumerate(data['consensus']['authorities'].values()):
+            authority['stake'] = stakes[i]
+        
+        # Update mempool authorities stakes
+        for i, authority in enumerate(data['mempool']['authorities'].values()):
+            authority['stake'] = stakes[i]
+
+    with open(path, 'w') as file:
+        json.dump(data, file, indent=4)
+
+def set_weight_bullshark(geo_input_file):
+    # Get the stake values
+    stakes = []
+    with open(geo_input_file, mode='r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            if row['stake'] and row['id']:
+                stakes.append(int(row['stake']))
+
+    def get_path():
+        return './.committee.json'
+    
+    # Set the weights
+    path = get_path()
+    with open(path, 'r') as file:
+        data = json.load(file)
+        for i, authority in enumerate(data['authorities'].values()):
+            authority['stake'] = stakes[i]
+
+    with open(path, 'w') as file:
+        json.dump(data, file, indent=4)
+        
+def set_weight(mechanism, geo_input_file):
+    if mechanism == 'cometbft':
+        set_weight_cometbft(geo_input_file)
+    elif mechanism == 'hotstuff':
+        set_weight_hotstuff(geo_input_file)
+    elif mechanism == 'bullshark':
+        set_weight_bullshark(geo_input_file)

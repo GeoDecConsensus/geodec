@@ -100,7 +100,7 @@ fab georemote <mechanism_name> # ["cometbft", "hotstuff", "bullshark"]
 -   Run data
 
     -   `cometbft-config.toml` - For any custom configuration for the cometbft consensus mechanism if needed.
-    -   `instances_ip.csv` - Contains the IP addresses of the node instances.
+    -   `ip_file.csv` - Contains the IP addresses of the node instances.
     -   `geo-input.csv` - Tells the artificial location of the nodes. The first column **ID** - server id and the second column **Count** - number of nodes in that location.
     -   `servers.csv` - Contains the geographical data of servers. NO NEED TO CHANGE THIS FILE.
     -   `ping_grouped.csv` - Contains the latency data of the servers. NO NEED TO CHANGE THIS FILE.
