@@ -54,7 +54,7 @@ class LogParser:
             f.write(self.result_str)
 
         result_json = self.parse_results()
-        write_results_to_csv(result_json, "results.csv")
+        write_results_to_csv(result_json, "/home/ubuntu/geodec/results/metrics.csv")
 
     def log_parser(self, mechanism_name, directory, faults=0):
         if mechanism_name == "hotstuff":
@@ -78,35 +78,52 @@ class LogParser:
 
     @staticmethod
     def aggregate_runs(run_id_array):
-        data = pd.read_csv("/home/ubuntu/geodec/results/metrics.csv")
+        csv_file = "/home/ubuntu/geodec/results/metrics.csv"
+        data = pd.read_csv(csv_file)
 
-        # Filter data to include only the specified run IDs
-        data = data.loc[data["run_id"].isin(run_id_array)]
+        # Filter data for the given run IDs
+        data_to_aggregate = data.loc[data["run_id"].isin(run_id_array)]
 
-        # Define the fields to average
-        fields_to_avg = [
-            "consensus_tps",
-            "consensus_bps",
-            "consensus_latency",
-            "end_to_end_tps",
-            "end_to_end_bps",
-            "end_to_end_latency",
+        # Compute the mean for the specified fields
+        aggregated_data = data_to_aggregate.mean(numeric_only=True).reset_index()
+        aggregated_data = aggregated_data.loc[
+            aggregated_data["index"].isin(
+                [
+                    "consensus_tps",
+                    "consensus_bps",
+                    "consensus_latency",
+                    "end_to_end_tps",
+                    "end_to_end_bps",
+                    "end_to_end_latency",
+                ]
+            )
         ]
 
-        # Group by 'name' and calculate the average for the specified fields
-        averages = data.groupby("name")[fields_to_avg].mean().reset_index()
+        # Convert the result to a dictionary for easy updating
+        aggregated_results = aggregated_data.set_index("index").T.to_dict("records")[0]
 
-        # Replace the original data with the averages
-        for field in fields_to_avg:
-            data[field] = data["name"].map(averages.set_index("name")[field])
+        # Add non-aggregated fields
+        run_id = min(run_id_array)
+        aggregated_results["run_id"] = run_id
+        aggregated_results["name"] = data_to_aggregate.iloc[0]["name"]
+        aggregated_results["faults"] = data_to_aggregate.iloc[0]["faults"]
+        aggregated_results["input_rate"] = data_to_aggregate.iloc[0]["input_rate"]
+        aggregated_results["committee_size"] = data_to_aggregate.iloc[0]["committee_size"]
+        aggregated_results["transaction_size"] = data_to_aggregate.iloc[0]["transaction_size"]
+        aggregated_results["execution_time"] = data_to_aggregate.iloc[0]["execution_time"]
+        aggregated_results["batch_size"] = data_to_aggregate.iloc[0]["batch_size"]
 
-        # Remove duplicates, keeping only the first occurrence
-        data = data.drop_duplicates(subset="name").reset_index(drop=True)
+        # Remove the original data for the specified run IDs
+        data = data.loc[~data["run_id"].isin(run_id_array)]
 
-        # Add a column to indicate the number of runs aggregated
-        data["runs"] = len(run_id_array)
+        # Append the new aggregated data
+        new_data = pd.DataFrame([aggregated_results])
+        data = pd.concat([data, new_data], ignore_index=True)
 
-        return data
+        # Save the updated data back to the CSV file
+        data.to_csv(csv_file, index=False)
+
+        return aggregated_results
 
     def parse_results(self):
         results = {}

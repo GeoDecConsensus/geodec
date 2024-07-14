@@ -20,7 +20,6 @@ from benchmark.config import (
     Key,
     NodeParameters,
 )
-from benchmark.geo_logs import GeoLogParser
 from benchmark.geodec import GeoDec
 from benchmark.instance import InstanceManager
 from benchmark.latency_setter import LatencySetter
@@ -181,7 +180,9 @@ class Bench:
             # Upload configuration files.
             progress = progress_bar(hosts, prefix="Uploading config files:")
             for i, host in enumerate(hosts):
-                cmd = [f"scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"]  # NOTE Path of the node config files
+                cmd = [
+                    f"scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"
+                ]  # NOTE Path of the node config files
                 subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 
         else:
@@ -506,7 +507,7 @@ class Bench:
 
                 # Run the benchmark.
                 for i in range(bench_parameters.runs):
-                    run_id = GeoLogParser.get_new_run_id()
+                    run_id = LogParser.get_new_run_id()
                     Print.heading(f"Run {i+1}/{bench_parameters.runs} with run_id {run_id}")
 
                     try:
@@ -542,14 +543,8 @@ class Bench:
                         Print.error(BenchError("Benchmark failed", e))
                         continue
 
-                aggregated_results = GeoLogParser.aggregate_runs(run_id_array)
+                aggregated_results = LogParser.aggregate_runs(run_id_array)
                 print(aggregated_results)
-                aggregated_results.to_csv(
-                    "/home/ubuntu/results/64node-fixed-mean-geo-dec-metrics.csv",
-                    mode="a",
-                    index=False,
-                    header=False,
-                )
 
         if isGeoRemote:
             # Delete delay parameters.
