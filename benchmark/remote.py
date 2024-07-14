@@ -68,9 +68,7 @@ class Bench:
             self.mechanism = BullsharkMechanism(self.settings)
 
         try:
-            ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(
-                self.manager.settings.key_path
-            )
+            ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(self.manager.settings.key_path)
             self.connect = ctx.connect_kwargs
         except (IOError, PasswordRequiredException, SSHException) as e:
             raise BenchError("Failed to load SSH key", e)
@@ -152,9 +150,7 @@ class Bench:
             # Cleanup node configuration files on hosts
             for i, host in enumerate(hosts):
                 cmd = CommandMaker.clean_node_config(i)
-                c = Connection(
-                    host, user=self.settings.key_name, connect_kwargs=self.connect
-                )
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.run(cmd, shell=True)
 
             # Create persistent peers
@@ -185,22 +181,16 @@ class Bench:
             # Upload configuration files.
             progress = progress_bar(hosts, prefix="Uploading config files:")
             for i, host in enumerate(hosts):
-                cmd = [
-                    f"scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"
-                ]  # NOTE Path of the node config files
+                cmd = [f"scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"]  # NOTE Path of the node config files
                 subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 
         else:
             # Recompile the latest code.
             cmd = CommandMaker.compile().split()
-            subprocess.run(
-                cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name)
-            )
+            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
 
             # Create alias for the client and nodes binary.
-            cmd = CommandMaker.alias_binaries(
-                PathMaker.binary_path(self.settings.repo_name), self.mechanism.name
-            )
+            cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name), self.mechanism.name)
             subprocess.run([cmd], shell=True)
 
             # Generate configuration files.
@@ -214,18 +204,14 @@ class Bench:
             names = [x.name for x in keys]
 
             if self.mechanism.name == "hotstuff":
-                consensus_addr = [
-                    f'{x}:{self.settings.ports["consensus"]}' for x in hosts
-                ]
+                consensus_addr = [f'{x}:{self.settings.ports["consensus"]}' for x in hosts]
                 front_addr = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
                 mempool_addr = [f'{x}:{self.settings.ports["mempool"]}' for x in hosts]
                 committee = Committee(names, consensus_addr, front_addr, mempool_addr)
             elif self.mechanism.name == "bullshark":
                 if bench_parameters.collocate:
                     workers = bench_parameters.workers
-                    addresses = OrderedDict(
-                        (x, [y] * (workers + 1)) for x, y in zip(names, hosts)
-                    )
+                    addresses = OrderedDict((x, [y] * (workers + 1)) for x, y in zip(names, hosts))
                 else:
                     addresses = OrderedDict((x, y) for x, y in zip(names, hosts))
                 committee = BullsharkCommittee(addresses, self.settings.ports["base"])
@@ -243,18 +229,14 @@ class Bench:
             # NOTE Upload configuration files.
             progress = progress_bar(hosts, prefix="Uploading config files:")
             for i, host in enumerate(progress):
-                c = Connection(
-                    host, user=self.settings.key_name, connect_kwargs=self.connect
-                )
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.put(PathMaker.committee_file(), ".")
                 c.put(PathMaker.key_file(i), ".")
                 c.put(PathMaker.parameters_file(), ".")
 
             return committee
 
-    def _run_single(
-        self, hosts, rate, bench_parameters, node_parameters, debug=False, committee=[]
-    ):
+    def _run_single(self, hosts, rate, bench_parameters, node_parameters, debug=False, committee=[]):
         Print.info("Booting testbed...")
 
         # Kill any potentially unfinished run and delete logs.
@@ -311,9 +293,7 @@ class Bench:
             addresses = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
             # rate_share = ceil(rate / committee.size()) # TODO Take faults into account.
             rate_share = ceil(rate / len(hosts))
-            duration = (
-                bench_parameters.duration
-            )  # Duration for which the client should run
+            duration = bench_parameters.duration  # Duration for which the client should run
             client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
             for host, addr, log_file in zip(hosts, addresses, client_logs):
                 cmd = CommandMaker.run_client(
@@ -406,9 +386,7 @@ class Bench:
         progress = progress_bar(hosts, prefix="Downloading logs:")
         if self.mechanism.name == "bullshark":
             workers_addresses = committee.workers_addresses(faults)
-            progress = progress_bar(
-                workers_addresses, prefix="Downloading workers logs:"
-            )
+            progress = progress_bar(workers_addresses, prefix="Downloading workers logs:")
             for i, addresses in enumerate(progress):
                 for id, address in addresses:
                     host = BullsharkCommittee.ip(address)
@@ -423,20 +401,14 @@ class Bench:
                     )
 
             primary_addresses = committee.primary_addresses(faults)
-            progress = progress_bar(
-                primary_addresses, prefix="Downloading primaries logs:"
-            )
+            progress = progress_bar(primary_addresses, prefix="Downloading primaries logs:")
             for i, address in enumerate(progress):
                 host = BullsharkCommittee.ip(address)
                 c = Connection(host, user="ubuntu", connect_kwargs=self.connect)
-                c.get(
-                    PathMaker.primary_log_file(i), local=PathMaker.primary_log_file(i)
-                )
+                c.get(PathMaker.primary_log_file(i), local=PathMaker.primary_log_file(i))
         else:
             for i, host in enumerate(progress):
-                c = Connection(
-                    host, user=self.settings.key_name, connect_kwargs=self.connect
-                )
+                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
                 c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
                 if self.mechanism.name == "cometbft":
@@ -452,9 +424,7 @@ class Bench:
         logParser.log_parser(self.mechanism.name, PathMaker.logs_path(), faults=faults)
         return logParser
 
-    def run(
-        self, bench_parameters_dict, node_parameters_dict, isGeoRemote, debug=False
-    ):
+    def run(self, bench_parameters_dict, node_parameters_dict, isGeoRemote, debug=False):
         assert isinstance(debug, bool)
         Print.heading(f"Starting {self.mechanism.name} remote benchmark")
 
@@ -483,25 +453,13 @@ class Bench:
 
         if isGeoRemote:
             geo_input = GeoDec.getGeoInput(self.settings.geo_input)
-            selected_servers = GeoDec.getAllServers(
-                geo_input, self.settings.servers_file, self.settings.ip_file
-            )
-            pingDelays = GeoDec.getPingDelay(
-                geo_input, self.settings.ping_grouped_file, self.settings.pings_file
-            )
+            selected_servers = GeoDec.getAllServers(geo_input, self.settings.servers_file, self.settings.ip_file)
+            pingDelays = GeoDec.getPingDelay(geo_input, self.settings.ping_grouped_file, self.settings.pings_file)
 
             Print.heading("\nSelected servers:")
-            print(
-                selected_servers[
-                    ["ip", "id", "name", "latitude", "longitude"]
-                ].to_string(index=False)
-            )
+            print(selected_servers[["ip", "id", "name", "latitude", "longitude"]].to_string(index=False))
             Print.heading("\nPing Delays:")
-            print(
-                pingDelays[["source", "destination", "avg", "mdev"]].to_string(
-                    index=False
-                )
-            )
+            print(pingDelays[["source", "destination", "avg", "mdev"]].to_string(index=False))
 
             if len(pingDelays) != len(selected_servers) * (len(selected_servers) - 1):
                 print("ERROR: Ping delays not available for all servers")
@@ -516,9 +474,7 @@ class Bench:
 
             try:
                 latencySetter.configDelay(selected_hosts)
-                latencySetter.addDelays(
-                    selected_servers, pingDelays, self.settings.interface
-                )
+                latencySetter.addDelays(selected_servers, pingDelays, self.settings.interface)
             except (subprocess.SubprocessError, GroupException) as e:
                 e = FabricError(e) if isinstance(e, GroupException) else e
                 Print.error(BenchError("Failed to initalize delays", e))
@@ -531,9 +487,7 @@ class Bench:
 
                 # Upload all configuration files.
                 try:
-                    committee = self._config(
-                        isGeoRemote, hosts, node_parameters, bench_parameters
-                    )
+                    committee = self._config(isGeoRemote, hosts, node_parameters, bench_parameters)
                 except (subprocess.SubprocessError, GroupException) as e:
                     e = FabricError(e) if isinstance(e, GroupException) else e
                     Print.error(BenchError("Failed to configure nodes", e))
@@ -553,9 +507,7 @@ class Bench:
                 # Run the benchmark.
                 for i in range(bench_parameters.runs):
                     run_id = GeoLogParser.get_new_run_id()
-                    Print.heading(
-                        f"Run {i+1}/{bench_parameters.runs} with run_id {run_id}"
-                    )
+                    Print.heading(f"Run {i+1}/{bench_parameters.runs} with run_id {run_id}")
 
                     try:
                         self._run_single(
