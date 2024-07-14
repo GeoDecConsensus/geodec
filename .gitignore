@@ -141,7 +141,7 @@ node
 client
 
 mytestnet/
-persistent_peer.txt
+*.txt
 
 frontend/node_modules
 

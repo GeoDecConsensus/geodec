@@ -1,9 +1,5 @@
 id,name,title,location,state,country,state_abbv,continent,latitude,longitude,count,stake
-151,Honolulu,Honolulu,Honolulu,Hawaii,United States,HI,1,21.3,-157.8167,1,1
-103,Edmonton,Edmonton,St Albert,Alberta,Canada,AB,1,53.6351,-113.6216,1,1
-167,Montevideo,Montevideo,Pando,Canelones,Uruguay,CA,2,-34.7249,-55.9477,1,1
-168,SanJuan,San Juan,San Juan,,Puerto Rico,,1,18.45,-66.0667,1,1
-118,Kampala,Kampala,Kampala,Kampala,Uganda,,5,0.3136,32.5811,1,1
-10,Stockholm,Stockholm,Stockholm,Stockholm,Sweden,,3,59.32,18.09,1,1
-21,Brisbane,Brisbane,Brisbane,Queensland,Australia,QLD,4,-27.4667,153.0333,1,1
-261,Zhangjiakou,Zhangjiakou,Zhangjiakou,Hebei,China,HE,3,40.7675,114.8863,1,1
+90,StLouis,St Louis,St Louis,Missouri,United States,MO,1,38.63,-90.2,1,1
+125,SaoPaulo,Sao Paulo,Sao Paulo,Sao Paulo,Brazil,SP,2,-23.55,-46.6333,1,1
+32,Warsaw,Warsaw,Warsaw,Mazovia,Poland,MZ,3,52.23,21.0108,1,1
+169,Perth,Perth,Perth,Western Australia,Australia,WA,4,-31.9522,115.8589,1,10

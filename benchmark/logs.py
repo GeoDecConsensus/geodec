@@ -18,6 +18,7 @@ class ParseError(Exception):
 class LogParser:
     def __init__(self):
         self.result_str = ""
+        self.name = ""
 
     @classmethod
     def process(cls, directory, faults):
@@ -57,6 +58,7 @@ class LogParser:
         write_results_to_csv(result_json, "/home/ubuntu/geodec/results/metrics.csv")
 
     def log_parser(self, mechanism_name, directory, faults=0):
+        self.name = mechanism_name
         if mechanism_name == "hotstuff":
             result = HotStuffLogParser.process(directory, faults).result_str
         elif mechanism_name == "cometbft":
@@ -103,8 +105,8 @@ class LogParser:
         aggregated_results = aggregated_data.set_index("index").T.to_dict("records")[0]
 
         # Add non-aggregated fields
-        run_id = min(run_id_array)
-        aggregated_results["run_id"] = run_id
+        run_id = max(run_id_array)
+        aggregated_results["run_id"] = run_id + 1
         aggregated_results["name"] = data_to_aggregate.iloc[0]["name"]
         aggregated_results["faults"] = data_to_aggregate.iloc[0]["faults"]
         aggregated_results["input_rate"] = data_to_aggregate.iloc[0]["input_rate"]
@@ -112,9 +114,10 @@ class LogParser:
         aggregated_results["transaction_size"] = data_to_aggregate.iloc[0]["transaction_size"]
         aggregated_results["execution_time"] = data_to_aggregate.iloc[0]["execution_time"]
         aggregated_results["batch_size"] = data_to_aggregate.iloc[0]["batch_size"]
+        aggregated_results['runs'] = len(run_id_array)
 
-        # Remove the original data for the specified run IDs
-        data = data.loc[~data["run_id"].isin(run_id_array)]
+        # # Remove the original data for the specified run IDs
+        # data = data.loc[~data["run_id"].isin(run_id_array)]
 
         # Append the new aggregated data
         new_data = pd.DataFrame([aggregated_results])
@@ -123,22 +126,16 @@ class LogParser:
         # Save the updated data back to the CSV file
         data.to_csv(csv_file, index=False)
 
-        return aggregated_results
-
     def parse_results(self):
         results = {}
         lines = self.result_str.split("\n")
 
         results["run_id"] = self.get_new_run_id()
-        results["name"] = ""
-
-        # Extract mechanism name from the summary header
-        mechanism_match = re.match(r"^\s*(\w+)\s+SUMMARY:", lines[0])
-        if mechanism_match:
-            results["mechanism"] = mechanism_match.group(1)
+        results["name"] = self.name
 
         # Parsing the CONFIG section
         for line in lines:
+            line = line.replace(",", "")
             if line.startswith(" Faults:"):
                 results["faults"] = int(line.split(":")[1].strip().split(" ")[0])
             elif line.startswith(" Input rate:"):
@@ -154,16 +151,17 @@ class LogParser:
 
         # Parsing the RESULTS section
         for line in lines:
+            line = line.replace(",", "")
             if line.startswith(" Consensus TPS:"):
                 results["consensus_tps"] = int(line.split(":")[1].strip().split(" ")[0])
             elif line.startswith(" Consensus BPS:"):
-                results["consensus_bps"] = int(line.split(":")[1].strip().split(" ")[0].replace(",", ""))
+                results["consensus_bps"] = int(line.split(":")[1].strip().split(" ")[0])
             elif line.startswith(" Consensus latency:"):
                 results["consensus_latency"] = int(line.split(":")[1].strip().split(" ")[0])
             elif line.startswith(" End-to-end TPS:"):
                 results["end_to_end_tps"] = int(line.split(":")[1].strip().split(" ")[0])
             elif line.startswith(" End-to-end BPS:"):
-                results["end_to_end_bps"] = int(line.split(":")[1].strip().split(" ")[0].replace(",", ""))
+                results["end_to_end_bps"] = int(line.split(":")[1].strip().split(" ")[0])
             elif line.startswith(" End-to-end latency:"):
                 results["end_to_end_latency"] = int(line.split(":")[1].strip().split(" ")[0])
 
@@ -203,3 +201,48 @@ def write_results_to_csv(results, csv_filename):
             writer.writeheader()  # Write header only if file doesn't exist
 
         writer.writerow(results)
+
+
+# Test function
+def test_log_parser():
+    log_parser = LogParser()
+
+    # Read from a test result.txt file
+    with open("result.txt", "r") as f:
+        log_parser.result_str = f.read()
+
+    # Parse results and write to CSV
+    results = log_parser.parse_results()
+    write_results_to_csv(results, "results.csv")
+
+    # Aggregate and update CSV
+    run_id_array = [results["run_id"]]  # Using the run_id from the parsed results
+    aggregated_data = log_parser.aggregate_runs(run_id_array)
+
+    print("Aggregated Data:")
+    print(aggregated_data)
+
+
+# Example content for result.txt
+example_result_txt = """
+COMETBFT SUMMARY:
+Date and Time: 2024-07-04 11:25:28
+
+ Faults: 0 nodes
+ Committee size: 4 nodes
+ Input rate: 1,000 tx/s
+ Transaction size: 256 B
+ Execution time: 101 s
+
+ Consensus timeout delay: 5,000 ms
+ Consensus sync retry delay: 5,000 ms
+ Mempool GC depth: 50 rounds
+ Mempool sync retry delay: 5,000 ms
+ Mempool sync retry nodes: 3 nodes
+ Mempool batch size: 204,800 B
+ Mempool max batch delay: 100 ms
+
+ Consensus TPS: 960 tx/s
+ Consensus BPS: 245,817 B/s
+ Consensus latency: 3
+ """

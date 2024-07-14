@@ -543,8 +543,7 @@ class Bench:
                         Print.error(BenchError("Benchmark failed", e))
                         continue
 
-                aggregated_results = LogParser.aggregate_runs(run_id_array)
-                print(aggregated_results)
+                LogParser.aggregate_runs(run_id_array)
 
         if isGeoRemote:
             # Delete delay parameters.
