@@ -22,7 +22,7 @@
                     "gc_depth": 50,
                     "sync_retry_delay": 5000,
                     "sync_retry_nodes": 3,
-                    "batch_size": 100000,
+                    "batch_size": 512,
                     "max_batch_delay": 100
                 }
             }
@@ -63,7 +63,7 @@
                 "workers": 1,
                 "collocate": true,
                 "rate": [
-                    200000
+                    150000
                 ],
                 "tx_size": 256,
                 "duration": 300,
@@ -75,7 +75,7 @@
                 "gc_depth": 50,
                 "sync_retry_delay": 5000,
                 "sync_retry_nodes": 3,
-                "batch_size": 256,
+                "batch_size": 100000,
                 "max_batch_delay": 100
             }
         }

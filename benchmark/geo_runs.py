@@ -428,8 +428,8 @@ def update_batch_size(json_file_path, mechanism_name, new_batch_size):
 
 if __name__ == "__main__":
 
-    batch_sizes = [256, 512, 1024, 10000, 20000, 50000, 80000, 100000]
-    mechanism = ["bullshark"]
+    batch_sizes = [512, 1024, 10000, 20000, 50000, 80000, 100000, 200000, 300000]
+    mechanism = ["hotstuff", "bullshark"]
 
     print("Starting benchmarking tool")
 
@@ -445,6 +445,6 @@ if __name__ == "__main__":
             subprocess.run(["fab", "remote", name])
 
             print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-            sleep(5)
+            sleep(10)
 
     print("Benchmarking finished")
