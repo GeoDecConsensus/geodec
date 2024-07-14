@@ -520,7 +520,6 @@ class Bench:
                         )
 
                         logger = self._logs(hosts, faults, committee_copy)
-                        print(logger.result())
                         logger.print(
                             PathMaker.result_file(
                                 self.mechanism.name,

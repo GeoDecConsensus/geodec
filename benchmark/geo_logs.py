@@ -71,28 +71,3 @@ class GeoLogParser:
         total_props = data["proposals"].sum()
         data["liveliness_woprops"] = ((data["votes"] + data["proposals"]) / total_props) * 100
         return data
-
-    @staticmethod
-    def get_new_run_id():
-        data = pd.read_csv("/home/ubuntu/results/metrics.csv")
-        return data["run_id"].max() + 1
-
-    @staticmethod
-    def aggregate_runs(run_id_array):
-        data = pd.read_csv("/home/ubuntu/results/geo-dec-metrics.csv")
-
-        data = data.loc[data["run_id"].isin(run_id_array)]
-        by_name = data.groupby(["name"])
-
-        # for name, liveliness in by_name:
-        #     print(f"entries for {name!r}")
-        #     print("------------------------")
-        #     print(liveliness.head(3), end="\n\n")
-
-        liveliness_mean = by_name["liveliness"].mean(numeric_only=True).reset_index()
-        liveliness_mean.rename(columns={"liveliness": "liveliness_avg"}, inplace=True)
-
-        data_first = data.loc[data["run_id"] == run_id_array[0]]
-        result = pd.merge(data_first, liveliness_mean, on="name")
-        result["runs"] = [len(run_id_array)] * len(result)
-        return result
