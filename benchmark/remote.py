@@ -416,29 +416,6 @@ class Bench:
         logParser.log_parser(self.mechanism.name, PathMaker.logs_path(), faults=faults)
         return logParser
 
-        # # Delete local logs (if any).
-        # cmd = CommandMaker.clean_logs()
-        # subprocess.run([cmd], shell=True, stderr=subprocess.DEVNULL)
-
-        # hosts_df = pd.DataFrame(columns=['ip', 'node_num'])
-
-        # # Download log files.
-        # progress = progress_bar(hosts, prefix='Downloading logs:')
-        # for i, host in enumerate(progress):
-        #     c = Connection(host, user='ubuntu', connect_kwargs=self.connect)
-        #     c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-        #     c.get(
-        #         PathMaker.client_log_file(i), local=PathMaker.client_log_file(i)
-        #     )
-        #     # mapping HOST <---> i 
-        #     new_data = pd.DataFrame({'ip':host, 'node_num':i},  index=[0])
-        #     hosts_df = pd.concat([hosts_df, new_data], ignore_index = True)
-        
-        # servers = pd.merge(servers, hosts_df, on='ip')
-        # # Parse logs and return the parser.
-        # Print.info('Parsing logs and computing performance...')
-        # return LogParser.process(PathMaker.logs_path(), faults=faults, servers=servers, run_id =run_id)
-
     def run(self, bench_parameters_dict, node_parameters_dict, isGeoRemote, debug=False):
         assert isinstance(debug, bool)
         Print.heading(f'Starting {self.mechanism.name} remote benchmark')
@@ -517,23 +494,25 @@ class Bench:
                 faults = bench_parameters.faults
                 hosts = hosts[:n-faults]
                 
-                # run_id_array = []
+                run_id_array = []
                 
                 # Run the benchmark.
                 for i in range(bench_parameters.runs):
-                    Print.heading(f'Run {i+1}/{bench_parameters.runs}')
-                    # run_id = GeoLogParser.get_new_run_id()
-                    # Print.heading(f'Run {i+1}/{bench_parameters.runs} with run_id {run_id}')
+                    run_id = GeoLogParser.get_new_run_id()
+                    Print.heading(f'Run {i+1}/{bench_parameters.runs} with run_id {run_id}')
+                    
                     try:
                         self._run_single(
                             hosts, r, bench_parameters, node_parameters, debug, committee_copy
                         )
+                        
                         logger = self._logs(hosts, faults, committee_copy)
                         print(logger.result())
                         logger.print(PathMaker.result_file(
                             self.mechanism.name, n, r, bench_parameters.tx_size, faults
                         ))
-        #                 run_id_array.append(run_id)
+                        
+                        run_id_array.append(run_id)
                     except (subprocess.SubprocessError, GroupException, ParseError) as e:
                         self.kill(hosts=hosts)
                         if isinstance(e, GroupException):
@@ -541,9 +520,9 @@ class Bench:
                         Print.error(BenchError('Benchmark failed', e))
                         continue
                 
-        #         aggregated_results = GeoLogParser.aggregate_runs(run_id_array)
-        #         print(aggregated_results)
-        #         aggregated_results.to_csv('/home/ubuntu/results/64node-fixed-mean-geo-dec-metrics.csv', mode='a', index=False, header=False)
+                aggregated_results = GeoLogParser.aggregate_runs(run_id_array)
+                print(aggregated_results)
+                aggregated_results.to_csv('/home/ubuntu/results/64node-fixed-mean-geo-dec-metrics.csv', mode='a', index=False, header=False)
 
         if isGeoRemote:
             # Delete delay parameters.
