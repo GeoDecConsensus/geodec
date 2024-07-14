@@ -412,7 +412,10 @@ def update_batch_size(json_file_path, mechanism_name, new_batch_size):
             data = json.load(file)
 
         if mechanism_name in data["remote"]:
-            data["remote"][mechanism_name]["node_params"]["mempool"]["batch_size"] = new_batch_size
+            if mechanism_name == "hotstuff":
+                data["remote"][mechanism_name]["node_params"]["mempool"]["batch_size"] = new_batch_size
+            elif mechanism_name == "bullshark":
+                data["remote"][mechanism_name]["node_params"]["batch_size"] = new_batch_size
             with open(json_file_path, "w") as file:
                 json.dump(data, file, indent=4)
             print(f"Batch size for {mechanism_name} updated to {new_batch_size}.")
@@ -426,7 +429,7 @@ def update_batch_size(json_file_path, mechanism_name, new_batch_size):
 if __name__ == "__main__":
 
     batch_sizes = [256, 512, 1024, 10000, 20000, 50000, 80000, 100000]
-    mechanism = ["hotstuff", "bullshark"]
+    mechanism = ["bullshark"]
 
     print("Starting benchmarking tool")
 
@@ -438,7 +441,7 @@ if __name__ == "__main__":
             print("==============================================================")
             print(str(now) + " Running test: ")
 
-            update_batch_size("../fab-params.json", name, b)
+            update_batch_size("/home/ubuntu/geodec/fab-params.json", name, b)
             subprocess.run(["fab", "remote", name])
 
             print("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")

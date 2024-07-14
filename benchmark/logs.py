@@ -148,11 +148,7 @@ class LogParser:
                 results["execution_time"] = int(line.split(":")[1].strip().split(" ")[0])
             elif line.startswith(" Mempool batch size:"):
                 results["batch_size"] = int(line.split(":")[1].strip().split(" ")[0])
-
-        # Parsing the RESULTS section
-        for line in lines:
-            line = line.replace(",", "")
-            if line.startswith(" Consensus TPS:"):
+            elif line.startswith(" Consensus TPS:"):
                 results["consensus_tps"] = int(line.split(":")[1].strip().split(" ")[0])
             elif line.startswith(" Consensus BPS:"):
                 results["consensus_bps"] = int(line.split(":")[1].strip().split(" ")[0])

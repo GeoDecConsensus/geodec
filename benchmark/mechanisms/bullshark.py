@@ -496,7 +496,7 @@ class BullsharkLogParser:
             f' GC depth: {gc_depth:,} round(s)\n'
             f' Sync retry delay: {sync_retry_delay:,} ms\n'
             f' Sync retry nodes: {sync_retry_nodes:,} node(s)\n'
-            f' batch size: {batch_size:,} B\n'
+            f' Mempool batch size: {batch_size:,} B\n'
             f' Max batch delay: {max_batch_delay:,} ms\n'
             '\n'
             ' + RESULTS:\n'
