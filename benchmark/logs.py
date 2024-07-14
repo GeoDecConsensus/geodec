@@ -5,6 +5,7 @@ from os.path import join
 
 import pandas as pd
 
+# Import parsers for specific mechanisms
 from benchmark.mechanisms.bullshark import BullsharkLogParser
 from benchmark.mechanisms.cometbft import CometBftLogParser
 from benchmark.mechanisms.hotstuff import HotStuffLogParser
@@ -20,17 +21,21 @@ class LogParser:
 
     @classmethod
     def process(cls, directory, faults):
-        assert isinstance(directory, str)
+        assert isinstance(directory, str), "Directory path must be a string"
 
-        clients = []
+        clients, nodes, latency = [], [], []
+
+        # Read client logs
         for filename in sorted(glob.glob(join(directory, "client-*.log"))):
             with open(filename, "r") as f:
                 clients.append(f.read())
-        nodes = []
+
+        # Read node logs
         for filename in sorted(glob.glob(join(directory, "node-*.log"))):
             with open(filename, "r") as f:
                 nodes.append(f.read())
-        latency = []
+
+        # Read latency logs
         for filename in sorted(glob.glob(join(directory, "latency-*.log"))):
             with open(filename, "r") as f:
                 latency.append(f.read())
@@ -41,7 +46,7 @@ class LogParser:
         return self.result_str
 
     def print(self, filename):
-        assert isinstance(filename, str)
+        assert isinstance(filename, str), "Filename must be a string"
 
         print(self.result_str)
 
@@ -58,42 +63,59 @@ class LogParser:
             result = CometBftLogParser.process(directory, faults).result_str
         elif mechanism_name == "bullshark":
             result = BullsharkLogParser.process(directory, faults).result_str
+        else:
+            raise ParseError(f"Unknown mechanism: {mechanism_name}")
 
         self.result_str = result
 
     @staticmethod
     def get_new_run_id():
-        data = pd.read_csv("/home/ubuntu/geodec/results/metrics.csv")
-        return data["run_id"].max() + 1
+        try:
+            data = pd.read_csv("/home/ubuntu/geodec/results/metrics.csv")
+            return data["run_id"].max() + 1
+        except FileNotFoundError:
+            return 1  # Return 1 if the file doesn't exist
 
     @staticmethod
     def aggregate_runs(run_id_array):
         data = pd.read_csv("/home/ubuntu/geodec/results/metrics.csv")
 
+        # Filter data to include only the specified run IDs
         data = data.loc[data["run_id"].isin(run_id_array)]
-        by_name = data.groupby(["name"])
 
-        # for name, liveliness in by_name:
-        #     print(f"entries for {name!r}")
-        #     print("------------------------")
-        #     print(liveliness.head(3), end="\n\n")
+        # Define the fields to average
+        fields_to_avg = [
+            "consensus_tps",
+            "consensus_bps",
+            "consensus_latency",
+            "end_to_end_tps",
+            "end_to_end_bps",
+            "end_to_end_latency",
+        ]
 
-        liveliness_mean = by_name["liveliness"].mean(numeric_only=True).reset_index()
-        liveliness_mean.rename(columns={"liveliness": "liveliness_avg"}, inplace=True)
+        # Group by 'name' and calculate the average for the specified fields
+        averages = data.groupby("name")[fields_to_avg].mean().reset_index()
 
-        data_first = data.loc[data["run_id"] == run_id_array[0]]
-        result = pd.merge(data_first, liveliness_mean, on="name")
-        result["runs"] = [len(run_id_array)] * len(result)
-        return result
+        # Replace the original data with the averages
+        for field in fields_to_avg:
+            data[field] = data["name"].map(averages.set_index("name")[field])
+
+        # Remove duplicates, keeping only the first occurrence
+        data = data.drop_duplicates(subset="name").reset_index(drop=True)
+
+        # Add a column to indicate the number of runs aggregated
+        data["runs"] = len(run_id_array)
+
+        return data
 
     def parse_results(self):
         results = {}
-
         lines = self.result_str.split("\n")
 
-        results["run_id"] = self.get_new_run_id() + 1
+        results["run_id"] = self.get_new_run_id()
         results["name"] = ""
 
+        # Extract mechanism name from the summary header
         mechanism_match = re.match(r"^\s*(\w+)\s+SUMMARY:", lines[0])
         if mechanism_match:
             results["mechanism"] = mechanism_match.group(1)
@@ -149,8 +171,18 @@ def write_results_to_csv(results, csv_filename):
         "end_to_end_latency",
     ]
 
-    with open(csv_filename, "w", newline="") as csvfile:
+    # Append to CSV if it exists, otherwise create it
+    file_exists = False
+    try:
+        with open(csv_filename, "r"):
+            file_exists = True
+    except FileNotFoundError:
+        pass
+
+    with open(csv_filename, "a" if file_exists else "w", newline="") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-        writer.writeheader()
+        if not file_exists:
+            writer.writeheader()  # Write header only if file doesn't exist
+
         writer.writerow(results)
