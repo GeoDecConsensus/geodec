@@ -22,7 +22,7 @@
                     "gc_depth": 50,
                     "sync_retry_delay": 5000,
                     "sync_retry_nodes": 3,
-                    "batch_size": 512,
+                    "batch_size": 300000,
                     "max_batch_delay": 100
                 }
             }
@@ -75,7 +75,7 @@
                 "gc_depth": 50,
                 "sync_retry_delay": 5000,
                 "sync_retry_nodes": 3,
-                "batch_size": 100000,
+                "batch_size": 300000,
                 "max_batch_delay": 100
             }
         }
