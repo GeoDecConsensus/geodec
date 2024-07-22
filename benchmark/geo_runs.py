@@ -429,7 +429,7 @@ def update_batch_size(json_file_path, mechanism_name, new_batch_size):
 if __name__ == "__main__":
 
     batch_sizes = [512, 1024, 10000, 20000, 50000, 80000, 100000, 200000, 300000]
-    mechanism = ["hotstuff", "bullshark"]
+    mechanism = ["hotstuff"]
 
     print("Starting benchmarking tool")
 

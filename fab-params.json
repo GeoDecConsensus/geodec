@@ -7,9 +7,9 @@
                     4
                 ],
                 "rate": [
-                    100000
+                    200000
                 ],
-                "tx_size": 256,
+                "tx_size": 128,
                 "duration": 300,
                 "runs": 3
             },
@@ -63,7 +63,7 @@
                 "workers": 1,
                 "collocate": true,
                 "rate": [
-                    150000
+                    280000
                 ],
                 "tx_size": 256,
                 "duration": 300,
