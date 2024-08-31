@@ -427,7 +427,8 @@ class Bench:
             for i, host in enumerate(progress):
                 c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-                c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
+                c.get(PathMaker.client_log_file(f"{i}-a"), local=PathMaker.client_log_file(f"{i}-a"))
+                c.get(PathMaker.client_log_file(f"{i}-b"), local=PathMaker.client_log_file(f"{i}-b"))
                 if self.mechanism.name == "cometbft":
                     c.get(
                         PathMaker.latency_log_file(i),
