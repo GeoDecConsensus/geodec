@@ -7,7 +7,7 @@
                     4
                 ],
                 "rate": [
-                    200000
+                    80000
                 ],
                 "tx_size": 128,
                 "duration": 300,
@@ -22,8 +22,8 @@
                     "gc_depth": 50,
                     "sync_retry_delay": 5000,
                     "sync_retry_nodes": 3,
-                    "batch_size": 300000,
-                    "max_batch_delay": 100
+                    "batch_size": 15000000,
+                    "max_batch_delay": 5000
                 }
             }
         },
