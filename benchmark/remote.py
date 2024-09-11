@@ -249,11 +249,16 @@ class Bench:
             # for the faulty nodes to be online).
             committee = Committee.load(PathMaker.committee_file())
             addresses = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-            rate_share = ceil(rate / committee.size())  # Take faults into account.
+            rate_share = ceil(rate / (committee.size() * 2))  # Take faults into account.
             timeout = node_parameters.timeout_delay
-            client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
-            for host, addr, log_file in zip(hosts, addresses, client_logs):
-                cmd = CommandMaker.run_client(
+
+            # Updated client logs for two clients per node
+            client_logs_a = [PathMaker.client_log_file(f"{i}-a") for i in range(len(hosts))]
+            client_logs_b = [PathMaker.client_log_file(f"{i}-b") for i in range(len(hosts))]
+
+            for host, addr, log_file_a, log_file_b in zip(hosts, addresses, client_logs_a, client_logs_b):
+                # Run first client (client-{i}-a)
+                cmd_a = CommandMaker.run_client(
                     addr,
                     bench_parameters.tx_size,
                     rate_share,
@@ -261,7 +266,18 @@ class Bench:
                     timeout,
                     nodes=addresses,
                 )
-                self._background_run(host, cmd, log_file)
+                self._background_run(host, cmd_a, log_file_a)
+
+                # Run second client (client-{i}-b)
+                cmd_b = CommandMaker.run_client(
+                    addr,
+                    bench_parameters.tx_size,
+                    rate_share,
+                    self.mechanism.name,
+                    timeout,
+                    nodes=addresses,
+                )
+                self._background_run(host, cmd_b, log_file_b)
 
             # Run the nodes.
             key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
@@ -411,7 +427,8 @@ class Bench:
             for i, host in enumerate(progress):
                 c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.get(PathMaker.node_log_file(i), local=PathMaker.node_log_file(i))
-                c.get(PathMaker.client_log_file(i), local=PathMaker.client_log_file(i))
+                c.get(PathMaker.client_log_file(f"{i}-a"), local=PathMaker.client_log_file(f"{i}-a"))
+                c.get(PathMaker.client_log_file(f"{i}-b"), local=PathMaker.client_log_file(f"{i}-b"))
                 if self.mechanism.name == "cometbft":
                     c.get(
                         PathMaker.latency_log_file(i),
