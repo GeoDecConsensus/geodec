@@ -18,7 +18,7 @@
             },
             "geodec": {
                 "interface": "ens3",
-                "geo_input": "/home/ubuntu/geodec/rundata/geo_input.csv",
+                "geo_input": "/home/ubuntu/geodec/rundata/solana.csv",
                 "servers_file": "/home/ubuntu/geodec/frontend/public/servers.csv",
                 "pings_grouped_file": "/home/ubuntu/geodec/rundata/ping_grouped.csv",
                 "pings_file": "/home/ubuntu/geodec/rundata/pings.csv"

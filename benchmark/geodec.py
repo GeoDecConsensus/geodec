@@ -18,8 +18,9 @@ class GeoDec:
             for row in csv_reader:
                 if row['id']:  # Ensure id is not empty
                     geo_input[int(row['id'])] = 1
-                if row['count'] and row['id']:
-                    geo_input[int(row['id'])] = int(row['count'])
+                # try:
+                #     if row['count'] and row['id']:
+                #         geo_input[int(row['id'])] = int(row['count'])
         return geo_input
        
     def _getServers(geoInput, servers_file):

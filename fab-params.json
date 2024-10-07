@@ -4,14 +4,14 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [
-                    4
+                    64
                 ],
                 "rate": [
-                    50000
+                    80000
                 ],
                 "tx_size": 128,
-                "duration": 100,
-                "runs": 3
+                "duration": 300,
+                "runs": 1
             },
             "node_params": {
                 "consensus": {

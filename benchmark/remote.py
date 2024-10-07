@@ -459,8 +459,8 @@ class Bench:
 
             Print.heading("\nSelected servers:")
             print(selected_servers[["ip", "id", "name", "latitude", "longitude"]].to_string(index=False))
-            Print.heading("\nPing Delays:")
-            print(pingDelays[["source", "destination", "avg", "mdev"]].to_string(index=False))
+            # Print.heading("\nPing Delays:")
+            # print(pingDelays[["source", "destination", "avg", "mdev"]].to_string(index=False))
 
             if len(pingDelays) != len(selected_servers) * (len(selected_servers) - 1):
                 print("ERROR: Ping delays not available for all servers")
