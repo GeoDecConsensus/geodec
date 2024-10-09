@@ -35,17 +35,17 @@ FAB_PARAMS_JSON = "/home/ubuntu/geodec/fab-params.json"
 
 # Define the list of chains and their CSV files
 CHAINS = {
+    "Ethereum": "ethereum.csv",
+    "Ethernodes": "ethernodes.csv",
     "Aptos": "aptos.csv",
     "Sui": "sui.csv",
     "Solana": "solana.csv",
     "Avalanche": "avalanche.csv",
-    "Ethereum": "ethereum.csv",
-    "Ethernodes": "ethernodes.csv",
 }
 
 CONSENSUS_MECHANISMS = [
-    # "hotstuff",
-    "cometbft",
+    "hotstuff",
+    # "cometbft",
     # "bullshark"
 ]
 
@@ -112,7 +112,7 @@ def update_chain_config_in_json(num_nodes, consensus_name, config):
     save_json_config(config, FAB_PARAMS_JSON)
 
 
-def process_weight_columns(input_file):
+def process_weight_columns(input_file, consensus_name):
     """
     Processes the weight columns by renaming them to 'stake' and executing the subprocess
     for each column, then reverting the changes.
@@ -149,7 +149,7 @@ def process_weight_columns(input_file):
 
             # Execute the subprocess and capture its output
             logger.info(f"Running subprocess for {weight_col}")
-            subprocess.run(["fab", "georemote", "hotstuff", str(addLatency)])
+            subprocess.run(["fab", "georemote", consensus_name, str(addLatency)])
 
 
             logger.info(f"Reverting column name back to '{weight_col}'")
@@ -201,7 +201,7 @@ def process_all_chains(consensus_name):
             input_file = config["consensusMechanisms"][consensus_name]["geodec"][GEO_INPUT_KEY]
 
             # Process the weight columns for the current geo_input CSV
-            process_weight_columns(input_file)
+            process_weight_columns(input_file, consensus_name)
 
         logger.info("Processing completed for all chains successfully")
 
@@ -212,4 +212,5 @@ def process_all_chains(consensus_name):
 
 if __name__ == "__main__":
     for consensus_name in CONSENSUS_MECHANISMS:
+        logger.info(f"Processing consensus: {consensus_name}")
         process_all_chains(consensus_name)

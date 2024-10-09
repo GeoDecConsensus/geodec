@@ -425,7 +425,7 @@ class Bench:
         logParser.log_parser(self.mechanism.name, PathMaker.logs_path(), faults=faults)
         return logParser
 
-    def run(self, bench_parameters_dict, node_parameters_dict, isGeoRemote, addLatency, debug=False):
+    def run(self, bench_parameters_dict, node_parameters_dict, isGeoRemote, addLatency="False", debug=False):
         assert isinstance(debug, bool)
         Print.heading(f"Starting {self.mechanism.name} remote benchmark")
 

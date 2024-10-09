@@ -79,7 +79,7 @@ class CommandMaker:
                     f'--rate {rate} --timeout {timeout} {nodes}')
         elif mechanism == 'cometbft':
             return (f'./client -c 1 --size {size} --rate {rate} --time {timeout}'
-                    f' --endpoints ws://localhost:26657/websocket -v --broadcast-tx-method sync --expect-peers {len(nodes)} --min-peer-connectivity {len(nodes)}')
+                    f' --endpoints ws://localhost:26657/websocket -v --broadcast-tx-method sync --expect-peers {len(nodes)} --min-peer-connectivity {int(round(len(nodes)*0.75))}')
                     # f' --endpoints ws://localhost:26657/websocket -v --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
         elif mechanism == 'bullshark':
             nodes = f'--nodes {" ".join(nodes)}' if nodes else ''
