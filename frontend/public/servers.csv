@@ -72,7 +72,6 @@ id,name,title,location,state,country,state_abbv,continent,latitude,longitude
 81,Detroit,Detroit,Detroit,Michigan,United States,MI,1,42.3314,-83.0458
 82,Portland,Portland,Portland,Oregon,United States,OR,1,45.5236,-122.675
 83,Halifax,Halifax,Halifax,Nova Scotia,Canada,NS,1,44.65,-63.6
-84,Hangzhou,Hangzhou,Hangzhou,Zhejiang,China,ZJ,3,30.25,120.1667
 85,Chennai,Chennai,Chennai,Tamil Nadu,India,TN,3,13.081,80.274
 86,SaltLakeCity,Salt Lake City,Salt Lake City,Utah,United States,UT,1,40.75,-111.8833
 87,TelAviv,Tel Aviv,Tel Aviv,Tel Aviv,Israel,TA,3,32.0833,34.8833
@@ -107,7 +106,6 @@ id,name,title,location,state,country,state_abbv,continent,latitude,longitude
 121,OklahomaCity,Oklahoma City,Oklahoma City,Oklahoma,United States,OK,1,35.4822,-97.535
 123,ColoradoSprings,Colorado Springs,Colorado Springs,Colorado,United States,CO,1,38.8633,-104.7919
 124,Knoxville,Knoxville,Knoxville,Tennessee,United States,TN,1,35.9728,-83.9422
-125,SaoPaulo,Sao Paulo,Sao Paulo,Sao Paulo,Brazil,SP,2,-23.55,-46.6333
 127,Riga,Riga,Riga,Riga,Latvia,RIX,3,56.9489,24.1064
 129,Oslo,Oslo,Oslo,Oslo,Norway,,3,59.95,10.75
 130,Piscataway,Piscataway,Piscataway,New Jersey,United States,NJ,1,40.5456,-74.4608
@@ -147,7 +145,6 @@ id,name,title,location,state,country,state_abbv,continent,latitude,longitude
 175,Johannesburg,Johannesburg,Johannesburg,Gauteng,South Africa,GT,5,-26.2044,28.0456
 176,Novosibirsk,Novosibirsk,Novosibirsk,Novosibirsk Oblast,Russia,NVS,3,55.0167,82.9333
 177,Guadalajara,Guadalajara,Guadalajara,Jalisco,Mexico,JAL,1,20.667,-103.35
-180,Shanghai,Shanghai,Shanghai,Shanghai,China,SH,3,31.2,121.5
 181,Brunswick,Brunswick,Brunswick,Maine,United States,ME,1,43.9108,-69.9631
 184,Pittsburgh,Pittsburgh,Pittsburgh,Pennsylvania,United States,PA,1,40.4397,-79.9764
 185,Strasbourg,Strasbourg,Strasbourg,Grand Est,France,GES,3,48.5734,7.7521
@@ -180,7 +177,6 @@ id,name,title,location,state,country,state_abbv,continent,latitude,longitude
 216,TheHague,The Hague,The Hague,South Holland,Netherlands,ZH,3,52.0833,4.3167
 217,Westpoort,Westpoort,Westpoort,North Holland,Netherlands,NH,3,52.4058,4.8211
 220,LaCeiba,La Ceiba,La Ceiba,Atlantida,Honduras,AT,1,15.7703,-86.7919
-221,Shenzhen,Shenzhen,Shenzhen,Guangdong,China,GD,3,22.5431,114.0579
 222,Bangalore,Bangalore,Bangalore,Karnataka,India,KA,3,12.9716,77.5946
 223,Liege,Liege,Liege,Liege,Belgium,WLG,3,50.6326,5.5797
 224,Vladivostok,Vladivostok,Vladivostok,Primorsky Krai,Russia,PRI,3,43.1737,132.0065
@@ -211,7 +207,6 @@ id,name,title,location,state,country,state_abbv,continent,latitude,longitude
 256,Ottawa,Ottawa,Ottawa,Ontario,Canada,ON,1,45.4215,-75.6972
 259,Lincoln,Lincoln,Lincoln,Nebraska,United States,NE,1,40.8258,-96.6852
 260,Carlow,Carlow,Carlow,Leinster,Ireland,L,3,52.8365,-6.9341
-261,Zhangjiakou,Zhangjiakou,Zhangjiakou,Hebei,China,HE,3,40.7675,114.8863
 262,Paramaribo,Paramaribo,Paramaribo,Paramaribo,Suriname,PM,2,5.852,-55.2038
 263,Cheltenham,Cheltenham,Cheltenham,England,United Kingdom,ENG,3,51.8994,-2.0783
 264,Falkenstein,Falkenstein,Falkenstein,Saxony,Germany,SN,3,50.475,12.365

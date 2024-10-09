@@ -4,14 +4,14 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [
-                    64
+                    40
                 ],
                 "rate": [
                     80000
                 ],
                 "tx_size": 128,
                 "duration": 300,
-                "runs": 1
+                "runs": 2
             },
             "node_params": {
                 "consensus": {
@@ -63,11 +63,11 @@
                 "workers": 1,
                 "collocate": true,
                 "rate": [
-                    280000
+                    80000
                 ],
-                "tx_size": 256,
+                "tx_size": 128,
                 "duration": 300,
-                "runs": 3
+                "runs": 1
             },
             "node_params": {
                 "header_size": 50,
@@ -75,8 +75,8 @@
                 "gc_depth": 50,
                 "sync_retry_delay": 5000,
                 "sync_retry_nodes": 3,
-                "batch_size": 300000,
-                "max_batch_delay": 100
+                "batch_size": 150000,
+                "max_batch_delay": 5000
             }
         }
     }

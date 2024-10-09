@@ -6,22 +6,40 @@ from datetime import datetime
 import copy
 import time
 import subprocess
+import sys
 
-# Setup logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
+# Setup logging to both console and file
 logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
+# Create a handler for the log file
+file_handler = logging.FileHandler("processing_log.txt")
+file_handler.setLevel(logging.INFO)
+
+# Create a handler for the console (stdout)
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setLevel(logging.INFO)
+
+# Create a formatter and attach it to both handlers
+formatter = logging.Formatter("%(asctime)s - %(message)s")
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+# Add the handlers to the logger
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
 
 # Define the JSON configuration path
 CONFIG_PATH = "/home/ubuntu/geodec/settings.json"  # Replace with actual path
 
 # Define the list of consensus mechanisms and their CSV files
 CONSENSUS_MECHANISMS = {
-    "Solana": "solana.csv",
-    "Aptos": "aptos.csv",
-    "Avalanche": "avalanche.csv",
     "Sui": "sui.csv",
+    "Solana": "solana.csv",
+    "Avalanche": "avalanche.csv",
     "Ethereum": "ethereum.csv",
-    "Ethernode": "ethernode.csv",
+    "Ethernodes": "ethernodes.csv",
+    "Aptos": "aptos.csv",
 }
 
 GEO_INPUT_KEY = "geo_input"  # Key in the JSON where the geo_input file path is stored
@@ -97,6 +115,8 @@ def process_weight_columns(input_file):
         weight_columns = [col for col in original_columns if "weight" in col.lower()]
         logger.info(f"Found {len(weight_columns)} weight columns: {weight_columns}")
 
+        addLatency = True
+        
         # Process each weight column
         for weight_col in weight_columns:
             # Create a copy of the DataFrame for this iteration
@@ -112,13 +132,17 @@ def process_weight_columns(input_file):
             df_temp = df_temp.rename(columns={weight_col: "stake"})
             df_temp.to_csv(input_file, index=False)
 
-            # Execute the subprocess (assumed fab command)
+            # Execute the subprocess and capture its output
             logger.info(f"Running subprocess for {weight_col}")
-            subprocess.run(["fab", "georemote", "hotstuff"])
+            subprocess.run(["fab", "georemote", "hotstuff", str(addLatency)])
+
 
             logger.info(f"Reverting column name back to '{weight_col}'")
             logger.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
+            # Only add the latencies for the first run
+            addLatency = False
+            
             # Wait before processing the next column
             time.sleep(10)
 
