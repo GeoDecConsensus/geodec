@@ -30,17 +30,24 @@ logger.addHandler(file_handler)
 logger.addHandler(console_handler)
 
 # Define the JSON configuration path
-CONFIG_PATH = "/home/ubuntu/geodec/settings.json"  # Replace with actual path
+CONFIG_PATH = "/home/ubuntu/geodec/settings.json"
+FAB_PARAMS_JSON = "/home/ubuntu/geodec/fab-params.json"
 
-# Define the list of consensus mechanisms and their CSV files
-CONSENSUS_MECHANISMS = {
+# Define the list of chains and their CSV files
+CHAINS = {
+    "Aptos": "aptos.csv",
     "Sui": "sui.csv",
     "Solana": "solana.csv",
     "Avalanche": "avalanche.csv",
     "Ethereum": "ethereum.csv",
     "Ethernodes": "ethernodes.csv",
-    "Aptos": "aptos.csv",
 }
+
+CONSENSUS_MECHANISMS = [
+    # "hotstuff",
+    "cometbft",
+    # "bullshark"
+]
 
 GEO_INPUT_KEY = "geo_input"  # Key in the JSON where the geo_input file path is stored
 
@@ -77,23 +84,32 @@ def save_json_config(config, config_path):
         raise
 
 
-def update_geo_input_in_json(consensus_name, config):
+def update_geo_input_in_json(chain_name, consensus_name, config):
     """
-    Update the 'geo_input' file path in the JSON configuration for the given consensus mechanism.
+    Update the 'geo_input' file path in the JSON configuration for the given chain.
 
-    :param consensus_name: Name of the consensus mechanism.
+    :param chain_name: Name of the chain.
     :param config: The current JSON config object.
     """
     try:
-        new_geo_input = f"/home/ubuntu/geodec/rundata/{CONSENSUS_MECHANISMS[consensus_name]}"
-        logger.info(f"Updating {GEO_INPUT_KEY} to {new_geo_input} for {consensus_name}.")
+        new_geo_input = f"/home/ubuntu/geodec/rundata/{CHAINS[chain_name]}"
+        df = pd.read_csv(new_geo_input)
+        
+        logger.info(f"Updating {GEO_INPUT_KEY} to {new_geo_input} for {chain_name}.")
 
-        config["consensusMechanisms"]["hotstuff"]["geodec"][GEO_INPUT_KEY] = new_geo_input
+        config["consensusMechanisms"][consensus_name]["geodec"][GEO_INPUT_KEY] = new_geo_input
         save_json_config(config, CONFIG_PATH)
 
     except Exception as e:
-        logger.error(f"Failed to update geo_input in JSON for {consensus_name}: {e}")
+        logger.error(f"Failed to update geo_input in JSON for {chain_name}: {e}")
         raise
+    
+    return len(df)
+
+def update_chain_config_in_json(num_nodes, consensus_name, config):
+    config["remote"][consensus_name]["bench_params"]["nodes"] = [ int(num_nodes) ]
+    
+    save_json_config(config, FAB_PARAMS_JSON)
 
 
 def process_weight_columns(input_file):
@@ -108,7 +124,6 @@ def process_weight_columns(input_file):
         # Read the CSV file
         logger.info(f"Reading input file: {input_file}")
         df = pd.read_csv(input_file)
-        df = df.rename(columns={"server_id": "id"})
         original_columns = df.columns.tolist()
 
         # Identify weight columns
@@ -163,28 +178,32 @@ def process_weight_columns(input_file):
         raise
 
 
-def process_all_consensus_mechanisms():
+def process_all_chains(consensus_name):
     """
-    Iterates over all consensus mechanisms, updating the geo_input path in JSON,
+    Iterates over all chains, updating the geo_input path in JSON,
     and processing the weight columns for each one.
     """
     try:
         # Load the JSON configuration
         config = load_json_config(CONFIG_PATH)
+        chain_config = load_json_config(FAB_PARAMS_JSON)
 
-        for consensus in CONSENSUS_MECHANISMS:
-            logger.info(f"Processing consensus mechanism: {consensus}")
+        for chain in CHAINS:
+            logger.info(f"Processing chain: {chain}")
 
-            # Update the geo_input path in the JSON for the current consensus
-            update_geo_input_in_json(consensus, config)
+            # Update the geo_input path in the JSON for the current chain
+            num_nodes = update_geo_input_in_json(chain, consensus_name, config)
+            
+            # Update the node count in the Fab params JSON for the current chain
+            update_chain_config_in_json(num_nodes, consensus_name, chain_config)
 
             # Get the updated geo_input file path from the config
-            input_file = config["consensusMechanisms"]["hotstuff"]["geodec"][GEO_INPUT_KEY]
+            input_file = config["consensusMechanisms"][consensus_name]["geodec"][GEO_INPUT_KEY]
 
             # Process the weight columns for the current geo_input CSV
             process_weight_columns(input_file)
 
-        logger.info("Processing completed for all consensus mechanisms successfully")
+        logger.info("Processing completed for all chains successfully")
 
     except Exception as e:
         logger.error(f"Program failed during processing: {e}")
@@ -192,4 +211,5 @@ def process_all_consensus_mechanisms():
 
 
 if __name__ == "__main__":
-    process_all_consensus_mechanisms()
+    for consensus_name in CONSENSUS_MECHANISMS:
+        process_all_chains(consensus_name)

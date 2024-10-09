@@ -198,7 +198,7 @@ def set_weight_hotstuff(geo_input_file):
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             if row['stake'] and row['id']:
-                stakes.append(int(round(float(row['stake']))))
+                stakes.append(int(row['stake']))
 
     def get_path():
         return './.committee.json'
@@ -225,7 +225,7 @@ def set_weight_bullshark(geo_input_file):
         csv_reader = csv.DictReader(file)
         for row in csv_reader:
             if row['stake'] and row['id']:
-                stakes.append(int(round(row['stake'])))
+                stakes.append(int(row['stake']))
 
     def get_path():
         return './.committee.json'
