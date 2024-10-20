@@ -178,7 +178,7 @@ def set_weight_cometbft(geo_input_file):
                 stakes.append(row['stake'])
 
     def get_path(i):
-        return './mytestnet/node{i}/config/genesis.json'.format(i=i)
+        return '/home/ubuntu/geodec/mytestnet/node{i}/config/genesis.json'.format(i=i)
     
     # Set the weights
     for i in range(len(stakes)):

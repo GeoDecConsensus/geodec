@@ -4,14 +4,14 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [
-                    4
+                    64
                 ],
                 "rate": [
-                    50000
+                    160000
                 ],
                 "tx_size": 128,
                 "duration": 100,
-                "runs": 3
+                "runs": 5
             },
             "node_params": {
                 "consensus": {
@@ -22,8 +22,8 @@
                     "gc_depth": 50,
                     "sync_retry_delay": 5000,
                     "sync_retry_nodes": 3,
-                    "batch_size": 150000,
-                    "max_batch_delay": 5000
+                    "batch_size": 120000,
+                    "max_batch_delay": 500
                 }
             }
         },
@@ -31,14 +31,14 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [
-                    4
+                    64
                 ],
                 "rate": [
-                    2000
+                    60000
                 ],
-                "tx_size": 256,
-                "duration": 300,
-                "runs": 3
+                "tx_size": 128,
+                "duration": 100,
+                "runs": 5
             },
             "node_params": {
                 "consensus": {
@@ -58,16 +58,16 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [
-                    4
+                    64
                 ],
                 "workers": 1,
                 "collocate": true,
                 "rate": [
-                    280000
+                    80000
                 ],
-                "tx_size": 256,
+                "tx_size": 128,
                 "duration": 300,
-                "runs": 3
+                "runs": 2
             },
             "node_params": {
                 "header_size": 50,
@@ -75,8 +75,8 @@
                 "gc_depth": 50,
                 "sync_retry_delay": 5000,
                 "sync_retry_nodes": 3,
-                "batch_size": 300000,
-                "max_batch_delay": 100
+                "batch_size": 120000,
+                "max_batch_delay": 500
             }
         }
     }

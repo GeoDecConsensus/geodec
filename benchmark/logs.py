@@ -87,7 +87,8 @@ class LogParser:
         data_to_aggregate = data.loc[data["run_id"].isin(run_id_array)]
 
         # Compute the mean for the specified fields
-        aggregated_data = data_to_aggregate.mean(numeric_only=True).reset_index()
+        # aggregated_data = data_to_aggregate.mean(numeric_only=True).reset_index()
+        aggregated_data = data_to_aggregate.median(numeric_only=True).reset_index()
         aggregated_data = aggregated_data.loc[
             aggregated_data["index"].isin(
                 [
