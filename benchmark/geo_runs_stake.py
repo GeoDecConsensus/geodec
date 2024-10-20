@@ -44,8 +44,8 @@ CHAINS = {
 }
 
 CONSENSUS_MECHANISMS = [
-    "hotstuff",
-    # "cometbft",
+    # "hotstuff",
+    "cometbft",
     # "bullshark"
 ]
 

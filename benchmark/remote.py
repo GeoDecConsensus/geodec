@@ -162,8 +162,8 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            cmd = [f"~/cometbft testnet --v {len(hosts)}"]
-            # cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml'] # NOTE custom configuration
+            # cmd = [f"~/cometbft testnet --v {len(hosts)}"]
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/rundata/cometbft-config.toml'] # NOTE custom configuration
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 
             # Update the stake weights in the configuration file
