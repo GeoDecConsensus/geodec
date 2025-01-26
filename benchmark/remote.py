@@ -180,10 +180,11 @@ class Bench:
             # Upload configuration files.
             progress = progress_bar(hosts, prefix="Uploading config files:")
             for i, host in enumerate(hosts):
-                cmd = [
-                    f"scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"
-                ]  # NOTE Path of the node config files
-                subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+                try:
+                    cmd = f"scp -o StrictHostKeyChecking=no -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"
+                    subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+                except Exception as e:
+                    Print.error(f"Failed to SCP config files to {host}: {e}")
 
         else:
             # Recompile the latest code.
@@ -471,13 +472,14 @@ class Bench:
 
             # Set delay parameters.
             latencySetter = LatencySetter(self.settings, self.connect)
-            try:
-                latencySetter.deleteDelay(selected_hosts)
-            except:
-                pass
+            # try:
+            #     latencySetter.deleteDelay(selected_hosts)
+            # except:
+            #     pass
 
             try:
                 latencySetter.configDelay(selected_hosts)
+                print("here")
                 latencySetter.addDelays(selected_servers, pingDelays, self.settings.interface)
             except (subprocess.SubprocessError, GroupException) as e:
                 e = FabricError(e) if isinstance(e, GroupException) else e

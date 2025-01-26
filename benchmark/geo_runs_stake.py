@@ -44,8 +44,8 @@ CHAINS = {
 }
 
 CONSENSUS_MECHANISMS = [
-    # "hotstuff",
     "cometbft",
+    "hotstuff",
     # "bullshark"
 ]
 
@@ -129,6 +129,8 @@ def process_weight_columns(input_file, consensus_name):
         # Identify weight columns
         weight_columns = [col for col in original_columns if "weight" in col.lower()]
         logger.info(f"Found {len(weight_columns)} weight columns: {weight_columns}")
+        weight_columns = weight_columns[3:]
+        print(weight_columns)
 
         addLatency = True
         

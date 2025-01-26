@@ -9,8 +9,13 @@ class LatencySetter:
 
     @staticmethod
     def _initalizeDelayQDisc(interface):
-        return f"sudo tc qdisc add dev {interface} parent root handle 1:0 htb default 100"
+        # Add commands to delete any existing root qdisc before initializing
+        delete_cmd = f"sudo tc qdisc del dev {interface} root || true"
+        add_cmd = f"sudo tc qdisc add dev {interface} root handle 1:0 htb default 100"
+        # Return the combined command
+        return f"{delete_cmd}; {add_cmd}"
 
+    # Not needed
     @staticmethod
     def _deleteDelayQDisc(interface):
         return f"sudo tc qdisc del dev {interface} parent root"
@@ -21,6 +26,7 @@ class LatencySetter:
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(cmd, hide=True)
 
+    # Not needed
     def deleteDelay(self, hosts):
         Print.info("Delete qdisc configurations...")
         cmd = LatencySetter._deleteDelayQDisc(self.settings.interface)

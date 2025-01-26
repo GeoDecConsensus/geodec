@@ -58,7 +58,7 @@
             "bench_params": {
                 "faults": 0,
                 "nodes": [
-                    64
+                    42
                 ],
                 "workers": 1,
                 "collocate": true,
