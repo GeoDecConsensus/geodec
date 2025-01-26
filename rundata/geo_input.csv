@@ -1,5 +1,5 @@
-id,latitude,longitude,stake,uuid,distance_km,GDI,0.9linear_weight,0.8linear_weight,0.7linear_weight,0.6linear_weight,0.5linear_weight,0.9exponential_weight,0.8exponential_weight,0.7exponential_weight,0.6exponential_weight,0.5exponential_weight
-1,-37.7833,144.9667,525,13ae0b3e-1c81-4ff9-9587-82a81cb0e1a9,4.276020286199781,0.0809058407590066,8563,16601,24639,32677,40715,1021,1928,3527,6239,10640
-2,43.6481,-79.4042,1420,0fb88001-64da-4e47-8be5-21481c290116,1.811067053708997,0.0133061272980647,2608,3797,4985,6174,7363,2086,2977,4116,5503,7093
-3,50.0833,14.4167,4982,b66d2882-67be-4002-bc4b-94fdde641415,3.601065795089078,0.0068812177364413,5172,5362,5552,5742,5932,6044,7122,8133,8977,9555
-4,48.8742,2.347,4948,9f4d18fc-7dde-48dd-a4e0-0e74235058da,10.074473407599696,0.0066852080918375,5121,5295,5469,5642,5816,5989,7042,8023,8837,9385
+id,name,title,location,state,country,state_abbv,continent,latitude,longitude,count,stake
+90,StLouis,St Louis,St Louis,Missouri,United States,MO,1,38.63,-90.2,1,1
+125,SaoPaulo,Sao Paulo,Sao Paulo,Sao Paulo,Brazil,SP,2,-23.55,-46.6333,1,1
+32,Warsaw,Warsaw,Warsaw,Mazovia,Poland,MZ,3,52.23,21.0108,1,1
+169,Perth,Perth,Perth,Western Australia,Australia,WA,4,-31.9522,115.8589,1,1

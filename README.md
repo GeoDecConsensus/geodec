@@ -114,10 +114,7 @@ fab georemote <mechanism_name> # ["cometbft", "hotstuff", "bullshark"]
 
 Demo of geodec running CometBFT with georemote and remote both.
 
-
 https://github.com/GeoDecConsensus/geodec/assets/97289118/dcf9a365-8528-42f4-b7d4-de49a7162804
-
-
 
 ## Maintainers
 
@@ -144,4 +141,5 @@ This project is licensed under the Apache License - see the [LICENSE.md](LICENSE
 ## Credits
 
 Thanks and credits to [Alberto Sonnino](https://github.com/asonnino) for the initial hotstuff and bullsharks benchmark.
-Thank you PBS Foundation and BuidlGuidl for supporting this work.
+
+Thank you [PBS Foundation](https://pbs.foundation/) for supporting this work.

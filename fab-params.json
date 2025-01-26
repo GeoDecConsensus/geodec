@@ -3,12 +3,8 @@
         "hotstuff": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [
-                    64
-                ],
-                "rate": [
-                    160000
-                ],
+                "nodes": [64],
+                "rate": [160000],
                 "tx_size": 128,
                 "duration": 100,
                 "runs": 5
@@ -30,12 +26,8 @@
         "cometbft": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [
-                    64
-                ],
-                "rate": [
-                    60000
-                ],
+                "nodes": [64],
+                "rate": [60000],
                 "tx_size": 128,
                 "duration": 100,
                 "runs": 5
@@ -57,14 +49,10 @@
         "bullshark": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [
-                    42
-                ],
+                "nodes": [42],
                 "workers": 1,
                 "collocate": true,
-                "rate": [
-                    80000
-                ],
+                "rate": [80000],
                 "tx_size": 128,
                 "duration": 300,
                 "runs": 2
