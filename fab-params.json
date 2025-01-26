@@ -3,15 +3,11 @@
         "hotstuff": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [
-                    4
-                ],
-                "rate": [
-                    50000
-                ],
+                "nodes": [64],
+                "rate": [160000],
                 "tx_size": 128,
                 "duration": 100,
-                "runs": 3
+                "runs": 5
             },
             "node_params": {
                 "consensus": {
@@ -22,23 +18,19 @@
                     "gc_depth": 50,
                     "sync_retry_delay": 5000,
                     "sync_retry_nodes": 3,
-                    "batch_size": 150000,
-                    "max_batch_delay": 5000
+                    "batch_size": 120000,
+                    "max_batch_delay": 500
                 }
             }
         },
         "cometbft": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [
-                    4
-                ],
-                "rate": [
-                    2000
-                ],
-                "tx_size": 256,
-                "duration": 300,
-                "runs": 3
+                "nodes": [64],
+                "rate": [60000],
+                "tx_size": 128,
+                "duration": 100,
+                "runs": 5
             },
             "node_params": {
                 "consensus": {
@@ -57,17 +49,13 @@
         "bullshark": {
             "bench_params": {
                 "faults": 0,
-                "nodes": [
-                    4
-                ],
+                "nodes": [42],
                 "workers": 1,
                 "collocate": true,
-                "rate": [
-                    280000
-                ],
-                "tx_size": 256,
+                "rate": [80000],
+                "tx_size": 128,
                 "duration": 300,
-                "runs": 3
+                "runs": 2
             },
             "node_params": {
                 "header_size": 50,
@@ -75,8 +63,8 @@
                 "gc_depth": 50,
                 "sync_retry_delay": 5000,
                 "sync_retry_nodes": 3,
-                "batch_size": 300000,
-                "max_batch_delay": 100
+                "batch_size": 120000,
+                "max_batch_delay": 500
             }
         }
     }
