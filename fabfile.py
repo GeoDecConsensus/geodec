@@ -108,18 +108,18 @@ def remote(ctx, mech):
     node_params = params_data["remote"][mech]["node_params"]
     
     try:
-        Bench(ctx, mech).run(bench_params, node_params, False, debug=True)
+        Bench(ctx, mech).run(bench_params, node_params, False, False, debug=True)
     except BenchError as e:
         Print.error(e)
 
 @task
-def georemote(ctx, mech):
+def georemote(ctx, mech, addLatency):
     ''' Run benchmarks on ComputeCanada/AWS '''
     bench_params = params_data["remote"][mech]["bench_params"]
     node_params = params_data["remote"][mech]["node_params"]
     
     try:
-        Bench(ctx, mech).run(bench_params, node_params, True, debug=True)
+        Bench(ctx, mech).run(bench_params, node_params, True, addLatency, debug=True)
     except BenchError as e:
         Print.error(e)
 

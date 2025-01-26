@@ -85,7 +85,7 @@ class Bench:
     def install(self):
         Print.info(f"Installing {self.settings.testbed}")
         cmd = self.mechanism.install_cmd
-        hosts = self._select_hosts()
+        hosts = self._select_hosts([64])
 
         try:
             g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
@@ -162,8 +162,8 @@ class Bench:
                 f.close()
 
             # Create testnet config files
-            cmd = [f"~/cometbft testnet --v {len(hosts)}"]
-            # cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/testdata/cometbft-config.toml'] # NOTE custom configuration
+            # cmd = [f"~/cometbft testnet --v {len(hosts)}"]
+            cmd = [f'~/cometbft testnet --v {len(hosts)} --config ~/geodec/rundata/cometbft-config.toml'] # NOTE custom configuration
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 
             # Update the stake weights in the configuration file
@@ -180,10 +180,11 @@ class Bench:
             # Upload configuration files.
             progress = progress_bar(hosts, prefix="Uploading config files:")
             for i, host in enumerate(hosts):
-                cmd = [
-                    f"scp -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"
-                ]  # NOTE Path of the node config files
-                subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+                try:
+                    cmd = f"scp -o StrictHostKeyChecking=no -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"
+                    subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+                except Exception as e:
+                    Print.error(f"Failed to SCP config files to {host}: {e}")
 
         else:
             # Recompile the latest code.
@@ -425,7 +426,7 @@ class Bench:
         logParser.log_parser(self.mechanism.name, PathMaker.logs_path(), faults=faults)
         return logParser
 
-    def run(self, bench_parameters_dict, node_parameters_dict, isGeoRemote, debug=False):
+    def run(self, bench_parameters_dict, node_parameters_dict, isGeoRemote, addLatency="False", debug=False):
         assert isinstance(debug, bool)
         Print.heading(f"Starting {self.mechanism.name} remote benchmark")
 
@@ -452,15 +453,18 @@ class Bench:
             e = FabricError(e) if isinstance(e, GroupException) else e
             raise BenchError("Failed to update nodes", e)
 
-        if isGeoRemote:
+        if addLatency == "False":
+            print("Add latency is false")
+            
+        if isGeoRemote and addLatency=="True":
             geo_input = GeoDec.getGeoInput(self.settings.geo_input)
             selected_servers = GeoDec.getAllServers(geo_input, self.settings.servers_file, self.settings.ip_file)
             pingDelays = GeoDec.getPingDelay(geo_input, self.settings.ping_grouped_file, self.settings.pings_file)
 
             Print.heading("\nSelected servers:")
             print(selected_servers[["ip", "id", "name", "latitude", "longitude"]].to_string(index=False))
-            Print.heading("\nPing Delays:")
-            print(pingDelays[["source", "destination", "avg", "mdev"]].to_string(index=False))
+            # Print.heading("\nPing Delays:")
+            # print(pingDelays[["source", "destination", "avg", "mdev"]].to_string(index=False))
 
             if len(pingDelays) != len(selected_servers) * (len(selected_servers) - 1):
                 print("ERROR: Ping delays not available for all servers")
@@ -468,13 +472,14 @@ class Bench:
 
             # Set delay parameters.
             latencySetter = LatencySetter(self.settings, self.connect)
-            try:
-                latencySetter.deleteDelay(selected_hosts)
-            except:
-                pass
+            # try:
+            #     latencySetter.deleteDelay(selected_hosts)
+            # except:
+            #     pass
 
             try:
                 latencySetter.configDelay(selected_hosts)
+                print("here")
                 latencySetter.addDelays(selected_servers, pingDelays, self.settings.interface)
             except (subprocess.SubprocessError, GroupException) as e:
                 e = FabricError(e) if isinstance(e, GroupException) else e
@@ -545,11 +550,11 @@ class Bench:
 
                 LogParser.aggregate_runs(run_id_array)
 
-        if isGeoRemote:
-            # Delete delay parameters.
-            latencySetter = LatencySetter(self.settings, self.connect)
-            try:
-                latencySetter.deleteDelay(selected_hosts)
-            except (subprocess.SubprocessError, GroupException) as e:
-                e = FabricError(e) if isinstance(e, GroupException) else e
-                Print.error(BenchError("Failed to initalize delays", e))
+        # if isGeoRemote:
+        #     # Delete delay parameters.
+        #     latencySetter = LatencySetter(self.settings, self.connect)
+        #     try:
+        #         latencySetter.deleteDelay(selected_hosts)
+        #     except (subprocess.SubprocessError, GroupException) as e:
+        #         e = FabricError(e) if isinstance(e, GroupException) else e
+        #         Print.error(BenchError("Failed to initalize delays", e))
