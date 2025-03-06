@@ -2,4 +2,4 @@ id,name,title,location,state,country,state_abbv,continent,latitude,longitude,cou
 90,StLouis,St Louis,St Louis,Missouri,United States,MO,1,38.63,-90.2,1,1
 125,SaoPaulo,Sao Paulo,Sao Paulo,Sao Paulo,Brazil,SP,2,-23.55,-46.6333,1,1
 32,Warsaw,Warsaw,Warsaw,Mazovia,Poland,MZ,3,52.23,21.0108,1,1
-169,Perth,Perth,Perth,Western Australia,Australia,WA,4,-31.9522,115.8589,1,10
+169,Perth,Perth,Perth,Western Australia,Australia,WA,4,-31.9522,115.8589,1,1
