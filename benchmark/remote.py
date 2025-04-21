@@ -123,6 +123,34 @@ class Bench:
                 addrs = [line.strip() for line in f.readlines()]
         return addrs[:max_count]
 
+    def _select_node_and_client_hosts(self, n_nodes: int):
+        """Read a CSV specifying which machine runs node_i and client_i."""
+        node_hosts = [None] * n_nodes
+        client_hosts = [None] * n_nodes
+
+        with open(self.settings.ip_file, "r") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                machine = row["machine"].strip()
+                node_id = int(row["node_id"])
+                client_id = int(row["client_id"])
+
+                if node_id >= 0:
+                    node_hosts[node_id] = machine
+
+                if client_id >= 0:
+                    client_hosts[client_id] = machine
+
+        # Make sure we have no None entries if user wants exactly n_nodes
+        # (or gracefully handle if some are missing)
+        for i in range(n_nodes):
+            if node_hosts[i] is None:
+                raise BenchError(f"No host in CSV for node {i}")
+            if client_hosts[i] is None:
+                raise BenchError(f"No host in CSV for client {i}")
+
+        return node_hosts, client_hosts
+
     def _background_run(self, host, command, log_file):
         name = splitext(basename(log_file))[0]
         cmd = f'tmux new -d -s "{name}" "{command} |& tee {log_file}"'
@@ -138,7 +166,12 @@ class Bench:
         g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
         g.run(" && ".join(cmd), hide=True)
 
-    def _config(self, isGeoremote, hosts, node_parameters, bench_parameters=None):
+    def _config(self, node_hosts, node_parameters, bench_parameters=None):
+        """
+        node_hosts: array of hosts for each node i
+        (If needed, pass client_hosts to also upload configs to clients)
+        """
+
         Print.info("Generating configuration files...")
 
         # Cleanup all local configuration files.
@@ -147,7 +180,7 @@ class Bench:
 
         if self.mechanism.name == "cometbft":
             # Cleanup node configuration files on hosts
-            for i, host in enumerate(hosts):
+            for i, host in enumerate(node_hosts):
                 cmd = CommandMaker.clean_node_config(i)
                 c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.run(cmd, shell=True)
@@ -155,7 +188,7 @@ class Bench:
             # Create persistent peers
             PathMaker.persistent_peers()
 
-            hosts_string = " ".join(hosts)
+            hosts_string = " ".join(node_hosts)
 
             with open("persistent_peer.txt", "w") as f:
                 f.write("")
@@ -163,7 +196,7 @@ class Bench:
 
             # Create testnet config files
             cmd = [
-                f"~/cometbft testnet --v {len(hosts)} --config ~/geodec/rundata/cometbft-config.toml"
+                f"~/cometbft testnet --v {len(node_hosts)} --config ~/geodec/rundata/cometbft-config.toml"
             ]  # NOTE custom configuration
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
 
@@ -178,8 +211,8 @@ class Bench:
             subprocess.run(cmd, shell=True)
 
             # Upload configuration files.
-            progress = progress_bar(hosts, prefix="Uploading config files:")
-            for i, host in enumerate(hosts):
+            progress = progress_bar(node_hosts, prefix="Uploading config files:")
+            for i, host in enumerate(node_hosts):
                 try:
                     cmd = f"scp -o StrictHostKeyChecking=no -i {self.settings.key_path} -r ~/geodec/mytestnet/node{i} ubuntu@{host}:~/"
                     subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
@@ -197,7 +230,7 @@ class Bench:
 
             # Generate configuration files.
             keys = []
-            key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
+            key_files = [PathMaker.key_file(i) for i in range(len(node_hosts))]
             for filename in key_files:
                 cmd = CommandMaker.generate_key(filename, self.mechanism.name).split()
                 subprocess.run(cmd, check=True)
@@ -206,16 +239,16 @@ class Bench:
             names = [x.name for x in keys]
 
             if self.mechanism.name == "hotstuff":
-                consensus_addr = [f'{x}:{self.settings.ports["consensus"]}' for x in hosts]
-                front_addr = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-                mempool_addr = [f'{x}:{self.settings.ports["mempool"]}' for x in hosts]
+                consensus_addr = [f'{x}:{self.settings.ports["consensus"]}' for x in node_hosts]
+                front_addr = [f'{x}:{self.settings.ports["front"]}' for x in node_hosts]
+                mempool_addr = [f'{x}:{self.settings.ports["mempool"]}' for x in node_hosts]
                 committee = Committee(names, consensus_addr, front_addr, mempool_addr)
             elif self.mechanism.name == "bullshark":
                 if bench_parameters.collocate:
                     workers = bench_parameters.workers
-                    addresses = OrderedDict((x, [y] * (workers + 1)) for x, y in zip(names, hosts))
+                    addresses = OrderedDict((x, [y] * (workers + 1)) for x, y in zip(names, node_hosts))
                 else:
-                    addresses = OrderedDict((x, y) for x, y in zip(names, hosts))
+                    addresses = OrderedDict((x, y) for x, y in zip(names, node_hosts))
                 committee = BullsharkCommittee(addresses, self.settings.ports["base"])
 
             committee.print(PathMaker.committee_file())
@@ -225,15 +258,20 @@ class Bench:
             set_weight(self.mechanism.name, self.settings.geo_input)
 
             cmd = f"{CommandMaker.cleanup()} || true"
-            g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
+            g = Group(*node_hosts, user=self.settings.key_name, connect_kwargs=self.connect)
             g.run(cmd, hide=True)
 
-            # NOTE Upload configuration files.
-            progress = progress_bar(hosts, prefix="Uploading config files:")
-            for i, host in enumerate(progress):
+            # NOTE Upload configuration files only to node hosts
+            unique_node_hosts = list(set(node_hosts))  # or keep them repeated if simpler
+            progress = progress_bar(unique_node_hosts, prefix="Uploading config files:")
+            for host in progress:
                 c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.put(PathMaker.committee_file(), ".")
-                c.put(PathMaker.key_file(i), ".")
+                # Node i's key file is unique,
+                # for each i where node_hosts[i] == host, upload key file.
+                for i, h in enumerate(node_hosts):
+                    if h == host:
+                        c.put(PathMaker.key_file(i), ".")
                 c.put(PathMaker.parameters_file(), ".")
 
             return committee
