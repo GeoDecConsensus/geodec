@@ -28,6 +28,9 @@ class CommandMaker:
             return f"./node keys --filename {filename}"
         elif mechanism == "bullshark":
             return f"./node generate_keys --filename {filename}"
+        # mysticeti keypairs are generated via the benchmark-genesis command; skip here
+        else:
+            return ""
 
     @staticmethod
     def run_node(keys, committee, store, parameters, mechanism, debug=False):
@@ -107,6 +110,6 @@ class CommandMaker:
         elif mechanism == "bullshark":
             node, client = join(origin, "node"), join(origin, "benchmark_client")
         elif mechanism == "mysticeti":
-            node, client = join(origin, "mysticeti"), join(origin, "mysticeti")
+            node, client = join(origin, "mysticeti"), join(origin, "client")
 
         return f"rm node ; rm client ; ln -s {node} node ; ln -s {client} client"

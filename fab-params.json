@@ -66,6 +66,29 @@
                 "batch_size": 120000,
                 "max_batch_delay": 500
             }
+        },
+        "mysticeti": {
+            "bench_params": {
+                "faults": 0,
+                "nodes": [4],
+                "rate": [1000],
+                "tx_size": 512,
+                "duration": 20,
+                "runs": 3
+            },
+            "node_params": {
+                "consensus": {
+                    "timeout_delay": 2000,
+                    "sync_retry_delay": 5000
+                },
+                "mempool": {
+                    "gc_depth": 50,
+                    "sync_retry_delay": 5000,
+                    "sync_retry_nodes": 3,
+                    "batch_size": 100000,
+                    "max_batch_delay": 500
+                }
+            }
         }
     }
 }
