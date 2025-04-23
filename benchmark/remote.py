@@ -32,6 +32,7 @@ from benchmark.mechanisms.bullshark import (
 )
 from benchmark.mechanisms.cometbft import CometBftMechanism
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
+from benchmark.mechanisms.mysticeti import MysticetiMechanism
 from benchmark.utils import BenchError, PathMaker, Print, progress_bar, set_weight
 
 # import pandas as pd
@@ -65,6 +66,8 @@ class Bench:
             self.mechanism = HotStuffMechanism(self.settings)
         elif mechanism == "bullshark":
             self.mechanism = BullsharkMechanism(self.settings)
+        elif mechanism == "mysticeti":
+            self.mechanism = MysticetiMechanism(self.settings)
 
         try:
             ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(self.manager.settings.key_path)
@@ -186,7 +189,7 @@ class Bench:
                 except Exception as e:
                     Print.error(f"Failed to SCP config files to {host}: {e}")
 
-        else:
+        elif self.mechanism.name == "hotstuff" or self.mechanism.name == "bullshark":
             # Recompile the latest code.
             cmd = CommandMaker.compile().split()
             subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
