@@ -18,8 +18,9 @@ class GeoDec:
             for row in csv_reader:
                 if row['id']:  # Ensure id is not empty
                     geo_input[int(row['id'])] = 1
-                if row['count'] and row['id']:
-                    geo_input[int(row['id'])] = int(row['count'])
+                # try:
+                #     if row['count'] and row['id']:
+                #         geo_input[int(row['id'])] = int(row['count'])
         return geo_input
        
     def _getServers(geoInput, servers_file):
@@ -105,12 +106,35 @@ class GeoDec:
 
     @staticmethod
     def getPingDelay(geoInput, pings_grouped_file, pings_file):
+        # Check if the grouped file exists, if not, create it by aggregating
         if not os.path.exists(pings_grouped_file):
             GeoDec._aggregatePingDelays(pings_file, pings_grouped_file)
+        
+        # Read the CSV file with ping delays
         pingsDelays = pd.read_csv(pings_grouped_file)
-        id = list(geoInput.keys())
-        pingsDelays = pingsDelays[pingsDelays.source.isin(id) & pingsDelays.destination.isin(id)].query('source != destination')
-        return pingsDelays
+        
+        # Extract the IDs from geoInput
+        id_list = list(geoInput.keys())
+        
+        # Filter the data for only the source and destination within the geoInput, excluding same source-destination pairs
+        pingsDelays_filtered = pingsDelays[pingsDelays.source.isin(id_list) & pingsDelays.destination.isin(id_list)].query('source != destination')
+        
+        # Find missing combinations
+        all_combinations = [(source, destination) for source in id_list for destination in id_list if source != destination]
+        existing_combinations = list(zip(pingsDelays_filtered['source'], pingsDelays_filtered['destination']))
+        
+        missing_combinations = [pair for pair in all_combinations if pair not in existing_combinations]
+        
+        # Print the ping delays that were not found
+        if missing_combinations:
+            print("The following ping delays were not found:")
+            for source, destination in missing_combinations:
+                print(f"Source: {source}, Destination: {destination}")
+        else:
+            print("All ping delays were found.")
+
+        # Return the filtered pingsDelays dataframe
+        return pingsDelays_filtered
    
     def _check_if_quorum(dist_matrix, server, target, quorum_threshold):
         distance = dist_matrix[target][server]

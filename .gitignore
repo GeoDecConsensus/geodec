@@ -146,3 +146,4 @@ mytestnet/
 frontend/node_modules
 
 .*.json
+.cursorrules
