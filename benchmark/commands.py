@@ -80,9 +80,11 @@ class CommandMaker:
             nodes = f'--nodes {" ".join(nodes)}' if nodes else ""
             return f"./client {address} --size {size} " f"--rate {rate} --timeout {timeout} {nodes}"
         elif mechanism == "cometbft":
+            # use provided address as endpoint
+            endpoints = f"ws://{address}/websocket"
             return (
                 f"./client -c 1 --size {size} --rate {rate} --time {timeout}"
-                f" --endpoints ws://localhost:26657/websocket -v --broadcast-tx-method sync --expect-peers {int(len(nodes)/2)} --min-peer-connectivity {int(round(len(nodes)/2))}"
+                f" --endpoints {endpoints} -v --broadcast-tx-method sync --expect-peers {int(len(nodes)/2)} --min-peer-connectivity {int(round(len(nodes)/2))}"
             )
             # f' --endpoints ws://localhost:26657/websocket -v --expect-peers {len(nodes)-1} --min-peer-connectivity {len(nodes)-1}')
         elif mechanism == "bullshark":
