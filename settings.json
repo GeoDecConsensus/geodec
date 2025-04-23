@@ -111,6 +111,42 @@
                 "provider": "google_compute_engine",
                 "ip_file": "/home/ubuntu/geodec/rundata/ip_file.csv"
             }
+        },
+        "mysticeti": {
+            "testbed": "mysticeti",
+            "key": {
+                "name": "ubuntu",
+                "path": "/home/ubuntu/.ssh/geodec"
+            },
+            "ports": {
+                "base": 5000
+            },
+            "repo": {
+                "name": "mysticeti",
+                "url": "https://github.com/GeoDecConsensus/mysticeti",
+                "branch": "geodec"
+            },
+            "geodec": {
+                "interface": "ens3",
+                "geo_input": "/home/ubuntu/geodec/rundata/aptos.csv",
+                "servers_file": "/home/ubuntu/geodec/frontend/public/servers.csv",
+                "pings_grouped_file": "/home/ubuntu/geodec/rundata/ping_grouped.csv",
+                "pings_file": "/home/ubuntu/geodec/rundata/pings.csv"
+            },
+            "instances": {
+                "type": "m5d.8xlarge",
+                "regions": [
+                    "us-east-1",
+                    "eu-north-1",
+                    "ap-southeast-2",
+                    "us-west-1",
+                    "ap-northeast-1"
+                ]
+            },
+            "configuration": {
+                "provider": "google_compute_engine",
+                "ip_file": "/home/ubuntu/geodec/rundata/ip_file.csv"
+            }
         }
     }
 }

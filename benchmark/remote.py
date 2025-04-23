@@ -32,6 +32,7 @@ from benchmark.mechanisms.bullshark import (
 )
 from benchmark.mechanisms.cometbft import CometBftMechanism
 from benchmark.mechanisms.hotstuff import HotStuffMechanism
+from benchmark.mechanisms.mysticeti import MysticetiMechanism
 from benchmark.utils import BenchError, PathMaker, Print, progress_bar, set_weight
 
 # import pandas as pd
@@ -52,7 +53,7 @@ class ExecutionError(Exception):
 
 class Bench:
     def __init__(self, ctx, mechanism):
-        consensusMechanisms = ["cometbft", "hotstuff", "bullshark"]
+        consensusMechanisms = ["cometbft", "hotstuff", "bullshark", "mysticeti"]
         if mechanism not in consensusMechanisms:
             raise BenchError("Consensus mechanism support not available", e)
 
@@ -65,6 +66,8 @@ class Bench:
             self.mechanism = HotStuffMechanism(self.settings)
         elif mechanism == "bullshark":
             self.mechanism = BullsharkMechanism(self.settings)
+        elif mechanism == "mysticeti":
+            self.mechanism = MysticetiMechanism(self.settings)
 
         try:
             ctx.connect_kwargs.pkey = RSAKey.from_private_key_file(self.manager.settings.key_path)
@@ -186,57 +189,74 @@ class Bench:
                 except Exception as e:
                     Print.error(f"Failed to SCP config files to {host}: {e}")
 
-        else:
-            # Recompile the latest code.
-            cmd = CommandMaker.compile().split()
-            subprocess.run(cmd, check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name))
+        elif self.mechanism.name in ("hotstuff", "bullshark"):
+            # Recompile the latest code and alias binaries
+            subprocess.run(
+                CommandMaker.compile().split(), check=True, cwd=PathMaker.node_crate_path(self.settings.repo_name)
+            )
+            subprocess.run(
+                [CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name), self.mechanism.name)],
+                shell=True,
+                check=True,
+            )
 
-            # Create alias for the client and nodes binary.
-            cmd = CommandMaker.alias_binaries(PathMaker.binary_path(self.settings.repo_name), self.mechanism.name)
-            subprocess.run([cmd], shell=True)
-
-            # Generate configuration files.
+            # Generate keys and build committee
             keys = []
             key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
             for filename in key_files:
-                cmd = CommandMaker.generate_key(filename, self.mechanism.name).split()
-                subprocess.run(cmd, check=True)
-                keys += [Key.from_file(filename)]
-
-            names = [x.name for x in keys]
-
+                subprocess.run(CommandMaker.generate_key(filename, self.mechanism.name).split(), check=True)
+                keys.append(Key.from_file(filename))
+            names = [k.name for k in keys]
             if self.mechanism.name == "hotstuff":
-                consensus_addr = [f'{x}:{self.settings.ports["consensus"]}' for x in hosts]
-                front_addr = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-                mempool_addr = [f'{x}:{self.settings.ports["mempool"]}' for x in hosts]
+                consensus_addr = [f'{h}:{self.settings.ports["consensus"]}' for h in hosts]
+                front_addr = [f'{h}:{self.settings.ports["front"]}' for h in hosts]
+                mempool_addr = [f'{h}:{self.settings.ports["mempool"]}' for h in hosts]
                 committee = Committee(names, consensus_addr, front_addr, mempool_addr)
-            elif self.mechanism.name == "bullshark":
+            else:
+                # bullshark
                 if bench_parameters.collocate:
                     workers = bench_parameters.workers
-                    addresses = OrderedDict((x, [y] * (workers + 1)) for x, y in zip(names, hosts))
+                    addresses = OrderedDict((n, [h] * (workers + 1)) for n, h in zip(names, hosts))
                 else:
-                    addresses = OrderedDict((x, y) for x, y in zip(names, hosts))
+                    addresses = OrderedDict((n, h) for n, h in zip(names, hosts))
                 committee = BullsharkCommittee(addresses, self.settings.ports["base"])
 
+            # Write committee and parameters
             committee.print(PathMaker.committee_file())
             node_parameters.print(PathMaker.parameters_file())
-
-            # Always update stake weights from geo_input for voting power
             set_weight(self.mechanism.name, self.settings.geo_input)
 
+            # Upload files
             cmd = f"{CommandMaker.cleanup()} || true"
-            g = Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect)
-            g.run(cmd, hide=True)
-
-            # NOTE Upload configuration files.
-            progress = progress_bar(hosts, prefix="Uploading config files:")
-            for i, host in enumerate(progress):
-                c = Connection(host, user=self.settings.key_name, connect_kwargs=self.connect)
+            Group(*hosts, user=self.settings.key_name, connect_kwargs=self.connect).run(cmd, hide=True)
+            for i, h in enumerate(progress_bar(hosts, prefix="Uploading config files:")):
+                c = Connection(h, user=self.settings.key_name, connect_kwargs=self.connect)
                 c.put(PathMaker.committee_file(), ".")
                 c.put(PathMaker.key_file(i), ".")
                 c.put(PathMaker.parameters_file(), ".")
-
             return committee
+
+        # Configuration template for mysticeti
+        elif self.mechanism.name == "mysticeti":
+            # Generate genesis & configs with mysticeti CLI
+            hosts_list = " ".join(hosts)
+            subprocess.run(
+                [
+                    f"./node benchmark-genesis --ips {hosts_list}"
+                    f" --working-directory genesis"
+                    f" --node-parameters-path {PathMaker.parameters_file()}"
+                ],
+                shell=True,
+                check=True,
+            )
+            # Upload generated configs
+            for i, h in enumerate(progress_bar(hosts, prefix="Uploading mysticeti configs:")):
+                c = Connection(h, user=self.settings.key_name, connect_kwargs=self.connect)
+                c.put("genesis/committee.yaml", "committee.yaml")
+                c.put("genesis/public-config.yaml", "public-config.yaml")
+                c.put(f"genesis/private-config-{i}.yaml", f"private-config-{i}.yaml")
+            # No Committee object used
+            return None
 
     def _run_single(self, hosts, rate, bench_parameters, node_parameters, debug=False, committee=[]):
         Print.info("Booting testbed...")
@@ -365,6 +385,39 @@ class Bench:
                     )
                     log_file = PathMaker.worker_log_file(i, id)
                     self._background_run(host, cmd, log_file)
+
+        elif self.mechanism.name == "mysticeti":
+            # Boot clients for mysticeti
+            Print.info("Booting clients... (mysticeti)")
+            addresses = [f'{x}:{self.settings.ports["base"]}' for x in hosts]
+            rate_share = ceil(rate / len(hosts))
+            client_logs = [PathMaker.client_log_file(i) for i in range(len(hosts))]
+            for host, addr, log_file in zip(hosts, addresses, client_logs):
+                cmd = CommandMaker.run_client(
+                    addr,
+                    bench_parameters.tx_size,
+                    rate_share,
+                    self.mechanism.name,
+                    bench_parameters.duration,
+                    nodes=addresses,
+                )
+                self._background_run(host, cmd, log_file)
+
+            # Boot nodes for mysticeti
+            Print.info("Booting nodes... (mysticeti)")
+            key_files = [PathMaker.key_file(i) for i in range(len(hosts))]
+            dbs = [PathMaker.db_path(i) for i in range(len(hosts))]
+            node_logs = [PathMaker.node_log_file(i) for i in range(len(hosts))]
+            for host, key_file, db, log_file in zip(hosts, key_files, dbs, node_logs):
+                cmd = CommandMaker.run_node(
+                    key_file,
+                    PathMaker.committee_file(),
+                    db,
+                    PathMaker.parameters_file(),
+                    debug=debug,
+                    mechanism=self.mechanism.name,
+                )
+                self._background_run(host, cmd, log_file)
 
         # Wait for all transactions to be processed.
         duration = bench_parameters.duration

@@ -28,6 +28,9 @@ class CommandMaker:
             return f"./node keys --filename {filename}"
         elif mechanism == "bullshark":
             return f"./node generate_keys --filename {filename}"
+        # mysticeti keypairs are generated via the benchmark-genesis command; skip here
+        else:
+            return ""
 
     @staticmethod
     def run_node(keys, committee, store, parameters, mechanism, debug=False):
@@ -44,6 +47,8 @@ class CommandMaker:
                 f'~/cometbft/build/cometbft node --home ~/node i --p2p.persistent_peers="{persistent_peers}" '
                 f"--proxy_app=kvstore --consensus.create_empty_blocks=true"
             )
+        elif mechanism == "mysticeti":
+            return f"./node {v} run --keys {keys} --committee {committee} " f"--store {store} --parameters {parameters}"
 
     @staticmethod
     def run_primary(keys, committee, store, parameters, debug=False):
@@ -88,6 +93,8 @@ class CommandMaker:
         elif mechanism == "bullshark":
             nodes = f'--nodes {" ".join(nodes)}' if nodes else ""
             return f"./client {address} --size {size} --rate {rate} {nodes}"
+        elif mechanism == "mysticeti":
+            return f"./client {address} --size {size} --rate {rate} {nodes}"
 
     @staticmethod
     def kill():
@@ -102,4 +109,7 @@ class CommandMaker:
             node, client = "./cometbft/build/cometbft", "./cometbft/test/loadtime/build/load"
         elif mechanism == "bullshark":
             node, client = join(origin, "node"), join(origin, "benchmark_client")
+        elif mechanism == "mysticeti":
+            node, client = join(origin, "mysticeti"), join(origin, "client")
+
         return f"rm node ; rm client ; ln -s {node} node ; ln -s {client} client"
