@@ -425,10 +425,67 @@ def update_batch_size(json_file_path, mechanism_name, new_batch_size):
     except Exception as e:
         print(f"An error occurred: {e}")
 
+# def update_parameters(json_file_path, mechanism_name, new_tx_size=None, new_rate=None, new_batch_size=None):
+#     try:
+#         with open(json_file_path, "r") as file:
+#             data = json.load(file)
+
+#         if mechanism_name in data["remote"]:
+#             # Update tx_size
+#             if new_tx_size is not None:
+#                 data["remote"][mechanism_name]["bench_params"]["tx_size"] = new_tx_size
+            
+#             # Update rate
+#             if new_rate is not None:
+#                 if isinstance(new_rate, list):
+#                     data["remote"][mechanism_name]["bench_params"]["rate"] = new_rate
+#                 else:
+#                     data["remote"][mechanism_name]["bench_params"]["rate"] = [new_rate]
+            
+#             # Update batch_size
+#             if new_batch_size is not None:
+#                 if mechanism_name == "hotstuff":
+#                     data["remote"][mechanism_name]["node_params"]["mempool"]["batch_size"] = new_batch_size
+#                 elif mechanism_name == "bullshark" or mechanism_name == "cometbft":
+#                     data["remote"][mechanism_name]["node_params"]["batch_size"] = new_batch_size
+
+#             with open(json_file_path, "w") as file:
+#                 json.dump(data, file, indent=4)
+#             print(f"Parameters for {mechanism_name} updated successfully.")
+#         else:
+#             print(f"Mechanism {mechanism_name} not found in the JSON file.")
+
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+
+# def update_batch_size_relative(json_file_path, mechanism_name, relative_tx_rate):
+#     try:
+#         with open(json_file_path, "r") as file:
+#             data = json.load(file)
+
+#         if mechanism_name in data["remote"]:
+#             if mechanism_name == "hotstuff":
+#                 tx_rate = data["remote"][mechanism_name]["bench_params"]["rate"][0]
+#                 tx_size = data["remote"][mechanism_name]["bench_params"]["tx_size"]
+#                 data["remote"][mechanism_name]["node_params"]["mempool"]["batch_size"] = int(tx_size) * (int(tx_rate) + int(relative_tx_rate))
+#             elif mechanism_name == "bullshark":
+#                 data["remote"][mechanism_name]["node_params"]["batch_size"] = relative_tx_rate
+#             with open(json_file_path, "w") as file:
+#                 json.dump(data, file, indent=4)
+#             print(f"Batch count for {mechanism_name} updated to {tx_rate + relative_tx_rate}.")
+#         else:
+#             print(f"Mechanism {mechanism_name} not found in the JSON file.")
+
+#     except Exception as e:
+#         print(f"An error occurred: {e}")
+
 
 if __name__ == "__main__":
 
-    batch_sizes = [512, 1024, 10000, 20000, 50000, 80000, 100000, 200000, 300000]
+    # batch_sizes = [512, 1024, 10000, 20000, 50000, 80000, 100000, 200000, 300000]
+    batch_sizes = [1000, 5000, 10000, 100000, 1000000, 5000000, 7500000, 10000000, 12500000, 15000000]
+    # batch_sizes = [-100, 100, -10, 0, 10, 20, 30, 40, 50, 70]
+    
     mechanism = ["hotstuff"]
 
     print("Starting benchmarking tool")

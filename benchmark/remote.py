@@ -249,7 +249,7 @@ class Bench:
             # for the faulty nodes to be online).
             committee = Committee.load(PathMaker.committee_file())
             addresses = [f'{x}:{self.settings.ports["front"]}' for x in hosts]
-            rate_share = ceil(rate / committee.size())  # Take faults into account.
+            rate_share = ceil(rate / (committee.size() * 2))  # Take faults into account.
             timeout = node_parameters.timeout_delay
 
             # Updated client logs for two clients per node
